@@ -1,0 +1,120 @@
+<%= turbo_frame_tag "modal" do %>
+  <div class="modal modal-open">
+    <div class="modal-box max-w-2xl">
+      <h2 class="font-bold text-xl mb-6"><%= @user_paint.persisted? ? "Edit Paint in Collection" : "Add Paint to Your Collection" %></h2>
+
+      <%= form_with(model: @user_paint, data: { controller: "cascading-select color-preview", cascading_select_brand_id_value: @user_paint.paint&.product_line&.brand_id, cascading_select_product_line_id_value: @user_paint.paint&.product_line_id, cascading_select_paint_id_value: @user_paint.paint_id }) do |form| %>
+        <% if @user_paint.errors.any? %>
+          <div class="alert alert-error mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <div>
+              <h3 class="font-bold">Please fix the following errors:</h3>
+              <ul class="mt-1 list-disc list-inside">
+                <% @user_paint.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Brand</span>
+          </label>
+          <select id="brand_id"
+                  class="select select-bordered w-full"
+                  data-cascading-select-target="brandSelect"
+                  data-action="change->cascading-select#brandChanged">
+            <option value="">Select a brand</option>
+            <% @brands.each do |brand| %>
+              <option value="<%= brand.id %>" <%= 'selected' if @user_paint.paint&.product_line&.brand_id == brand.id %>><%= brand.name %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Product Line</span>
+          </label>
+          <select id="product_line_id"
+                  class="select select-bordered w-full"
+                  data-cascading-select-target="productLineSelect"
+                  data-action="change->cascading-select#productLineChanged"
+                  <%= 'disabled' unless @user_paint.paint&.product_line_id %>>
+            <option value="">Select a product line</option>
+            <% @product_lines.each do |product_line| %>
+              <option value="<%= product_line.id %>" <%= 'selected' if @user_paint.paint&.product_line_id == product_line.id %>><%= product_line.name %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <div class="form-control mb-6">
+          <label class="label">
+            <span class="label-text">Paint</span>
+          </label>
+          <select id="user_paint_paint_id"
+                  name="user_paint[paint_id]"
+                  class="select select-bordered w-full"
+                  data-cascading-select-target="paintSelect"
+                  data-action="change->color-preview#updatePreview"
+                  <%= 'disabled' unless @user_paint.paint_id || @user_paint.paint&.product_line_id %>
+                  required>
+            <option value="">Select a paint</option>
+            <% @paints.each do |paint| %>
+              <option value="<%= paint.id %>" data-color="<%= paint.hex_color %>" <%= 'selected' if @user_paint.paint_id == paint.id %>><%= paint.name %> (<%= paint.code %>)</option>
+            <% end %>
+          </select>
+        </div>
+
+        <div class="flex items-center space-x-4 mb-6" data-color-preview-target="previewContainer">
+          <div class="w-12 h-12 rounded-full border shadow-sm" data-color-preview-target="colorSwatch"></div>
+          <div data-color-preview-target="colorCode"></div>
+        </div>
+
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Status</span>
+          </label>
+          <select name="user_paint[status]" class="select select-bordered w-full" required>
+            <option value="owned" <%= 'selected' if @user_paint.status == 'owned' %>>Owned</option>
+            <option value="wishlist" <%= 'selected' if @user_paint.status == 'wishlist' %>>Wishlist</option>
+            <option value="avoid" <%= 'selected' if @user_paint.status == 'avoid' %>>Avoid</option>
+          </select>
+        </div>
+
+        <div class="form-control mb-4">
+          <label class="label">
+            <span class="label-text">Notes</span>
+          </label>
+          <%= form.text_area :notes, rows: 3, class: "textarea textarea-bordered" %>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" data-controller="purchase-fields">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Purchase Date</span>
+            </label>
+            <%= form.date_field :purchase_date, class: "input input-bordered" %>
+          </div>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Purchase Price</span>
+            </label>
+            <div class="input-group">
+              <span>$</span>
+              <%= form.number_field :purchase_price, step: 0.01, min: 0, class: "input input-bordered w-full" %>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-action">
+          <button type="button" class="btn btn-ghost" onclick="this.closest('.modal').classList.remove('modal-open')">Cancel</button>
+          <%= form.submit @user_paint.persisted? ? "Edit paint" : "Add to Collection", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="modal-backdrop" onclick="this.closest('.modal').classList.remove('modal-open')"></div>
+  </div>
+<% end %>

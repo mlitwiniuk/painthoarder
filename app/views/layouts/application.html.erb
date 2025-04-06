@@ -15,9 +15,12 @@
           </div>
 
           <!-- Navigation Links -->
-          <div class="flex items-center gap-2">
+          <div class="flex grow justify-between gap-2">
             <% if user_signed_in? %>
-              <%= link_to "Dashboard", user_root_path, class: "btn btn-ghost" %>
+              <div class="flex flex-row gap-2">
+                <%= link_to "Dashboard", user_root_path, class: "btn btn-ghost" %>
+                <%= link_to "My paints", user_paints_path, class: "btn btn-ghost" %>
+              </div>
               <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
                   <div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
@@ -32,8 +35,11 @@
                 </ul>
               </div>
             <% else %>
+            <div></div>
+            <div>
               <%= link_to "Login", new_user_session_path, class: "btn btn-ghost" %>
               <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-primary" %>
+            </div>
             <% end %>
             <div title="Change Theme" class="absolute top-2 right-2">
               <label for="my-drawer" class="btn btn-square btn-ghost drawer-button text-primary">

@@ -1,0 +1,31 @@
+<!-- First, append the new paint items to the grid container -->
+<%= turbo_stream.append "similar-paints-#{@similar_type}" do %>
+  <% if @similar_paints.any? %>
+    <% @similar_paints.each do |user_paint| %>
+      <div class="similar-paint-item">
+        <%= render "similar_paint_card", user_paint: user_paint %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+
+<!-- Then, update the turbo_frame with a new load more button or "no more" message -->
+<%= turbo_stream.update "similar-paints-frame" do %>
+  <% if @similar_paints.any? && @similar_paints.size == @per_page %>
+    <!-- Show load more button if we have a full page of results -->
+    <div id="load-more-<%= @similar_type %>" class="text-center py-6">
+      <%= link_to user_paint_path(@user_paint, page: @page + 1, similar_type: @similar_type, format: :turbo_stream),
+                  class: "btn btn-outline" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+        Load more
+      <% end %>
+    </div>
+  <% else %>
+    <!-- No more paints to load -->
+    <div id="load-more-<%= @similar_type %>" class="text-center py-4">
+      <p class="text-base-content/60">No more paints to load</p>
+    </div>
+  <% end %>
+<% end %>
