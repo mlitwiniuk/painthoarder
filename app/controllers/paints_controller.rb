@@ -33,7 +33,7 @@ class PaintsController < ApplicationController
   def show
     # Check if the user already has this paint in their collection
     @user_paint = current_user.user_paints.find_by(paint_id: @paint.id)
-    
+
     # For paint collection options
     @new_user_paint = @user_paint || UserPaint.new(paint: @paint)
 
@@ -63,6 +63,21 @@ class PaintsController < ApplicationController
     @similar_type = params[:similar_type] || "rgb"
     @source_paint = Paint.find(params[:id])
 
+    # Parse brand_ids if provided in params
+    if params[:brand_ids].present?
+      @brand_ids = params[:brand_ids].split(",")
+      # Save to user preferences if user is logged in
+      current_user.similar_paint_brand_ids = @brand_ids if user_signed_in?
+    elsif user_signed_in?
+      # Use user's stored preferences
+      @brand_ids = current_user.similar_paint_brand_ids
+    else
+      @brand_ids = nil
+    end
+
+    # Get all brands for the filter
+    @brands = Brand.order(:name)
+
     # For user_provided similarity (paints from same brand)
     if @similar_type == "user"
       # Get the brand information
@@ -80,10 +95,10 @@ class PaintsController < ApplicationController
       @similar_paints = map_paints_to_user_paints(paints)
     # For RGB similarity
     elsif @similar_type == "rgb"
-      @similar_paints = find_rgb_similar_paints(@page, @per_page)
+      @similar_paints = find_rgb_similar_paints(@page, @per_page, @brand_ids)
     # For HSL similarity
     else # "hsl"
-      @similar_paints = find_hsl_similar_paints(@page, @per_page)
+      @similar_paints = find_hsl_similar_paints(@page, @per_page, @brand_ids)
     end
 
     respond_to do |format|
@@ -102,7 +117,7 @@ class PaintsController < ApplicationController
     # Brand filter
     if params[:q] && params[:q][:product_line_brand_id_eq].present?
       query = query.joins(product_line: :brand)
-                   .where(product_lines: { brand_id: params[:q][:product_line_brand_id_eq] })
+        .where(product_lines: { brand_id: params[:q][:product_line_brand_id_eq] })
     end
 
     # Product line filter
@@ -145,7 +160,7 @@ class PaintsController < ApplicationController
     end
   end
 
-  def find_rgb_similar_paints(page, per_page)
+  def find_rgb_similar_paints(page, per_page, brand_ids = nil)
     # Skip the current paint in the results
     paint = @paint || @source_paint # Use whichever is available
     paint_id = paint.id
@@ -161,7 +176,14 @@ class PaintsController < ApplicationController
               POWER(paints.green - #{green}, 2) +
               POWER(paints.blue - #{blue}, 2)) AS color_distance")
       .includes(product_line: :brand)
-      .order("color_distance ASC")
+
+    # Apply brand filter if provided
+    if brand_ids.present?
+      paints = paints.joins(product_line: :brand)
+        .where(product_lines: { brand_id: brand_ids })
+    end
+
+    paints = paints.order("color_distance ASC")
       .limit(per_page)
       .offset((page - 1) * per_page)
 
@@ -169,7 +191,7 @@ class PaintsController < ApplicationController
     map_paints_to_user_paints(paints)
   end
 
-  def find_hsl_similar_paints(page, per_page)
+  def find_hsl_similar_paints(page, per_page, brand_ids = nil)
     # Skip the current paint in the results
     paint = @paint || @source_paint # Use whichever is available
     paint_id = paint.id
@@ -188,7 +210,14 @@ class PaintsController < ApplicationController
               ABS(paints.green - #{green}) +
               ABS(paints.blue - #{blue})) AS color_distance")
       .includes(product_line: :brand)
-      .order("color_distance ASC")
+
+    # Apply brand filter if provided
+    if brand_ids.present?
+      paints = paints.joins(product_line: :brand)
+        .where(product_lines: { brand_id: brand_ids })
+    end
+
+    paints = paints.order("color_distance ASC")
       .limit(per_page)
       .offset((page - 1) * per_page)
 
@@ -226,7 +255,7 @@ class PaintsController < ApplicationController
       .offset((page - 1) * per_page)
   end
 
-  def find_rgb_similar_paints_for(paint, page, per_page)
+  def find_rgb_similar_paints_for(paint, page, per_page, brand_ids = nil)
     return [] unless paint
     paint_id = paint.id
 
@@ -236,17 +265,24 @@ class PaintsController < ApplicationController
     blue = paint.blue
 
     # Calculate Euclidean distance in RGB space
-    Paint.where.not(id: paint_id)
+    paints = Paint.where.not(id: paint_id)
       .select("paints.*, SQRT(POWER(paints.red - #{red}, 2) +
               POWER(paints.green - #{green}, 2) +
               POWER(paints.blue - #{blue}, 2)) AS color_distance")
       .includes(product_line: :brand)
-      .order("color_distance ASC")
+
+    # Apply brand filter if provided
+    if brand_ids.present?
+      paints = paints.joins(product_line: :brand)
+        .where(product_lines: { brand_id: brand_ids })
+    end
+
+    paints.order("color_distance ASC")
       .limit(per_page)
       .offset((page - 1) * per_page)
   end
 
-  def find_hsl_similar_paints_for(paint, page, per_page)
+  def find_hsl_similar_paints_for(paint, page, per_page, brand_ids = nil)
     return [] unless paint
     paint_id = paint.id
 
@@ -258,13 +294,20 @@ class PaintsController < ApplicationController
 
     # Calculate weighted distance that emphasizes color similarities that would be
     # perceptually similar in HSL space
-    Paint.where.not(id: paint_id)
+    paints = Paint.where.not(id: paint_id)
       .select("paints.*, (
               ABS(paints.red - #{red}) +
               ABS(paints.green - #{green}) +
               ABS(paints.blue - #{blue})) AS color_distance")
       .includes(product_line: :brand)
-      .order("color_distance ASC")
+
+    # Apply brand filter if provided
+    if brand_ids.present?
+      paints = paints.joins(product_line: :brand)
+        .where(product_lines: { brand_id: brand_ids })
+    end
+
+    paints.order("color_distance ASC")
       .limit(per_page)
       .offset((page - 1) * per_page)
   end

@@ -11,7 +11,10 @@
     </div>
     <% if @similar_paints.any? && @similar_paints.size == @per_page %>
       <div id="load-more-<%= @similar_type %>" class="text-center py-6">
-        <%= link_to similar_paint_path(@source_paint, page: @page + 1, similar_type: @similar_type, per_page: @per_page, format: :turbo_stream),
+        <% # Include brand_ids in the load more link if present %>
+        <% load_more_params = { page: @page + 1, similar_type: @similar_type, per_page: @per_page, format: :turbo_stream } %>
+        <% load_more_params[:brand_ids] = @brand_ids.join(',') if @brand_ids.present? %>
+        <%= link_to similar_paint_path(@source_paint, load_more_params),
                   class: "btn btn-outline" do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />

@@ -27,7 +27,8 @@ class PagesController < ApplicationController
     respond_with(@page)
   end
 
-  def edit; end
+  def edit
+  end
 
   def create
     @page = Page.new(page_params)

@@ -54,8 +54,20 @@
                       <div class="flex-1">
                         <div class="w-full bg-gray-200 rounded-full h-2.5">
                           <% percentage = (count.to_f / @owned_paints_count * 100).round %>
+                          <% color_map = {
+                               "Reds" => "#ff3b30",
+                               "Greens" => "#34c759",
+                               "Blues" => "#007bff",
+                               "Yellows" => "#ffcc00",
+                               "Purples" => "#af52de",
+                               "Cyans" => "#5ac8fa",
+                               "Whites" => "#f2f2f7",
+                               "Blacks" => "#1c1c1e",
+                               "Grays" => "#8e8e93",
+                               "Other" => "#ff9500"
+                             } %>
                           <div class="h-2.5 rounded-full"
-                               style="width: <%= percentage %>%; background-color: <%= category.downcase %>;">
+                               style="width: <%= percentage %>%; background-color: <%= color_map[category] || '#999999' %>;">
                           </div>
                         </div>
                       </div>
@@ -76,12 +88,12 @@
             <div class="divider"></div>
             <div data-controller="search">
               <div class="form-control">
-                <div class="input-group">
+                <div class="join w-full">
                   <input type="text" placeholder="Search paints..."
-                         class="input input-bordered w-full"
+                         class="input input-bordered join-item w-full"
                          data-search-target="input"
                          data-action="input->search#search">
-                  <button class="btn btn-square btn-primary">
+                  <button class="btn join-item btn-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
@@ -110,27 +122,7 @@
             <% if @wishlist_items.any? %>
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <% @wishlist_items.each do |user_paint| %>
-                  <div class="card bg-base-200 shadow-sm" id="<%= dom_id(user_paint) %>">
-                    <div class="card-body p-4">
-                      <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 rounded-full border" style="background-color: <%= user_paint.paint.hex_color %>;"></div>
-                        <div class="flex-1">
-                          <h3 class="font-bold"><%= user_paint.paint.name %></h3>
-                          <div class="text-xs opacity-70">
-                            <%= user_paint.paint.product_line.brand.name %> -
-                            <%= user_paint.paint.product_line.name %>
-                          </div>
-                        </div>
-                        <%= button_to user_paint_path(user_paint),
-                                  method: :patch,
-                                  params: { user_paint: { status: :owned }},
-                                  form: { data: { turbo_frame: "wishlist-items", turbo_confirm: "Mark as owned?" } },
-                                  class: "btn btn-xs btn-success" do %>
-                          Add to Collection
-                        <% end %>
-                      </div>
-                    </div>
-                  </div>
+                  <%= render "user_paints/collection_paint_card", user_paint: user_paint %>
                 <% end %>
               </div>
             <% else %>
@@ -150,38 +142,10 @@
           <%= turbo_frame_tag "avoid-list" do %>
             <% avoided_paints = current_user.user_paints.avoid.includes(paint: { product_line: :brand }) %>
             <% if avoided_paints.any? %>
-              <div class="overflow-x-auto">
-                <table class="table w-full">
-                  <thead>
-                    <tr>
-                      <th>Color</th>
-                      <th>Name</th>
-                      <th>Brand</th>
-                      <th>Notes</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <% avoided_paints.each do |user_paint| %>
-                      <tr id="<%= dom_id(user_paint) %>">
-                        <td>
-                          <div class="w-6 h-6 rounded-full border" style="background-color: <%= user_paint.paint.hex_color %>;"></div>
-                        </td>
-                        <td><%= user_paint.paint.name %></td>
-                        <td><%= user_paint.paint.product_line.brand.name %></td>
-                        <td><%= user_paint.notes %></td>
-                        <td>
-                          <%= button_to user_paint_path(user_paint),
-                                    method: :delete,
-                                    form: { data: { turbo_frame: "avoid-list", turbo_confirm: "Remove from avoid list?" } },
-                                    class: "btn btn-xs btn-error" do %>
-                            Remove
-                          <% end %>
-                        </td>
-                      </tr>
-                    <% end %>
-                  </tbody>
-                </table>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <% avoided_paints.each do |user_paint| %>
+                  <%= render "user_paints/collection_paint_card", user_paint: user_paint %>
+                <% end %>
               </div>
             <% else %>
               <p class="text-center py-4 text-base-content/70">You haven't marked any paints to avoid.</p>

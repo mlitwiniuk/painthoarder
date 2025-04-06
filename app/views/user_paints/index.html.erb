@@ -41,10 +41,10 @@
   <% end %>
 
   <%= turbo_frame_tag "collection-filters" do %>
-    <div class="card bg-base-100 shadow mb-6">
+    <div class="card bg-base-200 shadow mb-6">
       <div class="card-body p-4" data-controller="toggle">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <h2 class="card-title text-lg">
+          <h2 class="card-title text-lg" data-action="click->toggle#toggle">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
@@ -125,9 +125,13 @@
     </div>
   <% end %>
 
-  <div class="tabs tabs-boxed mb-6">
+  <div id="collection-counts" class="tabs tabs-boxed mb-6">
+    <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).merge(status: nil)),
+            class: "tab #{params[:status] == 'all' || params[:status].blank? ? 'tab-active' : ''}" do %>
+      All (<%= @all_count %>)
+    <% end %>
     <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).merge(status: :owned)),
-            class: "tab #{params[:status] == 'owned' || params[:status].blank? ? 'tab-active' : ''}" do %>
+            class: "tab #{params[:status] == 'owned' ? 'tab-active' : ''}" do %>
       Owned (<%= @owned_count %>)
     <% end %>
 
@@ -146,92 +150,7 @@
     <% if @user_paints.any? %>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <% @user_paints.each do |user_paint| %>
-          <div id="<%= dom_id(user_paint) %>" class="card bg-base-100 shadow hover:shadow-lg transition-shadow duration-300">
-            <div class="card-body p-4">
-              <%= link_to user_paint_path(user_paint), class: "flex items-center gap-3 mb-2", data: { turbo_frame: "_top" } do %>
-                <div class="w-10 h-10 rounded-full border shadow-sm flex-shrink-0"
-                     style="background-color: <%= user_paint.paint.hex_color %>;"></div>
-                <div>
-                  <h3 class="font-bold"><%= user_paint.paint.name %></h3>
-                  <div class="text-xs opacity-70">
-                    <%= user_paint.paint.product_line.brand.name %> •
-                    <%= user_paint.paint.product_line.name %>
-                  </div>
-                </div>
-              <% end %>
-
-              <div class="divider my-2"></div>
-
-              <div class="flex justify-between items-center">
-                <div>
-                  <% case user_paint.status %>
-                  <% when 'owned' %>
-                    <div class="badge badge-success gap-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                      Owned
-                    </div>
-                  <% when 'wishlist' %>
-                    <div class="badge badge-warning gap-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                      </svg>
-                      Wishlist
-                    </div>
-                  <% when 'avoid' %>
-                    <div class="badge badge-error gap-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                      </svg>
-                      Avoid
-                    </div>
-                  <% end %>
-
-                  <% if user_paint.purchase_date.present? %>
-                    <div class="badge badge-ghost badge-sm ml-1">
-                      <%= user_paint.purchase_date.strftime("%b %Y") %>
-                    </div>
-                  <% end %>
-                </div>
-
-                <div class="dropdown dropdown-end">
-                  <label tabindex="0" class="btn btn-ghost btn-circle btn-xs">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
-                    </svg>
-                  </label>
-                  <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-50">
-                    <li>
-                      <%= link_to user_paint_path(user_paint) do %>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                        View Details
-                      <% end %>
-                    </li>
-                    <li>
-                      <%= link_to edit_user_paint_path(user_paint), data: { turbo_frame: "modal" } do %>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                        Edit
-                      <% end %>
-                    </li>
-                    <!-- Status change options remain the same -->
-                  </ul>
-                </div>
-              </div>
-
-              <% if user_paint.notes.present? %>
-                <div class="mt-2">
-                  <div class="text-xs font-semibold opacity-70">Notes:</div>
-                  <p class="text-sm line-clamp-2"><%= user_paint.notes %></p>
-                </div>
-              <% end %>
-            </div>
-          </div>
+          <%= render 'user_paints/collection_paint_card', user_paint: user_paint %>
         <% end %>
       </div>
     <% else %>

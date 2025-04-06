@@ -27,6 +27,41 @@
   <% end %>
 <% end %>
 
+<%# Handle collection updates - if status changed, remove from current collection view %>
+<% if @previous_status.present? && @previous_status != @user_paint.status %>
+  <%= turbo_stream.remove dom_id(@user_paint) %>
+  
+  <%# Update the collection counts %>
+  <%= turbo_stream.replace "collection-counts" do %>
+    <div id="collection-counts">
+      <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).except(:status)),
+              class: "tab #{params[:status].blank? ? 'tab-active' : ''}" do %>
+        All (<%= current_user.user_paints.count %>)
+      <% end %>
+      
+      <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).merge(status: :owned)),
+              class: "tab #{params[:status] == 'owned' ? 'tab-active' : ''}" do %>
+        Owned (<%= current_user.user_paints.owned.count %>)
+      <% end %>
+      
+      <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).merge(status: :wishlist)),
+              class: "tab #{params[:status] == 'wishlist' ? 'tab-active' : ''}" do %>
+        Wishlist (<%= current_user.user_paints.wishlist.count %>)
+      <% end %>
+      
+      <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).merge(status: :avoid)),
+              class: "tab #{params[:status] == 'avoid' ? 'tab-active' : ''}" do %>
+        Avoid (<%= current_user.user_paints.avoid.count %>)
+      <% end %>
+    </div>
+  <% end %>
+<% else %>
+  <%# Update the paint in its current collection if status hasn't changed %>
+  <%= turbo_stream.replace dom_id(@user_paint) do %>
+    <%= render 'user_paints/collection_paint_card', user_paint: @user_paint %>
+  <% end %>
+<% end %>
+
 <%# Update any paint cards for this paint that might be on the page %>
 <%= turbo_stream.replace_all ".paint-card-#{@user_paint.paint_id}" do %>
   <%= render 'paints/paint_card', user_paint: @user_paint %>

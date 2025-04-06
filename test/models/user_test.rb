@@ -14,6 +14,7 @@
 #  last_sign_in_at        :datetime
 #  last_sign_in_ip        :string
 #  locked_at              :datetime
+#  preferences            :json
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
@@ -32,7 +33,6 @@
 #  index_users_on_unlock_token          (unlock_token) UNIQUE
 #  index_users_on_username              (username) UNIQUE
 #
-# test/models/user_test.rb
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase

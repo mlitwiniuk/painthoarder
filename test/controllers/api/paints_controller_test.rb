@@ -48,7 +48,8 @@ class Api::PaintsControllerTest < ActionDispatch::IntegrationTest
     assert_equal({
       "id" => @paint1.id,
       "text" => "Abaddon Black (AB01)",
-      "color" => "#808080"
+      "color" => "#808080",
+      "product_line_id" => @paint1.product_line_id
     }, response_data.find { |p| p["id"] == @paint1.id })
   end
 
