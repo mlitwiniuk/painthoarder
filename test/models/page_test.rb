@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: pages
+#
+#  id         :integer          not null, primary key
+#  content    :text
+#  prefrences :json
+#  published  :boolean          default(FALSE)
+#  status     :integer          default("draft"), not null
+#  title      :string
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
 require "test_helper"
 
 class PageTest < ActiveSupport::TestCase

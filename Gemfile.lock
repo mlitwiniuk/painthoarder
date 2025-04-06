@@ -1,3 +1,11 @@
+GIT
+  remote: https://github.com/mlitwiniuk/annotate_models.git
+  revision: 44a395a9243ef0f06e5e8e9d1b2cc6726da27626
+  specs:
+    annotate (3.2.0)
+      activerecord (>= 3.2, < 8.1.0)
+      rake (>= 10.4, < 14.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -431,6 +439,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  annotate!
   better_errors
   binding_of_caller
   bootsnap
