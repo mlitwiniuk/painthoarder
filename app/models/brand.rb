@@ -13,7 +13,6 @@
 #  index_brands_on_name  (name) UNIQUE
 #
 class Brand < ApplicationRecord
-
   ## ATTRIBUTES
   has_one_attached :logo
 
@@ -24,6 +23,16 @@ class Brand < ApplicationRecord
   ## VALIDATIONS
   validates :name, presence: true, uniqueness: true
 
+  ## RANSACK CONFIG
+  # Define which attributes can be used for searching
+  def self.ransackable_attributes(auth_object = nil)
+    [ "created_at", "id", "name", "updated_at", "url" ]
+  end
+
+  # Define which associations can be used for searching
+  def self.ransackable_associations(auth_object = nil)
+    [ "paints", "product_lines" ]
+  end
 
   def to_s
     name

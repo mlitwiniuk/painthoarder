@@ -1,0 +1,12 @@
+<%= turbo_stream.update "catalog-results" do %>
+  <% if @paints.any? %>
+    <%= render 'sort_bar' %>
+    <%= render 'paint_grid' %>
+
+    <div class="mt-8 flex justify-center">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  <% else %>
+    <%= render 'no_paints' %>
+  <% end %>
+<% end %>

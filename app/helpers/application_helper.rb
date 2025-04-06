@@ -1,4 +1,5 @@
 module ApplicationHelper
+  include Pagy::Frontend
   def container_class
     if controller_name == "pages" && action_name == "welcome"
       "container-full"

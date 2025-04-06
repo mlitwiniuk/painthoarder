@@ -1,0 +1,37 @@
+<% if similar_paints.any? %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <% similar_paints.each do |user_paint| %>
+      <div class="similar-paint-item">
+        <%= render "paints/similar_paint_card", user_paint: user_paint %>
+      </div>
+    <% end %>
+  </div>
+  
+  <%= turbo_frame_tag "similar-paints-frame-#{similar_type}", class: "block" do %>
+    <% if similar_paints.any? && similar_paints.size == per_page %>
+      <div id="load-more-<%= similar_type %>" class="text-center py-6">
+        <%= link_to similar_paint_path(source_paint, page: page + 1, similar_type: similar_type, per_page: per_page, format: :turbo_stream),
+                  class: "btn btn-outline" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+          Load more
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+<% else %>
+  <div class="col-span-full text-center py-6">
+    <p class="text-base-content/60">
+      <% if similar_type == "user" %>
+        No similar paints found from the same brand.
+      <% elsif similar_type == "rgb" %>
+        No similar paints with matching RGB values found.
+      <% elsif similar_type == "hsl" %>
+        No similar paints with matching HSL values found.
+      <% else %>
+        No similar paints found.
+      <% end %>
+    </p>
+  </div>
+<% end %>

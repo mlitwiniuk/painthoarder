@@ -1,0 +1,38 @@
+<%# Close the modal %>
+<%= turbo_stream.update "modal", "" %>
+
+<%# Flash notification %>
+<%= turbo_stream.prepend "flash-messages" do %>
+  <div class="alert alert-success shadow-lg mb-6 max-w-5xl mx-auto">
+    <div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      <span><%= flash.now[:notice] %></span>
+    </div>
+  </div>
+<% end %>
+
+<%# Update the user paint show page content %>
+<% if controller.action_name == "update" && request.referer&.include?(user_paint_path(@user_paint)) %>
+  <%= turbo_stream.update dom_id(@user_paint) do %>
+    <div id="<%= dom_id(@user_paint) %>" class="card bg-base-100 shadow">
+      <%= render 'user_paints/user_paint_details', user_paint: @user_paint %>
+    </div>
+  <% end %>
+  
+  <%# Update the quick actions sidebar %>
+  <%= turbo_stream.update "quick-actions-#{dom_id(@user_paint)}" do %>
+    <div id="quick-actions-<%= dom_id(@user_paint) %>" class="card bg-base-100 shadow h-fit">
+      <%= render 'user_paints/quick_actions', user_paint: @user_paint %>
+    </div>
+  <% end %>
+<% end %>
+
+<%# Update any paint cards for this paint that might be on the page %>
+<%= turbo_stream.replace_all ".paint-card-#{@user_paint.paint_id}" do %>
+  <%= render 'paints/paint_card', user_paint: @user_paint %>
+<% end %>
+
+<%# Update any search results for this paint that might be on the page %>
+<%= turbo_stream.replace "search-result-#{@user_paint.paint_id}" do %>
+  <%= render 'paints/search_result', user_paint: @user_paint %>
+<% end %>

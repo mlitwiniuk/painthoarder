@@ -20,6 +20,7 @@
               <div class="flex flex-row gap-2">
                 <%= link_to "Dashboard", user_root_path, class: "btn btn-ghost" %>
                 <%= link_to "My paints", user_paints_path, class: "btn btn-ghost" %>
+                <%= link_to "Paints", paints_path, class: "btn btn-ghost" %>
               </div>
               <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
@@ -78,6 +79,10 @@
     <main class="flex-grow drawer-content">
       <%= yield %>
     </main>
+
+    <!-- Modal Container for Turbo Frame -->
+    <turbo-frame id="modal"></turbo-frame>
+    <div id="flash-messages"></div>
 
     <!-- Footer (can be conditionally hidden with @hide_footer) -->
     <% unless user_signed_in? %>

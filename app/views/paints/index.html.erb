@@ -1,0 +1,134 @@
+<% content_for :title, "Paint Catalog | PaintStash" %>
+
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold mb-8">Paint Catalog</h1>
+
+  <%= turbo_frame_tag "catalog-stats" do %>
+    <div class="stats shadow mb-8 w-full">
+      <div class="stat">
+        <div class="stat-figure text-info">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="stat-title">Total Paints</div>
+        <div class="stat-value text-info"><%= Paint.count %></div>
+        <div class="stat-desc">Available in the catalog</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-figure text-success">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+          </svg>
+        </div>
+        <div class="stat-title">Brands</div>
+        <div class="stat-value text-success"><%= Brand.count %></div>
+        <div class="stat-desc">Represented in catalog</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-figure text-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+          </svg>
+        </div>
+        <div class="stat-title">Product Lines</div>
+        <div class="stat-value"><%= ProductLine.count %></div>
+        <div class="stat-desc">Available across all brands</div>
+      </div>
+    </div>
+  <% end %>
+
+  <%= turbo_frame_tag "catalog-filters" do %>
+    <div class="card bg-base-200 shadow mb-6">
+      <div class="card-body p-4" data-controller="toggle">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <h2 class="card-title text-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Filter Catalog
+          </h2>
+
+          <button data-action="toggle#toggle" class="btn btn-ghost">
+            <span data-toggle-target="label">Filters</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 transition-transform duration-200"
+                data-toggle-target="icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+
+        <div data-toggle-target="content" class="hidden mt-4">
+          <%= search_form_for @q, url: paints_path, method: :get, 
+              data: { turbo_frame: "catalog-results", turbo_action: "advance", controller: "auto-submit" } do |f| %>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">Search</span>
+                </label>
+                <%= f.search_field :name_or_code_cont, 
+                      placeholder: "Search paints...", 
+                      class: "input input-bordered w-full",
+                      data: { action: "input->auto-submit#submit" } %>
+              </div>
+
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">Brand</span>
+                </label>
+                <%= f.select :product_line_brand_id_eq, 
+                      @brands.map { |b| [b.name, b.id] },
+                      { include_blank: "All Brands" },
+                      class: "select select-bordered w-full",
+                      data: { action: "change->auto-submit#submit" } %>
+              </div>
+
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">Product Line</span>
+                </label>
+                <%= f.select :product_line_id_eq, 
+                      @product_lines.map { |pl| ["#{pl.brand.name} - #{pl.name}", pl.id] },
+                      { include_blank: "All Product Lines" },
+                      class: "select select-bordered w-full",
+                      data: { action: "change->auto-submit#submit" } %>
+              </div>
+
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">Color</span>
+                </label>
+                <%= select_tag :color, 
+                      options_for_select(@color_categories, params[:color]), 
+                      include_blank: "All Colors" ,
+                      class: "select select-bordered w-full",
+                      data: { action: "change->auto-submit#submit" } %>
+              </div>
+            </div>
+
+            <div class="flex justify-end mt-4">
+              <%= link_to "Clear Filters", paints_path, class: "btn btn-ghost ml-2" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%= turbo_frame_tag "catalog-results" do %>
+    <% if @paints.any? %>
+      <%= render 'sort_bar' %>
+      <%= render 'paint_grid' %>
+
+      <div class="mt-8 flex justify-center">
+        <%== pagy_nav(@pagy) %>
+      </div>
+    <% else %>
+      <%= render 'no_paints' %>
+    <% end %>
+  <% end %>
+</div>
+
+<%= turbo_frame_tag "modal" %>
