@@ -1,0 +1,52 @@
+<%# app/views/paints/search.turbo_stream.erb %>
+<%= turbo_stream.replace "search-results" do %>
+  <div id="search-results" class="mt-4 space-y-2 max-h-80 overflow-y-auto">
+    <% if @paints.any? %>
+      <% @paints.each do |paint| %>
+        <div class="card bg-base-200 shadow-sm">
+          <div class="card-body p-3">
+            <div class="flex items-center space-x-3">
+              <div class="w-6 h-6 rounded-full border" style="background-color: <%= paint.hex_color %>;"></div>
+              <div class="flex-1">
+                <p class="font-medium"><%= paint.name %></p>
+                <p class="text-xs opacity-70">
+                  <%= paint.product_line.brand.name %> -
+                  <%= paint.product_line.name %>
+                </p>
+              </div>
+
+              <% if @user_paint_ids.include?(paint.id) %>
+                <div class="badge badge-sm">Already in collection</div>
+              <% else %>
+                <div class="dropdown dropdown-end">
+                  <label tabindex="0" class="btn btn-xs btn-primary">Add</label>
+                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                    <%= button_to user_paints_path,
+                              params: { user_paint: { paint_id: paint.id, status: :owned }},
+                              class: "btn btn-xs btn-ghost justify-start w-full" do %>
+                      <span>Add to Collection</span>
+                    <% end %>
+
+                    <%= button_to user_paints_path,
+                              params: { user_paint: { paint_id: paint.id, status: :wishlist }},
+                              class: "btn btn-xs btn-ghost justify-start w-full" do %>
+                      <span>Add to Wishlist</span>
+                    <% end %>
+
+                    <%= button_to user_paints_path,
+                              params: { user_paint: { paint_id: paint.id, status: :avoid }},
+                              class: "btn btn-xs btn-ghost justify-start w-full" do %>
+                      <span>Mark as Avoid</span>
+                    <% end %>
+                  </ul>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="text-center py-4 text-base-content/70">No paints found matching "<%= params[:query] %>"</p>
+    <% end %>
+  </div>
+<% end %>

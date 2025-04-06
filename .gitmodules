@@ -1,0 +1,3 @@
+[submodule "db/miniature-paints"]
+	path = db/miniature-paints
+	url = git@github.com:Arcturus5404/miniature-paints.git

@@ -14,11 +14,12 @@
     "tailwind-scrollbar": "^4.0.1",
     "tailwindcss": "^4.0.14",
     "tailwindcss-displaymodes": "^1.0.8",
-    "tinymce": "^7.7.2"
+    "tinymce": "^7.7.2",
+    "tom-select": "^2.4.3"
   },
   "scripts": {
     "build": "node esbuild.config.mjs",
-    "build:css": "npx @tailwindcss/cli -i ./app/assets/stylesheets/application.css -o ./app/assets/builds/application.css --minify"
+    "build:css": "npx @tailwindcss/cli -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application-main.css --minify"
   },
   "devDependencies": {
     "esbuild": "^0.25.1",

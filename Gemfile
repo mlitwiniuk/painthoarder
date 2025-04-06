@@ -59,7 +59,6 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
-  gem "factory_bot_rails"
   gem 'minitest-spec-rails'
   gem "selenium-webdriver"
   gem "shoulda-context"
@@ -67,6 +66,7 @@ group :test do
 end
 
 group :development do
+  gem "annotate", github: "mlitwiniuk/annotate_models"
   gem "better_errors"
   gem "binding_of_caller"
   gem "ruby-lsp-rails", require: false
