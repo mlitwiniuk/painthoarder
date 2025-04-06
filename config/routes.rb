@@ -20,7 +20,7 @@ Rails.application.routes.draw do
 
 
   authenticated :user do
-    resources :user_paints, only: [:new, :create]
+    resources :user_paints
     get "paints/search", to: "paints#search"
     root "dashboard#index", as: :user_root
   end

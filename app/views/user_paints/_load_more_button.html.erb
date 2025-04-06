@@ -1,0 +1,10 @@
+<div id="load-more-<%= type %>" class="text-center py-6">
+  <%= link_to user_paint_path(user_paint_id, page: page, similar_type: type),
+              class: "btn btn-outline",
+              data: { turbo_frame: "similar-paints-frame" } do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+    Load more
+  <% end %>
+</div>

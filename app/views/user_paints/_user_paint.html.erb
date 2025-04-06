@@ -1,18 +1,32 @@
-<%# app/views/user_paints/_user_paint.html.erb %>
-<li id="<%= dom_id(user_paint) %>" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-base-200">
-  <div class="w-6 h-6 rounded-full border" style="background-color: <%= user_paint.paint.hex_color %>;"></div>
+<li id="<%= dom_id(user_paint) %>" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-base-200 transition-colors duration-200">
+  <div class="w-8 h-8 rounded-full border shadow-sm" style="background-color: <%= user_paint.paint.hex_color %>;"></div>
   <div class="flex-1">
     <p class="font-medium"><%= user_paint.paint.name %></p>
     <p class="text-xs opacity-70">
-      <%= user_paint.paint.product_line.brand.name %> -
+      <%= user_paint.paint.product_line.brand.name %> •
       <%= user_paint.paint.product_line.name %>
     </p>
   </div>
   <% if user_paint.owned? %>
-    <div class="badge badge-success">Owned</div>
+    <div class="badge badge-success gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      Owned
+    </div>
   <% elsif user_paint.wishlist? %>
-    <div class="badge badge-warning">Wishlist</div>
+    <div class="badge badge-warning gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+      </svg>
+      Wishlist
+    </div>
   <% elsif user_paint.avoid? %>
-    <div class="badge badge-error">Avoid</div>
+    <div class="badge badge-error gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+      </svg>
+      Avoid
+    </div>
   <% end %>
 </li>

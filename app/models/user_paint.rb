@@ -26,13 +26,25 @@ class UserPaint < ApplicationRecord
 
   ## ATTRIBUTES
   enum :status, { owned: 0, wishlist: 1, avoid: 2 }
-
+  
+  # Virtual attribute for non-persisted similar paint recommendations
+  attr_accessor :virtual
+  
   ## ASSOCIATIONS
   belongs_to :paint
   belongs_to :user
 
-
   ## VALIDATIONS
-  validates :status, presence: true
-
+  validates :status, presence: true, unless: :virtual?
+  
+  # Check if this is a virtual (non-persisted) UserPaint object
+  def virtual?
+    virtual == true
+  end
+  
+  # Default status for virtual paints
+  def status
+    return 'similar' if virtual?
+    super
+  end
 end

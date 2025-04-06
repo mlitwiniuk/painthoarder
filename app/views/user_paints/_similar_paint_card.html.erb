@@ -1,0 +1,60 @@
+<div class="card <%= user_paint.virtual? ? 'bg-base-200' : 'bg-base-100' %> shadow border hover:shadow-md transition-shadow duration-200">
+  <% if user_paint.virtual? %>
+    <%= link_to new_user_paint_path(paint_id: user_paint.paint.id), class: "card-body p-4", data: { turbo_frame: "modal" } do %>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full border shadow-sm flex-shrink-0 relative"
+             style="background-color: rgb(<%= user_paint.paint.red %>, <%= user_paint.paint.green %>, <%= user_paint.paint.blue %>);">
+          <div class="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-content rounded-full flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+          </div>
+        </div>
+        <div>
+          <div class="font-medium flex items-center gap-2">
+            <%= user_paint.paint.name %>
+            <span class="badge badge-sm badge-outline badge-primary">Not in collection</span>
+          </div>
+          <div class="text-xs opacity-70">
+            <%= user_paint.paint.product_line.brand.name %> •
+            <%= user_paint.paint.product_line.name %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <%= link_to user_paint_path(user_paint), class: "card-body p-4", data: { turbo_frame: "_top" } do %>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full border shadow-sm flex-shrink-0 relative"
+             style="background-color: rgb(<%= user_paint.paint.red %>, <%= user_paint.paint.green %>, <%= user_paint.paint.blue %>);">
+          <% if user_paint.owned? %>
+            <div class="absolute -top-1 -right-1 w-5 h-5 bg-success text-success-content rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          <% elsif user_paint.wishlist? %>
+            <div class="absolute -top-1 -right-1 w-5 h-5 bg-warning text-warning-content rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+            </div>
+          <% elsif user_paint.avoid? %>
+            <div class="absolute -top-1 -right-1 w-5 h-5 bg-error text-error-content rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+          <% end %>
+        </div>
+        <div>
+          <div class="font-medium"><%= user_paint.paint.name %></div>
+          <div class="text-xs opacity-70">
+            <%= user_paint.paint.product_line.brand.name %> •
+            <%= user_paint.paint.product_line.name %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>

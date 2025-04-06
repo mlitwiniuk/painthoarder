@@ -1,0 +1,28 @@
+<%# This partial is used for the turbo stream response when loading more similar paints %>
+
+<% if similar_paints.any? %>
+  <% # First, add the new paints to the container %>
+  <% similar_paints.each do |user_paint| %>
+    <div class="similar-paint-item">
+      <%= render "similar_paint_card", user_paint: user_paint %>
+    </div>
+  <% end %>
+<% end %>
+
+<%# Load more button, only shown if we have a full page of results %>
+<% if similar_paints.size == per_page %>
+  <div id="load-more-<%= similar_type %>" class="text-center py-6">
+    <%= link_to user_paint_path(user_paint, page: page + 1, similar_type: similar_type),
+            class: "btn btn-outline",
+            data: { turbo_frame: "similar-paints-frame" } do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+      Load more
+    <% end %>
+  </div>
+<% else %>
+  <div id="load-more-<%= similar_type %>" class="text-center py-4">
+    <p class="text-base-content/60">No more paints to load</p>
+  </div>
+<% end %>

@@ -17,14 +17,15 @@ module Api
         {
           id: paint.id,
           text: "#{paint.name} (#{paint.code})",
-          color: paint.hex_color
+          color: paint.hex_color,
+          product_line_id: paint.product_line_id
         }
       }
     end
 
     def show
       @paint = Paint.find(params[:id])
-      render json: {id: @paint.id, name: @paint.name, code: @paint.code, color: @paint.hex_color}
+      render json: { id: @paint.id, name: @paint.name, code: @paint.code, color: @paint.hex_color }
     end
   end
 end
