@@ -1,0 +1,79 @@
+<div class="card-body">
+  <div class="flex flex-col md:flex-row gap-6">
+    <!-- Color swatch -->
+    <div class="flex-shrink-0">
+      <div class="w-32 h-32 rounded-lg shadow border" style="background-color: rgb(<%= user_paint.paint.red %>, <%= user_paint.paint.green %>, <%= user_paint.paint.blue %>);"></div>
+    </div>
+
+    <!-- Paint details -->
+    <div class="flex-grow">
+      <h2 class="card-title text-2xl mb-2"><%= user_paint.paint.name %></h2>
+      <div class="flex flex-col gap-2">
+        <div>
+          <span class="text-base-content/60">Brand:</span>
+          <span class="font-medium"><%= user_paint.paint.product_line.brand.name %></span>
+        </div>
+        <div>
+          <span class="text-base-content/60">Product Line:</span>
+          <span class="font-medium"><%= user_paint.paint.product_line.name %></span>
+        </div>
+        <div>
+          <span class="text-base-content/60">Status:</span>
+          <% if user_paint.owned? %>
+            <span class="badge badge-success">Owned</span>
+          <% elsif user_paint.wishlist? %>
+            <span class="badge badge-warning">Wishlist</span>
+          <% elsif user_paint.avoid? %>
+            <span class="badge badge-error">Avoid</span>
+          <% end %>
+        </div>
+
+        <div>
+          <span class="text-base-content/60">Color (RGB):</span>
+          <span class="font-mono text-sm">rgb(<%= user_paint.paint.red %>, <%= user_paint.paint.green %>, <%= user_paint.paint.blue %>)</span>
+        </div>
+
+        <div>
+          <span class="text-base-content/60">Color (HEX):</span>
+          <span class="font-mono text-sm">#<%= user_paint.paint.hex_color %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if user_paint.owned? %>
+    <div class="divider"></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <% if user_paint.purchase_date.present? %>
+        <div>
+          <h3 class="font-semibold mb-1">Purchase Date</h3>
+          <p><%= user_paint.purchase_date.strftime("%B %d, %Y") %></p>
+        </div>
+      <% end %>
+
+      <% if user_paint.purchase_price.present? %>
+        <div>
+          <h3 class="font-semibold mb-1">Purchase Price</h3>
+          <p><%= number_to_currency(user_paint.purchase_price) %></p>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if user_paint.notes.present? %>
+    <div class="divider"></div>
+    <div>
+      <h3 class="font-semibold mb-2">Notes</h3>
+      <p class="whitespace-pre-line"><%= user_paint.notes %></p>
+    </div>
+  <% end %>
+
+  <div class="card-actions justify-end mt-4">
+    <%= link_to edit_user_paint_path(user_paint), data: { turbo_frame: "modal", turbo: true }, class: "btn btn-primary" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+      </svg>
+      Edit Paint
+    <% end %>
+  </div>
+</div>

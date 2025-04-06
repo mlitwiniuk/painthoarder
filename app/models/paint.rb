@@ -30,14 +30,29 @@ class Paint < ApplicationRecord
   has_one :brand, through: :product_line
   has_many :user_paints, dependent: :destroy
 
-
   ## VALIDATIONS
   validates :name, :code, presence: true
   validates :red, :green, :blue, presence: true,
             numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 255 }
 
-    ## BEFORE & AFTER
+  ## BEFORE & AFTER
   before_save :set_hex_color
+
+  ## RANSACK CONFIG
+  # Define which attributes can be used for searching
+  def self.ransackable_attributes(auth_object = nil)
+    [ "blue", "code", "created_at", "green", "hex_color", "id", "name", "product_line_id", "red", "updated_at" ]
+  end
+
+  # Define which associations can be used for searching
+  def self.ransackable_associations(auth_object = nil)
+    [ "brand", "product_line", "user_paints" ]
+  end
+
+  # Make custom sort work for associations
+  def self.ransortable_attributes(auth_object = nil)
+    ransackable_attributes(auth_object) + [ "product_line_brand_name" ]
+  end
 
   private
 

@@ -1,0 +1,50 @@
+<div id="similar-paint-<%= user_paint.paint_id %>" class="card bg-base-100 shadow-md hover:shadow-lg transition-shadow">
+  <div class="card-body p-4">
+    <div class="flex flex-col md:flex-row gap-3 items-center md:items-start">
+      <!-- Color swatch -->
+      <div class="w-16 h-16 rounded-lg shadow border" style="background-color: rgb(<%= user_paint.paint.red %>, <%= user_paint.paint.green %>, <%= user_paint.paint.blue %>);"></div>
+      
+      <!-- Paint info -->
+      <div class="flex-grow text-center md:text-left">
+        <h3 class="font-bold"><%= user_paint.paint.name %></h3>
+        <p class="text-sm opacity-75"><%= user_paint.paint.product_line.brand.name %></p>
+        <p class="text-xs opacity-60"><%= user_paint.paint.product_line.name %></p>
+        
+        <% unless user_paint.virtual? %>
+          <div class="mt-1">
+            <% if user_paint.owned? %>
+              <span class="badge badge-sm badge-success">In Collection</span>
+            <% elsif user_paint.wishlist? %>
+              <span class="badge badge-sm badge-warning">Wishlist</span>
+            <% elsif user_paint.avoid? %>
+              <span class="badge badge-sm badge-error">Avoid</span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    
+    <div class="card-actions justify-between mt-3">
+      <%= link_to paint_path(user_paint.paint), class: "btn btn-sm btn-outline" do %>
+        View
+      <% end %>
+      
+      <% if user_paint.virtual? %>
+        <%= link_to new_user_paint_path(paint_id: user_paint.paint.id), class: "btn btn-sm btn-primary", data: { turbo_frame: "modal" } do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Add
+        <% end %>
+      <% else %>
+        <%= link_to user_paint_path(user_paint), class: "btn btn-sm btn-secondary" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          Collection
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

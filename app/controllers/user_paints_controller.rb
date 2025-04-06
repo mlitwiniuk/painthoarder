@@ -36,6 +36,10 @@ class UserPaintsController < ApplicationController
     @brands = Brand.order(:name)
     @product_lines = []
     @paints = []
+    if params[:paint_id].present?
+      @paint = Paint.find(params[:paint_id])
+      @user_paint.paint = @paint
+    end
   end
 
   def create
@@ -44,7 +48,7 @@ class UserPaintsController < ApplicationController
     respond_to do |format|
       if @user_paint.save
         format.html { redirect_to dashboard_path, notice: "Paint added to your collection!" }
-        format.turbo_stream { render turbo_stream: turbo_stream.prepend("user_paints", partial: "user_paints/user_paint", locals: { user_paint: @user_paint }) }
+        format.turbo_stream # Will render create.turbo_stream.erb that updates multiple parts of the UI
       else
         @brands = Brand.order(:name)
 
@@ -61,44 +65,17 @@ class UserPaintsController < ApplicationController
         end
 
         format.html { render :new, status: :unprocessable_entity }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("modal", partial: "user_paints/form", locals: { user_paint: @user_paint }) }
       end
     end
   end
 
   def show
-    @page = (params[:page] || 1).to_i
-    @per_page = 12
-    @similar_type = params[:similar_type] || "user"
-
-    # Load similar paints based on the requested type
-    case @similar_type
-    when "rgb"
-      @similar_paints = find_rgb_similar_paints(@page, @per_page)
-    when "hsl"
-      @similar_paints = find_hsl_similar_paints(@page, @per_page)
-    else
-      @similar_paints = find_user_similar_paints(@page, @per_page)
-    end
-
-    @user_similar_paints = []
-    @rgb_similar_paints = []
-    @hsl_similar_paints = []
-
-    # Only for the initial page load
-    unless params[:page]
-      @rgb_similar_paints = find_rgb_similar_paints(1, 4)
-      @hsl_similar_paints = find_hsl_similar_paints(1, 4)
-      @user_similar_paints = find_user_similar_paints(1, 4)
-    end
-
+    # No need to initialize similar paints arrays anymore
+    # Similar paints will be loaded lazily by turbo_frames making requests to PaintsController#similar
     respond_to do |format|
       format.html
-      format.turbo_stream do
-        # For debugging - make sure you can see these messages in the server log
-        Rails.logger.debug "Turbo request for similar paints: #{@similar_type}, page: #{@page}"
-        Rails.logger.debug "Found #{@similar_paints.size} similar paints"
-        # Just use the standard turbo_stream template - don't render in the controller
-      end
+      format.turbo_stream
     end
   end
 
@@ -115,13 +92,19 @@ class UserPaintsController < ApplicationController
   def update
     if @user_paint.update(user_paint_params)
       respond_to do |format|
-        format.html { redirect_to user_paints_path, notice: "Paint was successfully updated." }
-        format.turbo_stream { flash.now[:notice] = "Paint was successfully updated." }
+        format.html { redirect_to user_paint_path(@user_paint), notice: "Paint was successfully updated." }
+        format.turbo_stream { 
+          flash.now[:notice] = "Paint was successfully updated." 
+        }
       end
     else
+      @brands = Brand.order(:name)
+      @product_lines = @user_paint.paint&.product_line&.brand&.product_lines&.order(:name) || []
+      @paints = @user_paint.paint&.product_line&.paints&.order(:name) || []
+      
       respond_to do |format|
         format.html { render :edit }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace(dom_id(@user_paint, :edit), partial: "user_paints/form", locals: { user_paint: @user_paint }) }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("modal", partial: "user_paints/form", locals: { user_paint: @user_paint }) }
       end
     end
   end
@@ -193,96 +176,6 @@ class UserPaintsController < ApplicationController
       query.joins(:paint).where("paints.name ILIKE '%metal%' OR paints.name ILIKE '%silver%' OR paints.name ILIKE '%gold%'")
     else
       query
-    end
-  end
-
-  # Helper methods for finding similar paints
-  def find_user_similar_paints(page, per_page)
-    # For now, this is a placeholder - would typically be based on user input
-    # or some relationship between paints that the user has defined
-    # For now, we'll just return other paints from the same brand
-    return [] unless @user_paint.paint
-
-    # Get the brand and product line information
-    brand_id = @user_paint.paint.product_line.brand_id
-    paint_id = @user_paint.paint.id
-
-    # Find paints from the same brand
-    paints = Paint.joins(product_line: :brand)
-      .where(product_lines: { brand_id: brand_id })
-      .where.not(id: paint_id)
-      .includes(product_line: :brand)
-      .order(name: :asc)
-      .limit(per_page)
-      .offset((page - 1) * per_page)
-
-    # Convert paints to user_paints where they exist, or create virtual ones
-    map_paints_to_user_paints(paints)
-  end
-
-  def find_rgb_similar_paints(page, per_page)
-    # Find paints with similar RGB values
-    return [] unless @user_paint.paint
-
-    # Skip the current paint in the results
-    paint_id = @user_paint.paint.id
-
-    # Use PostgreSQL's distance calculation between RGB values
-    red = @user_paint.paint.red
-    green = @user_paint.paint.green
-    blue = @user_paint.paint.blue
-
-    # Calculate Euclidean distance in RGB space
-    paints = Paint.where.not(id: paint_id)
-      .select("paints.*, SQRT(POWER(paints.red - #{red}, 2) +
-              POWER(paints.green - #{green}, 2) +
-              POWER(paints.blue - #{blue}, 2)) AS color_distance")
-      .includes(product_line: :brand)
-      .order("color_distance ASC")
-      .limit(per_page)
-      .offset((page - 1) * per_page)
-
-    # Convert paints to user_paints where they exist, or create virtual ones
-    map_paints_to_user_paints(paints)
-  end
-
-  def find_hsl_similar_paints(page, per_page)
-    # Find paints with similar HSL values
-    return [] unless @user_paint.paint
-
-    # Skip the current paint in the results
-    paint_id = @user_paint.paint.id
-
-    # Use RGB for now as a placeholder, since we don't have HSL values directly
-    # In a real implementation, we'd convert RGB to HSL and compare in HSL space
-    red = @user_paint.paint.red
-    green = @user_paint.paint.green
-    blue = @user_paint.paint.blue
-
-    # Calculate weighted distance that emphasizes color similarities that would be
-    # perceptually similar in HSL space
-    paints = Paint.where.not(id: paint_id)
-      .select("paints.*, (
-              ABS(paints.red - #{red}) +
-              ABS(paints.green - #{green}) +
-              ABS(paints.blue - #{blue})) AS color_distance")
-      .includes(product_line: :brand)
-      .order("color_distance ASC")
-      .limit(per_page)
-      .offset((page - 1) * per_page)
-
-    # Convert paints to user_paints where they exist, or create virtual ones
-    map_paints_to_user_paints(paints)
-  end
-
-  # Helper method to convert Paint objects to UserPaint objects
-  # If the user already has the paint in their collection, use that
-  # Otherwise, create a virtual UserPaint object for display purposes
-  def map_paints_to_user_paints(paints)
-    user_paint_map = current_user.user_paints.where(paint_id: paints.map(&:id)).index_by(&:paint_id)
-
-    paints.map do |paint|
-      user_paint_map[paint.id] || UserPaint.new(paint: paint, user: current_user, virtual: true)
     end
   end
 end

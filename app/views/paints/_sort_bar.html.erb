@@ -1,0 +1,10 @@
+<div class="flex justify-between items-center mb-4">
+  <h2 class="text-lg font-semibold"><%= raw pagy_info(@pagy) %></h2>
+  <div class="flex items-center">
+    <span class="mr-2">Sort by:</span>
+    <%= link_to "Name", paints_path(q: request.params[:q]&.merge(s: "name asc") || {s: "name asc"}), 
+          class: "btn btn-sm btn-ghost mr-1 #{params.dig(:q, :s) == 'name asc' ? 'btn-active' : ''}" %>
+    <%= link_to "Brand", paints_path(q: request.params[:q]&.merge(s: "product_line_brand_name asc") || {s: "product_line_brand_name asc"}), 
+          class: "btn btn-sm btn-ghost #{params.dig(:q, :s) == 'product_line_brand_name asc' ? 'btn-active' : ''}" %>
+  </div>
+</div>

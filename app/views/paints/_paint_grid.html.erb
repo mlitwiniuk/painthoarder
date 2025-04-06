@@ -1,0 +1,14 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+  <% @paints.each do |paint| %>
+    <% 
+      # Create a virtual UserPaint object for each paint
+      # If the user already has this paint in their collection, use that
+      user_paint = if @user_paint_ids&.include?(paint.id)
+                    current_user.user_paints.find_by(paint_id: paint.id)
+                  else
+                    UserPaint.new(paint: paint, user: current_user, virtual: true)
+                  end
+    %>
+    <%= render "paints/paint_card", user_paint: user_paint %>
+  <% end %>
+</div>
