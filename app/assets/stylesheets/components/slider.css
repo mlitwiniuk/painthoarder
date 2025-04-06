@@ -1,0 +1,79 @@
+/* Slider component styling for the welcome page */
+.screenshot-slider {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.screenshot-slider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--p), var(--s), var(--a));
+  z-index: 10;
+  animation: rainbow-border 3s ease infinite;
+}
+
+/* Slide transitions */
+[data-controller="slider"] [data-slider-target="slide"] {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 500ms ease, transform 500ms ease;
+}
+
+[data-controller="slider"] [data-slider-target="slide"].opacity-0 {
+  opacity: 0;
+}
+
+/* Active/inactive slide states */
+.screenshot-slide {
+  transition: opacity 500ms ease, transform 500ms ease;
+}
+
+.screenshot-slide.active {
+  opacity: 1 !important;
+  transform: scale(1.02);
+  z-index: 5;
+}
+
+.screenshot-slide.inactive {
+  opacity: 0 !important;
+  transform: scale(0.98);
+  z-index: 1;
+}
+
+/* Navigation buttons */
+[data-controller="slider"] button {
+  transition: all 150ms ease;
+}
+
+[data-controller="slider"] button:hover {
+  transform: scale(1.1);
+}
+
+[data-controller="slider"] button:active {
+  transform: scale(0.95);
+}
+
+/* Decorative elements */
+.device-dot {
+  position: absolute;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes rainbow-border {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.7; }
+}

@@ -1,26 +1,53 @@
-<% if @similar_paints.any? %>
-  <%= turbo_frame_tag "similar-paints-frame-#{@similar_type}" do %>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-2">
-      <% @similar_paints.each do |user_paint| %>
-        <div id="similar-paint-<%= user_paint.paint_id %>" class="similar-paint-item">
-          <%= render "paint_card", user_paint: user_paint %>
+<%= turbo_frame_tag "similar-paints-frame-#{@similar_type}" do %>
+  <div data-controller="brand-filter" 
+       data-brand-filter-url-value="<%= similar_paint_path %>" 
+       data-brand-filter-source-id-value="<%= @source_paint.id %>" 
+       data-brand-filter-similar-type-value="<%= @similar_type %>" 
+       data-brand-filter-per-page-value="<%= @per_page %>" 
+       data-brand-filter-selected-brands-value="<%= @brand_ids.present? ? @brand_ids.to_json : '[]' %>">
+    
+    <div class="mb-4" data-brand-filter-target="container">
+      <label class="form-control w-full">
+        <div class="label justify-between">
+          <span class="label-text font-medium">Filter by Brand</span>
+          <% if @brand_ids&.any? %>
+            <span class="label-text-alt text-primary"><%= @brand_ids.size %> brands selected</span>
+          <% end %>
         </div>
-      <% end %>
+        <select data-brand-filter-target="brandSelect" class="select select-bordered w-full" multiple>
+          <% @brands.each do |brand| %>
+            <option value="<%= brand.id %>" <%= @brand_ids&.include?(brand.id.to_s) ? 'selected' : '' %>><%= brand.name %></option>
+          <% end %>
+        </select>
+      </label>
     </div>
-    <% if @similar_paints.any? && @similar_paints.size == @per_page %>
-      <div id="load-more-<%= @similar_type %>" class="text-center py-6">
-        <%= link_to similar_paint_path(@source_paint, page: @page + 1, similar_type: @similar_type, per_page: @per_page, format: :turbo_stream),
-                  class: "btn btn-outline" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-          Load more
+    
+    <% if @similar_paints.any? %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-2">
+        <% @similar_paints.each do |user_paint| %>
+          <div id="similar-paint-<%= user_paint.paint_id %>" class="similar-paint-item">
+            <%= render "similar_paint_card", user_paint: user_paint %>
+          </div>
         <% end %>
       </div>
+      <% if @similar_paints.any? && @similar_paints.size == @per_page %>
+        <div id="load-more-<%= @similar_type %>" class="text-center py-6">
+          <% # Include brand_ids in the load more link if present %>
+          <% load_more_params = { page: @page + 1, similar_type: @similar_type, per_page: @per_page, format: :turbo_stream } %>
+          <% load_more_params[:brand_ids] = @brand_ids.join(',') if @brand_ids.present? %>
+          <%= link_to similar_paint_path(@source_paint, load_more_params),
+                    class: "btn btn-outline" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+            Load more
+          <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="col-span-full text-center py-6">
+        <p class="text-base-content/60">No similar paints found.</p>
+      </div>
     <% end %>
-  <% end %>
-<% else %>
-  <div class="col-span-full text-center py-6">
-    <p class="text-base-content/60">No similar paints found.</p>
   </div>
 <% end %>

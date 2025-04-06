@@ -11,7 +11,7 @@ module Api
         @product_lines = @product_lines.where("name LIKE ?", "%#{params[:query]}%")
       end
 
-      render json: @product_lines.map { |pl| { id: pl.id, text: pl.name, brand_id: pl.brand_id } }
+      render json: @product_lines.map { |pl| {id: pl.id, text: pl.name, brand_id: pl.brand_id} }
     end
   end
 end

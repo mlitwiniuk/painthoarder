@@ -16,15 +16,18 @@ class Api::ProductLinesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
-  # Note: There's a potential bug in the controller with `.non` - it should likely be `.none`
-  # This test assumes the controller is fixed to use `.none` when no brand_id is present
-  test "should return empty array when no brand_id is provided" do
+  test "should get all product lines when no brand_id is provided" do
     sign_in @user
     get api_product_lines_url, as: :json
     assert_response :success
 
     response_data = JSON.parse(response.body)
-    assert_empty response_data
+    assert_equal 3, response_data.length
+    
+    product_lines = response_data.map { |pl| pl["text"] }
+    assert_includes product_lines, "Base Colors"
+    assert_includes product_lines, "Metallics"
+    assert_includes product_lines, "Special Effects"
   end
 
   test "should get product lines for specific brand" do
@@ -42,7 +45,8 @@ class Api::ProductLinesControllerTest < ActionDispatch::IntegrationTest
     # Check JSON structure
     assert_equal({
       "id" => @product_line1.id,
-      "text" => @product_line1.name
+      "text" => @product_line1.name,
+      "brand_id" => @product_line1.brand_id
     }, response_data.find { |pl| pl["id"] == @product_line1.id })
   end
 

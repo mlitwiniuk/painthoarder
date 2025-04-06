@@ -35,7 +35,13 @@
 
         <div>
           <span class="text-base-content/60">Color (HEX):</span>
-          <span class="font-mono text-sm">#<%= user_paint.paint.hex_color %></span>
+          <span class="font-mono text-sm"><%= user_paint.paint.hex_color %></span>
+        </div>
+        
+        <% h, s, l = rgb_to_hsl(user_paint.paint.red, user_paint.paint.green, user_paint.paint.blue) %>
+        <div>
+          <span class="text-base-content/60">Color (HSL):</span>
+          <span class="font-mono text-sm">hsl(<%= h %>°, <%= s %>%, <%= l %>%)</span>
         </div>
       </div>
     </div>

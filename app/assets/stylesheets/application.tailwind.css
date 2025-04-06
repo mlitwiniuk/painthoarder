@@ -7,6 +7,39 @@
   themes: all;
 }
 
+/* Import component styles */
+@import "./components/slider.css";
+
 .scrollbar-rounded {
   @apply scrollbar-thin scrollbar-thumb-primary hover:scrollbar-thumb-primary active:scrollbar-thumb-primary scrollbar-track-base-200
+}
+
+.ts-control {
+  @apply border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-lg gap-2
+}
+
+.ts-wrapper.plugin-remove_button .item {
+  @apply rounded-md
+}
+.ts-wrapper.multi .ts-control > div {
+  @apply p-0 m-0 pl-1
+}
+
+.ts-wrapper.plugin-remove_button .item .remove {
+  @apply border-none text-lg leading-none py-1 rounded-r-lg
+}
+
+.ts-dropdown {
+  @apply rounded-md border border-solid border-t border-gray-300
+}
+
+.ts-dropdown [data-selectable].option:first-child {
+  @apply rounded-t-md
+}
+
+.ts-dropdown [data-selectable].option:last-child {
+  @apply rounded-b-md
+}
+.ts-dropdown .create:hover, .ts-dropdown .option:hover, .ts-dropdown .active {
+  @apply bg-indigo-100 text-indigo-900
 }

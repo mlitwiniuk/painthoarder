@@ -101,9 +101,9 @@
             <label class="label">
               <span class="label-text">Purchase Price</span>
             </label>
-            <div class="input-group">
-              <span>$</span>
-              <%= form.number_field :purchase_price, step: 0.01, min: 0, class: "input input-bordered w-full" %>
+            <div class="join w-full">
+              <span class="join-item flex items-center justify-center px-3 bg-base-200">$</span>
+              <%= form.number_field :purchase_price, step: 0.01, min: 0, class: "input input-bordered join-item w-full" %>
             </div>
           </div>
         </div>

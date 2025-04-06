@@ -16,6 +16,7 @@
 #  last_sign_in_at        :datetime
 #  last_sign_in_ip        :string
 #  locked_at              :datetime
+#  preferences            :json
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
@@ -49,6 +50,9 @@ class User < ApplicationRecord
   ## ASSOCIATIONS
   has_many :user_paints
   has_many :paints, through: :user_paints
+  
+  # Store user preferences in a JSON column
+  store_accessor :preferences, :similar_paint_brand_ids
 
   validates :username, presence: true, length: {maximum: 20}, username: true, uniqueness: {case_sensitive: false}
 
@@ -60,5 +64,23 @@ class User < ApplicationRecord
     else
       where(conditions).first
     end
+  end
+  
+  # Get the brand IDs for similar paint filtering
+  # If not set, defaults to the brands of paints the user owns
+  def similar_paint_brand_ids
+    stored_ids = preferences&.dig('similar_paint_brand_ids')
+    return stored_ids if stored_ids.present?
+    
+    # Default to brands of paints the user owns
+    owned_brand_ids = paints.joins(:brand).distinct.pluck('brands.id').map(&:to_s)
+    owned_brand_ids
+  end
+  
+  # Set the brand IDs for similar paint filtering
+  def similar_paint_brand_ids=(ids)
+    self.preferences ||= {}
+    self.preferences['similar_paint_brand_ids'] = Array(ids).map(&:to_s).uniq
+    save
   end
 end
