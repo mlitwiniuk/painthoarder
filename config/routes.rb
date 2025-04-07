@@ -22,7 +22,12 @@ Rails.application.routes.draw do
     get :search, on: :collection
     get :similar, on: :member
   end
-  resources :user_paints
+  resources :user_paints do
+    collection do
+      get :bulk_import
+      post :bulk_search
+    end
+  end
   authenticated :user do
     get "paints/search", to: "paints#search"
     root "dashboard#index", as: :user_root

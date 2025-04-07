@@ -52,6 +52,7 @@ class UserPaintsController < ApplicationController
 
   def create
     @user_paint = current_user.user_paints.build(user_paint_params)
+    @search_term = params[:search_term].to_s
 
     respond_to do |format|
       if @user_paint.save
@@ -118,6 +119,28 @@ class UserPaintsController < ApplicationController
     end
   end
 
+  def bulk_import
+    # Just render the form
+  end
+
+  def bulk_search
+    @paint_names = parse_paint_names(params[:paint_names])
+    @search_results = {}
+
+    @paint_names.each do |name|
+      next if name.blank?
+
+      # Find top 10 matches for each paint name
+      matches = Paint.full_search(name).limit(10).includes(:brand, :product_line)
+      @search_results[name] = matches if matches.any?
+    end
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { render :bulk_import }
+    end
+  end
+
   # Update and destroy actions remain the same...
 
   private
@@ -128,6 +151,13 @@ class UserPaintsController < ApplicationController
 
   def user_paint_params
     params.require(:user_paint).permit(:paint_id, :status, :notes, :purchase_date, :purchase_price)
+  end
+
+  def parse_paint_names(text)
+    return [] if text.blank?
+
+    # Split by commas, semicolons, or new lines
+    text.split(/[,;\r\n]+/).map(&:strip).reject(&:blank?).uniq
   end
 
   def apply_filters(query)

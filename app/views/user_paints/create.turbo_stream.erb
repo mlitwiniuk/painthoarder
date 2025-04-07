@@ -1,15 +1,32 @@
-<%# Add the new paint to the recent additions on dashboard %>
-<%= turbo_stream.prepend "recent-paints" do %>
-  <%= render "user_paints/user_paint", user_paint: @user_paint %>
-<% end %>
+<% if @search_term.present? %>
+  <%= turbo_stream.replace "search-term-row-#{@search_term}" do %>
+    <tr id="search-term-row-<%= @search_term %>" class="search-term-row bg-success bg-opacity-20">
+      <td class="font-medium"><%= @user_paint.paint.name %></td>
+      <td><span class="text-success font-semibold">Added to your <%= @user_paint.status %> ✓</span></td>
+      <td>
+        <div class="flex gap-2">
+          <span class="badge badge-<%= @user_paint.status == 'owned' ? 'success' : 'info' %> badge-lg">
+            Added to <%= @user_paint.status.titleize %>
+          </span>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+<% else %>
+  <%# Regular paint addition - update dashboard components %>
+  <%# Add the new paint to the recent additions on dashboard %>
+  <%= turbo_stream.prepend "recent-paints" do %>
+    <%= render "user_paints/user_paint", user_paint: @user_paint %>
+  <% end %>
 
-<%# Update the dashboard stats %>
-<%= turbo_stream.replace "dashboard-stats" do %>
-  <%= render "dashboard/stats" %>
-<% end %>
+  <%# Update the dashboard stats %>
+  <%= turbo_stream.replace "dashboard-stats" do %>
+    <%= render "dashboard/stats" %>
+  <% end %>
 
-<%# Update the paint in search results if present %>
-<% paint_id = @user_paint.paint_id %>
+  <%# Update the paint in search results if present %>
+  <% paint_id = @user_paint.paint_id %>
+<% end %>
 
 <%# Replace the paint card in all similar paints sections %>
 <% ["rgb", "hsl", "user"].each do |type| %>
@@ -39,7 +56,7 @@
   <div class="alert alert-success shadow-lg mb-4" data-controller="auto-dismiss" data-auto-dismiss-timeout-value="5000">
     <div>
       <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-      <span>Paint added to your collection!</span>
+      <span>Paint added to your <%= @user_paint.status %> collection!</span>
     </div>
     <button class="btn btn-sm btn-ghost">×</button>
   </div>
