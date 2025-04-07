@@ -1,7 +1,7 @@
 # app/controllers/user_paints_controller.rb
 class UserPaintsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_user_paint, only: [:show, :edit, :update]
+  before_action :set_user_paint, only: [:show, :edit, :update, :destroy]
 
   def index
     @query = current_user.user_paints.includes(paint: {product_line: :brand})
@@ -141,7 +141,13 @@ class UserPaintsController < ApplicationController
     end
   end
 
-  # Update and destroy actions remain the same...
+  def destroy
+    @user_paint.destroy
+    respond_to do |format|
+      format.html { redirect_to user_paints_path }
+      format.turbo_stream { render turbo_stream: turbo_stream.action(:redirect, user_paints_path) }
+    end
+  end
 
   private
 
