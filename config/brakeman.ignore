@@ -1,0 +1,51 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "342ae1ec8cbe57896f987f527892d511cc6507a69a51308f650db64d486e417b",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/concerns/sqlite_search.rb",
+      "line": 71,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"DELETE FROM fts_#{table_name} #{(\"WHERE #{to_s.foreign_key} IN (#{ids.join(\", \")})\" or \"\")};\\n\".strip)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SqliteSearch",
+        "method": "rebuild_search_index"
+      },
+      "user_input": "ids.join(\", \")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "5fd4e8f82a816da498c7d33615c51fa89313945851070ea163a094c713b4c097",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/concerns/sqlite_search.rb",
+      "line": 85,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"INSERT INTO fts_#{table_name}(#{@@search_scope_attrs.join(\", \")}, #{to_s.foreign_key})\\nVALUES (#{where(:id => id).includes(*@@includes).first.values_at(*@@search_scope_attrs).map do\n \"'#{quote_string(value)}'\"\n end.join(\", \")}, #{where(:id => id).includes(*@@includes).first.id});\\n\".strip)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SqliteSearch",
+        "method": "rebuild_search_index"
+      },
+      "user_input": "@@search_scope_attrs.join(\", \")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    }
+  ],
+  "brakeman_version": "7.0.2"
+}
