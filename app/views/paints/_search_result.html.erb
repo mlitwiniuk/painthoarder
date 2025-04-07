@@ -1,11 +1,11 @@
 <div id="search-result-<%= user_paint.paint_id %>" class="search-result-item flex items-center gap-3 rounded-lg border p-3">
   <div class="w-10 h-10 rounded-full border shadow-sm" style="background-color: rgb(<%= user_paint.paint.red %>, <%= user_paint.paint.green %>, <%= user_paint.paint.blue %>);"></div>
-  
+
   <div class="flex-1">
-    <h3 class="font-medium"><%= user_paint.paint.name %></h3>
+    <h3 class="font-medium"><%= link_to user_paint.paint.name, user_paint.paint %></h3>
     <p class="text-xs opacity-70"><%= user_paint.paint.product_line.brand.name %> - <%= user_paint.paint.product_line.name %></p>
   </div>
-  
+
   <div>
     <% if user_paint.virtual? %>
       <%= link_to new_user_paint_path(paint_id: user_paint.paint.id), class: "btn btn-sm btn-primary", data: { turbo_frame: "modal", turbo: true } do %>

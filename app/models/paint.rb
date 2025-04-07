@@ -22,6 +22,10 @@
 #  product_line_id  (product_line_id => product_lines.id)
 #
 class Paint < ApplicationRecord
+  ## CONCERNS
+  include SqliteSearch
+  search_scope(:name, :code, :brand_name, :product_line_name, includes: [:brand, :product_line])
+
   ## ATTRIBUTES
   has_one_attached :image
 
@@ -37,6 +41,14 @@ class Paint < ApplicationRecord
 
   ## BEFORE & AFTER
   before_save :set_hex_color
+
+  def brand_name
+    brand.name
+  end
+
+  def product_line_name
+    product_line.name
+  end
 
   ## RANSACK CONFIG
   # Define which attributes can be used for searching
