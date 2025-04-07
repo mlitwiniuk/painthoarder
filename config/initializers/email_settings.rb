@@ -49,7 +49,7 @@ elsif Rails.env.staging?
   ActionMailer::Base.default_url_options[:host] = ENV["HOST"]
   ActionMailer::Base.default_url_options[:protocol] = "https"
 elsif Rails.env.test?
-  ActionMailer::Base.default_url_options[:host] = ENV["HOST"]
+  ActionMailer::Base.default_url_options[:host] = ENV.fetch("HOST", "painthoarder.local")
   ActionMailer::Base.default_url_options[:protocol] = "http"
 else
   fail StandardError, "Not supported environment: #{Rails.env}, check: #{__FILE__}"
