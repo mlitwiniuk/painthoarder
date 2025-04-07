@@ -85,3 +85,5 @@ gem "responders"
 gem "show_for"
 gem "simple_form"
 gem "simple-navigation"
+
+gem "appsignal", "~> 4.5"
