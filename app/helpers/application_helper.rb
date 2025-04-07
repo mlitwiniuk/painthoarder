@@ -8,18 +8,18 @@ module ApplicationHelper
     r /= 255.0
     g /= 255.0
     b /= 255.0
-    
+
     max = [r, g, b].max
     min = [r, g, b].min
-    
+
     h = s = l = (max + min) / 2.0
-    
+
     if max == min
       h = s = 0 # achromatic
     else
       d = max - min
       s = l > 0.5 ? d / (2.0 - max - min) : d / (max + min)
-      
+
       case max
       when r
         h = (g - b) / d + (g < b ? 6 : 0)
@@ -28,18 +28,18 @@ module ApplicationHelper
       when b
         h = (r - g) / d + 4
       end
-      
+
       h /= 6.0
     end
-    
+
     # Convert to degrees and percentages
     h = (h * 360).round
     s = (s * 100).round
     l = (l * 100).round
-    
+
     [h, s, l]
   end
-  
+
   include Pagy::Frontend
   def container_class
     if controller_name == "pages" && action_name == "welcome"
@@ -50,9 +50,9 @@ module ApplicationHelper
   end
 
   def gravatar_for(user, options = { size: 200 })
-    gravatar_id = Digest::MD5.hexdigest(user.email.downcase)
+    hash = Digest::MD5.hexdigest(user.email.downcase)
     size = options[:size]
-    gravatar_url = "https://secure.gravatar.com/avatar/#{gravatar_id}?s=#{size}"
+    gravatar_url = "https://robohash.org/#{hash}?gravatar=hashed&size=#{size}x#{size}&bgset=bg1"
     image_tag(gravatar_url, alt: user.username, class: "img-circle")
   end
 end

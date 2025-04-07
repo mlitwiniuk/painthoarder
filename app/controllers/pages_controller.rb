@@ -8,6 +8,7 @@ class PagesController < ApplicationController
   end
 
   def welcome
+    @last_users = User.order(created_at: :desc).limit(5)
     @user_count = User.count
     @paint_count = Paint.count
 
