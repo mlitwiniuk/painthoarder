@@ -37,7 +37,7 @@ class UserPaintTest < ActiveSupport::TestCase
   test "can create a user_paint with valid attributes" do
     user_paint = build(:user_paint)
     assert user_paint.valid?
-    assert_difference('UserPaint.count') do
+    assert_difference("UserPaint.count") do
       user_paint.save
     end
   end

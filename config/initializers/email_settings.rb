@@ -8,7 +8,7 @@ if Rails.env.development?
 
   ActionMailer::Base.delivery_method = :smtp
 
-  ActionMailer::Base.smtp_settings = {address: "localhost", port: 1025} # mailcatcher or mailpit
+  ActionMailer::Base.smtp_settings = { address: "localhost", port: 1025 } # mailcatcher or mailpit
 elsif Rails.env.production?
   ActionMailer::Base.delivery_method = :mailgun
   ActionMailer::Base.mailgun_settings = {

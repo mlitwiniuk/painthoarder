@@ -20,9 +20,9 @@ FactoryBot.define do
     trait :with_logo do
       after(:build) do |brand|
         brand.logo.attach(
-          io: File.open(Rails.root.join('test', 'fixtures', 'files', '1px.png')),
-          filename: '1px.png',
-          content_type: 'image/png'
+          io: File.open(Rails.root.join("test/fixtures/files/1px.png")),
+          filename: "1px.png",
+          content_type: "image/png"
         )
       end
     end

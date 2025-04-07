@@ -32,7 +32,7 @@ class ProductLineTest < ActiveSupport::TestCase
   test "can create a product line with valid attributes" do
     product_line = build(:product_line)
     assert product_line.valid?
-    assert_difference('ProductLine.count') do
+    assert_difference("ProductLine.count") do
       product_line.save
     end
   end

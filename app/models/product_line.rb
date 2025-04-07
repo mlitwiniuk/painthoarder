@@ -28,15 +28,15 @@ class ProductLine < ApplicationRecord
   ## RANSACK CONFIG
   # Define which attributes can be used for searching
   def self.ransackable_attributes(auth_object = nil)
-    [ "brand_id", "created_at", "description", "id", "name", "updated_at" ]
+    ["brand_id", "created_at", "description", "id", "name", "updated_at"]
   end
 
   # Define which associations can be used for searching
   def self.ransackable_associations(auth_object = nil)
-    [ "brand", "paints" ]
+    ["brand", "paints"]
   end
 
   def to_s
-    [ brand.name, name ].join(" - ")
+    [brand.name, name].join(" - ")
   end
 end

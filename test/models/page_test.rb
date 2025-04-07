@@ -14,14 +14,14 @@
 require "test_helper"
 
 class PageTest < ActiveSupport::TestCase
-  context 'validations' do
+  context "validations" do
     should validate_presence_of(:title)
     should validate_uniqueness_of(:title)
     should validate_length_of(:title).is_at_least(5).is_at_most(150)
     should validate_presence_of(:content)
   end
 
-  context 'enum definitions' do
+  context "enum definitions" do
     should define_enum_for(:status).with_values(draft: 0, issued: 1, archived: 99)
   end
 

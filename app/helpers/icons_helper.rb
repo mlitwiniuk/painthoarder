@@ -6,7 +6,7 @@ module IconsHelper
       options = text
       text = nil
     end
-    options.reverse_merge!({ class: "w-6 h-6" })
+    options.reverse_merge!({class: "w-6 h-6"})
     options["id"] = nil
     options["class"] = options[:class]
     options["width"] = "24px"
@@ -20,8 +20,8 @@ module IconsHelper
 
     return icon unless tooltip
 
-    content_tag(:span, icon, class: "tooltip", data: { tip: tooltip })
-  rescue StandardError
+    content_tag(:span, icon, class: "tooltip", data: {tip: tooltip})
+  rescue
     tag.span(name.to_s.dasherize) + content_tag(:span, text, class: "ms-1")
   end
 

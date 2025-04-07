@@ -1,5 +1,5 @@
 # test/services/markdown_color_parser_test.rb
-require 'test_helper'
+require "test_helper"
 
 class MarkdownColorParserTest < ActiveSupport::TestCase
   setup do

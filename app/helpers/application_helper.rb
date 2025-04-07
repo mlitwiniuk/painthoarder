@@ -18,11 +18,11 @@ module ApplicationHelper
       h = s = 0 # achromatic
     else
       d = max - min
-      s = l > 0.5 ? d / (2.0 - max - min) : d / (max + min)
+      s = (l > 0.5) ? d / (2.0 - max - min) : d / (max + min)
 
       case max
       when r
-        h = (g - b) / d + (g < b ? 6 : 0)
+        h = (g - b) / d + ((g < b) ? 6 : 0)
       when g
         h = (b - r) / d + 2
       when b
@@ -49,7 +49,7 @@ module ApplicationHelper
     end
   end
 
-  def gravatar_for(user, options = { size: 200 })
+  def gravatar_for(user, options = {size: 200})
     hash = Digest::MD5.hexdigest(user.email.downcase)
     size = options[:size]
     gravatar_url = "https://robohash.org/#{hash}?gravatar=hashed&size=#{size}x#{size}&bgset=bg1"

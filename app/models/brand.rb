@@ -26,12 +26,12 @@ class Brand < ApplicationRecord
   ## RANSACK CONFIG
   # Define which attributes can be used for searching
   def self.ransackable_attributes(auth_object = nil)
-    [ "created_at", "id", "name", "updated_at", "url" ]
+    ["created_at", "id", "name", "updated_at", "url"]
   end
 
   # Define which associations can be used for searching
   def self.ransackable_associations(auth_object = nil)
-    [ "paints", "product_lines" ]
+    ["paints", "product_lines"]
   end
 
   def to_s

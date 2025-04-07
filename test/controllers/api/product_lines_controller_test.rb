@@ -1,7 +1,6 @@
 require "test_helper"
 
 class Api::ProductLinesControllerTest < ActionDispatch::IntegrationTest
-
   setup do
     @user = FactoryBot.create(:confirmed_user)
     @brand = FactoryBot.create(:brand)
@@ -23,7 +22,7 @@ class Api::ProductLinesControllerTest < ActionDispatch::IntegrationTest
 
     response_data = JSON.parse(response.body)
     assert_equal 3, response_data.length
-    
+
     product_lines = response_data.map { |pl| pl["text"] }
     assert_includes product_lines, "Base Colors"
     assert_includes product_lines, "Metallics"
@@ -32,7 +31,7 @@ class Api::ProductLinesControllerTest < ActionDispatch::IntegrationTest
 
   test "should get product lines for specific brand" do
     sign_in @user
-    get api_product_lines_url, params: { brand_id: @brand.id }, as: :json
+    get api_product_lines_url, params: {brand_id: @brand.id}, as: :json
     assert_response :success
 
     response_data = JSON.parse(response.body)
@@ -52,7 +51,7 @@ class Api::ProductLinesControllerTest < ActionDispatch::IntegrationTest
 
   test "should filter product lines by query" do
     sign_in @user
-    get api_product_lines_url, params: { brand_id: @brand.id, query: "Base" }, as: :json
+    get api_product_lines_url, params: {brand_id: @brand.id, query: "Base"}, as: :json
     assert_response :success
 
     response_data = JSON.parse(response.body)

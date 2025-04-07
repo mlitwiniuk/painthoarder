@@ -13,9 +13,9 @@ Rails.application.routes.draw do
 
   # API endpoints for cascading selects
   namespace :api do
-    resources :brands, only: [:index]
-    resources :product_lines, only: [:index]
-    resources :paints, only: [:index, :show]
+    resources :brands, only: [ :index ]
+    resources :product_lines, only: [ :index ]
+    resources :paints, only: [ :index, :show ]
   end
 
   resources :paints do

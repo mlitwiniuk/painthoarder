@@ -1,7 +1,6 @@
 require "test_helper"
 
 class Api::BrandsControllerTest < ActionDispatch::IntegrationTest
-
   setup do
     @user = FactoryBot.create(:confirmed_user)
     @brand1 = FactoryBot.create(:brand, name: "Citadel")
@@ -34,7 +33,7 @@ class Api::BrandsControllerTest < ActionDispatch::IntegrationTest
 
   test "should filter brands by query" do
     sign_in @user.reload
-    get api_brands_url, params: { query: "Cita" }, as: :json
+    get api_brands_url, params: {query: "Cita"}, as: :json
     assert_response :success
 
     response_data = JSON.parse(response.body)

@@ -1,7 +1,7 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
-require 'shoulda/matchers'
+require "shoulda/matchers"
 
 module ActiveSupport
   class TestCase
@@ -73,7 +73,6 @@ Shoulda::Matchers.configure do |config|
     with.library :rails
   end
 end
-
 
 ActiveSupport.on_load(:action_mailer) do
   Rails.application.reload_routes_unless_loaded

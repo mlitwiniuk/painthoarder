@@ -22,7 +22,7 @@ class DashboardSystemTest < ApplicationSystemTestCase
 
     # Test recent paints section
     assert_selector "h2.card-title", text: "Recently Added"
-    
+
     # There might be user paints or the empty state message
     assert_selector("ul.space-y-2", minimum: 0)
 
