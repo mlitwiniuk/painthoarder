@@ -130,5 +130,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_143135) do
 
   # Virtual tables defined in this database.
   # Note that virtual tables may not work with other database engines. Be careful if changing database.
-  create_virtual_table "fts_paints", "fts5", ["name", "code", "brand_name", "product_line_name", "paint_id"]
+  create_virtual_table "fts_paints", "fts5", ["name", "code", "brand_name", "product_line_name", "name_code_normalized", "paint_id"]
 end
