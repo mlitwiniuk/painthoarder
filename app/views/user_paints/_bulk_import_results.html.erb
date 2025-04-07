@@ -1,0 +1,55 @@
+<div class="results-container">
+  <h2 class="text-2xl font-bold mb-4">Search Results</h2>
+
+  <% if search_results.empty? %>
+    <div class="alert alert-warning">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+      <span>No matches found for your search terms.</span>
+    </div>
+  <% else %>
+    <div class="overflow-x-auto">
+      <table class="table table-zebra w-full">
+        <thead>
+          <tr>
+            <th>Your Search Term</th>
+            <th>Best Match</th>
+            <th class="flex justify-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% search_results.each do |search_term, matches| %>
+            <tr id="search-term-row-<%= search_term.parameterize %>" class="search-term-row">
+              <td class="font-medium"><%= search_term %></td>
+              <td>
+                <%= form_with url: "#", method: :put, class: "paint-select-form", html: { id: "paint-form-#{search_term.parameterize}" } do |f| %>
+                  <%= f.select :paint_id,
+                    matches.map { |p| ["#{p.brand_name} - #{p.name} (#{p.code} #{p.product_line_name})", p.id] },
+                    { selected: matches.first.id },
+                    {
+                      class: "select select-bordered w-full paint-select"
+                    }
+                  %>
+                <% end %>
+              </td>
+              <td class="flex gap-2 grow justify-end">
+                <%= form_with model: UserPaint.new, class: "add-to-owned" do |f| %>
+                  <%= f.hidden_field :paint_id, value: matches.first.id %>
+                  <%= f.hidden_field :status, value: "owned" %>
+                  <%= hidden_field_tag :search_term, search_term.parameterize %>
+                  <%= f.submit "Add to Collection", class: "btn btn-sm btn-success", data: { search_term: search_term.parameterize } %>
+                <% end %>
+
+                <%= form_with model: UserPaint.new, class: "add-to-wishlist" do |f| %>
+                  <%= f.hidden_field :paint_id, value: matches.first.id %>
+                  <%= f.hidden_field :status, value: "wishlist" %>
+                  <%= hidden_field_tag :search_term, search_term.parameterize %>
+                  <%= f.submit "Add to Wishlist", class: "btn btn-sm btn-info", data: { search_term: search_term.parameterize } %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

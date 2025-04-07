@@ -24,8 +24,15 @@ module Api
     end
 
     def show
-      @paint = Paint.find(params[:id])
-      render json: {id: @paint.id, name: @paint.name, code: @paint.code, color: @paint.hex_color}
+      @paint = Paint.includes(:brand, :product_line).find(params[:id])
+      render json: {
+        id: @paint.id,
+        name: @paint.name,
+        code: @paint.code,
+        color: @paint.hex_color,
+        brand_name: @paint.brand&.name,
+        product_line_name: @paint.product_line&.name
+      }
     end
   end
 end

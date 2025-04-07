@@ -16,10 +16,11 @@
           <!-- Navigation Links -->
           <div class="flex grow justify-between gap-2">
             <% if user_signed_in? %>
-              <div class="flex flex-row gap-2">
+              <div class="flex flex-row gap-2 items-center">
                 <%= link_to "Dashboard", user_root_path, class: "btn btn-ghost" %>
                 <%= link_to "My paints", user_paints_path, class: "btn btn-ghost" %>
                 <%= link_to "Paints", paints_path, class: "btn btn-ghost" %>
+                <%= link_to "Bulk Import", bulk_import_user_paints_path, class: "btn btn-ghost btn-sm " %>
               </div>
               <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
