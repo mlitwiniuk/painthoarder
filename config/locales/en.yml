@@ -29,3 +29,6 @@
 
 en:
   hello: "Hello world"
+  user_mailer:
+    welcome:
+      subject: "Welcome to PaintHoarder"

@@ -38,7 +38,7 @@
 class User < ApplicationRecord
   attr_accessor :login
 
-  normalizes :email, with: -> email { email.strip.downcase }
+  normalizes :email, with: ->(email) { email.strip.downcase }
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
@@ -46,15 +46,26 @@ class User < ApplicationRecord
     :recoverable, :rememberable, :validatable, :lockable, :confirmable,
     authentication_keys: [:login]
 
-
   ## ASSOCIATIONS
   has_many :user_paints
   has_many :paints, through: :user_paints
-  
+
   # Store user preferences in a JSON column
   store_accessor :preferences, :similar_paint_brand_ids
 
   validates :username, presence: true, length: {maximum: 20}, username: true, uniqueness: {case_sensitive: false}
+
+  def to_s
+    username
+  end
+
+  def name
+    username
+  end
+
+  def after_confirmation
+    UserMailer.with(user: self).welcome.deliver_later
+  end
 
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
@@ -65,22 +76,21 @@ class User < ApplicationRecord
       where(conditions).first
     end
   end
-  
+
   # Get the brand IDs for similar paint filtering
   # If not set, defaults to the brands of paints the user owns
   def similar_paint_brand_ids
-    stored_ids = preferences&.dig('similar_paint_brand_ids')
+    stored_ids = preferences&.dig("similar_paint_brand_ids")
     return stored_ids if stored_ids.present?
-    
+
     # Default to brands of paints the user owns
-    owned_brand_ids = paints.joins(:brand).distinct.pluck('brands.id').map(&:to_s)
-    owned_brand_ids
+    paints.joins(:brand).distinct.pluck("brands.id").map(&:to_s)
   end
-  
+
   # Set the brand IDs for similar paint filtering
   def similar_paint_brand_ids=(ids)
     self.preferences ||= {}
-    self.preferences['similar_paint_brand_ids'] = Array(ids).map(&:to_s).uniq
+    self.preferences["similar_paint_brand_ids"] = Array(ids).map(&:to_s).uniq
     save
   end
 end

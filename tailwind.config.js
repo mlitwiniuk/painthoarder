@@ -18,7 +18,7 @@ export default {
   daisyui: {
     themes: [
       {
-        minipaints: {
+        painthoarder: {
           primary: "#6D28D9", // purple
           secondary: "#EC4899", // pink
           accent: "#10B981", // emerald

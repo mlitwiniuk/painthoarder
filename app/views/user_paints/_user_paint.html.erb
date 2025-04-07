@@ -1,7 +1,12 @@
 <li id="<%= dom_id(user_paint) %>" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-base-200 transition-colors duration-200">
   <div class="w-8 h-8 rounded-full border shadow-sm" style="background-color: <%= user_paint.paint.hex_color %>;"></div>
   <div class="flex-1">
-    <p class="font-medium"><%= user_paint.paint.name %></p>
+    <p class="font-medium">
+      <%= link_to user_paint, data: { turbo_frame: "_top"} do %>
+        <span class="absolute inset-0" aria-hidden="true"></span>
+        <%= user_paint.paint.name %>
+      <% end %>
+    </p>
     <p class="text-xs opacity-70">
       <%= user_paint.paint.product_line.brand.name %> •
       <%= user_paint.paint.product_line.name %>

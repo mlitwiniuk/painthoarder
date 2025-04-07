@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scrollbar-rounded" data-theme="minipaints">
+<html lang="en" class="scrollbar-rounded" data-theme="painthoarder">
   <head>
     <%= render "layouts/head" %>
   </head>
@@ -13,7 +13,6 @@
           <div class="text-2xl font-bold">
             <%= link_to "PaintHoarder", root_path %>
           </div>
-
           <!-- Navigation Links -->
           <div class="flex grow justify-between gap-2">
             <% if user_signed_in? %>
@@ -33,11 +32,11 @@
                 </ul>
               </div>
             <% else %>
-            <div></div>
-            <div>
-              <%= link_to "Login", new_user_session_path, class: "btn btn-ghost" %>
-              <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-primary" %>
-            </div>
+              <div></div>
+              <div>
+                <%= link_to "Login", new_user_session_path, class: "btn btn-ghost" %>
+                <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-primary" %>
+              </div>
             <% end %>
             <div title="Change Theme" class="absolute top-2 right-2">
               <label for="my-drawer" class="btn btn-square btn-ghost drawer-button text-primary">
@@ -48,7 +47,6 @@
         </nav>
       </div>
     </header>
-
     <!-- Flash Messages -->
     <% if flash.any? %>
       <div class="container mx-auto px-4 py-2">
@@ -71,15 +69,12 @@
         </div>
       </div>
     <% end %>
-
     <!-- Main Content -->
     <main class="flex-grow drawer-content">
       <%= yield %>
     </main>
-
     <!-- Modal Container for Turbo Frame -->
     <turbo-frame id="modal"></turbo-frame>
-
     <!-- Footer (can be conditionally hidden with @hide_footer) -->
     <% unless user_signed_in? %>
       <footer class="bg-neutral text-neutral-content">
@@ -118,11 +113,14 @@
               </div>
             </div>
           </div>
-
           <div class="flex flex-col md:flex-row items-center justify-between py-6 border-t border-neutral-focus">
-            <div class="flex items-center">
+            <div class="grid grid-cols-2 md:flex items-center gap-2">
               <div class="text-xl font-bold mr-2">MiniPaints</div>
-              <div class="text-sm opacity-70">© <%= Date.current.year %> All Rights Reserved</div>
+              <div class="text-sm opacity-70 mr-2">© <%= Date.current.year %> All Rights Reserved</div>
+              <div class="text-sm mr-2">
+                ❤️ Crafted with love by <a href="https://prograils.com" title="Ruby on Rails product company">Prograils.com</a> / <a href="https://humadroid.io" title="Powerful compliance & team engagement software (with free HR module) for SMBs">humadroid.io</a> team
+              </div>
+              <div class="text-sm">Made in EU 🇪🇺</div>
             </div>
             <div class="flex space-x-4 mt-4 md:mt-0">
               <a class="btn btn-circle btn-outline">
@@ -150,7 +148,6 @@
         </div>
       </footer>
     <% end %>
-
     <div class="drawer-side">
       <label for="my-drawer" class="drawer-overlay"></label>
       <ul class="menu px-4 py-0 w-80 bg-base-200 text-base-content" data-controller="theme">

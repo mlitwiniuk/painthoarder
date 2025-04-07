@@ -13,18 +13,17 @@ Rails.application.routes.draw do
 
   # API endpoints for cascading selects
   namespace :api do
-    resources :brands, only: [ :index ]
-    resources :product_lines, only: [ :index ]
-    resources :paints, only: [ :index, :show ]
+    resources :brands, only: [:index]
+    resources :product_lines, only: [:index]
+    resources :paints, only: [:index, :show]
   end
 
-
+  resources :paints do
+    get :search, on: :collection
+    get :similar, on: :member
+  end
+  resources :user_paints
   authenticated :user do
-    resources :paints do
-      get :search, on: :collection
-      get :similar, on: :member
-    end
-    resources :user_paints
     get "paints/search", to: "paints#search"
     root "dashboard#index", as: :user_root
   end

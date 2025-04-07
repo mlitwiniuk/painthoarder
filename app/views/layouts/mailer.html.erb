@@ -1,13 +1,164 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <style>
-      /* Email styles need to be inline */
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaintHoarder</title>
+    <style type="text/css">
+      /* Base styles */
+      body, p, td, div, span {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #333333;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100% !important;
+        background-color: #f3f4f6;
+      }
+
+      table {
+        border-spacing: 0;
+        border-collapse: collapse;
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+
+      img {
+        border: 0;
+        outline: none;
+        text-decoration: none;
+        max-width: 100%;
+      }
+
+      p {
+        margin: 0 0 16px 0;
+      }
+
+      /* Layout & Components */
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+      }
+
+      .header {
+        background: linear-gradient(to right, #570df8, #f000b8);
+        color: #ffffff;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .header-logo {
+        font-size: 24px;
+        font-weight: bold;
+        color: #ffffff;
+        text-decoration: none;
+      }
+
+      .content {
+        padding: 30px 20px;
+      }
+
+      .footer {
+        background-color: #2a2e37;
+        color: #a6adba;
+        padding: 20px;
+        text-align: center;
+        font-size: 14px;
+      }
+
+      .social-icon {
+        display: inline-block;
+        margin: 0 5px;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #570df8;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .alert-info {
+        background-color: #e0f2fe;
+        border-left: 4px solid #0ea5e9;
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+
+      .alert-error {
+        background-color: #fef2f2;
+        border-left: 4px solid #ef4444;
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+
+      /* Responsive adjustments */
+      @media screen and (max-width: 600px) {
+        .container {
+          width: 100% !important;
+        }
+
+        .content {
+          padding: 20px 15px !important;
+        }
+      }
     </style>
   </head>
-
   <body>
-    <%= yield %>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td align="center" valign="top" style="padding: 20px 0;">
+          <table class="container" width="600" cellpadding="0" cellspacing="0" border="0">
+            <!-- Header -->
+            <tr>
+              <td class="header" align="center" valign="middle">
+                <a href="<%= root_url %>" class="header-logo">
+                  PaintHoarder
+                </a>
+              </td>
+            </tr>
+            <!-- Content -->
+            <tr>
+              <td class="content">
+                <%= yield %>
+              </td>
+            </tr>
+            <!-- Footer -->
+            <tr>
+              <td class="footer">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="center" style="padding-bottom: 10px;">
+                      <p style="color: #a6adba; margin-bottom: 8px;">
+                        <strong>PaintHoarder</strong> | Track your mini painting collection
+                      </p>
+                      <p style="color: #a6adba; font-size: 13px; margin-bottom: 0;">
+                        &copy; <%= Date.current.year %> PaintHoarder. All rights reserved.
+                      </p>
+                    </td>
+                  </tr>
+                  <!-- <tr> -->
+                  <!--   <td align="center" style="font-size: 13px; color: #a6adba;"> -->
+                  <!--     <a href="#" style="color: #a6adba; text-decoration: underline;">Unsubscribe</a> | -->
+                  <!--     <a href="#" style="color: #a6adba; text-decoration: underline;">Privacy Policy</a> | -->
+                  <!--     <a href="#" style="color: #a6adba; text-decoration: underline;">Terms of Service</a> -->
+                  <!--   </td> -->
+                  <!-- </tr> -->
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   </body>
 </html>
