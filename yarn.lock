@@ -1825,6 +1825,10 @@ __metadata:
     tinymce: "npm:^7.7.2"
     tom-select: "npm:^2.4.3"
     workbox-cli: "npm:^7.3.0"
+    workbox-precaching: "npm:^7.3.0"
+    workbox-recipes: "npm:^7.3.0"
+    workbox-routing: "npm:^7.3.0"
+    workbox-strategies: "npm:^7.3.0"
   languageName: unknown
   linkType: soft
 
@@ -6273,7 +6277,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"workbox-precaching@npm:7.3.0":
+"workbox-precaching@npm:7.3.0, workbox-precaching@npm:^7.3.0":
   version: 7.3.0
   resolution: "workbox-precaching@npm:7.3.0"
   dependencies:
@@ -6293,7 +6297,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"workbox-recipes@npm:7.3.0":
+"workbox-recipes@npm:7.3.0, workbox-recipes@npm:^7.3.0":
   version: 7.3.0
   resolution: "workbox-recipes@npm:7.3.0"
   dependencies:
@@ -6307,7 +6311,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"workbox-routing@npm:7.3.0":
+"workbox-routing@npm:7.3.0, workbox-routing@npm:^7.3.0":
   version: 7.3.0
   resolution: "workbox-routing@npm:7.3.0"
   dependencies:
@@ -6316,7 +6320,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"workbox-strategies@npm:7.3.0":
+"workbox-strategies@npm:7.3.0, workbox-strategies@npm:^7.3.0":
   version: 7.3.0
   resolution: "workbox-strategies@npm:7.3.0"
   dependencies:
