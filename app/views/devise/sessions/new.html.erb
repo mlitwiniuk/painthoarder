@@ -3,7 +3,7 @@
   Not a member?
   <a href="/users/sign_up" class="font-semibold text-primary hover:text-secondary">Sign up</a>
 </p>
-<%= simple_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+<%= simple_form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "", data: { turbo: "false" }}) do |f| %>
   <div class="form-inputs mt-2">
     <%= f.input :login,
                 required: false,
