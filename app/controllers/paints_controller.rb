@@ -44,9 +44,7 @@ class PaintsController < ApplicationController
   end
 
   def search
-    @paints = Paint.joins(:product_line).includes(:product_line)
-      .where("paints.name LIKE ? OR paints.code LIKE ?", "%#{params[:query]}%", "%#{params[:query]}%")
-      .limit(20)
+    @paints = Paint.full_search(params[:query]).limit(20)
 
     # Get IDs of paints the user already has a relationship with
     @user_paint_ids = current_user.user_paints.pluck(:paint_id)
