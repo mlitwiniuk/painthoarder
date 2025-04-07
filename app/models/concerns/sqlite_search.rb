@@ -43,9 +43,10 @@ module SqliteSearch
     scope :full_search, ->(query) {
       return none if query.blank?
 
+      whr = sanitize_sql(["fts_#{table_name} = ?", query])
       sql = <<~SQL.strip
         SELECT #{scope_foreign_key} AS id FROM fts_#{table_name}
-        WHERE fts_#{table_name} = '#{query}' ORDER BY rank;
+        WHERE #{whr} ORDER BY rank;
       SQL
       ids = connection.execute(sql).map(&:values).flatten
       where(id: ids)
