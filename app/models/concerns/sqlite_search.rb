@@ -7,7 +7,7 @@ module SqliteSearch
     foreign_key = self.class.to_s.foreign_key
 
     search_attrs = @@search_scope_attrs.each_with_object({}) { |attr, acc|
-      acc[attr] = quote_string(send(attr) || "")
+      acc[attr] = self.class.quote_string(send(attr) || "")
     }
     id_value = attributes[primary_key]
 

@@ -93,7 +93,9 @@ class Api::PaintsControllerTest < ActionDispatch::IntegrationTest
       "id" => @paint1.id,
       "name" => "Abaddon Black",
       "code" => "AB01",
-      "color" => "#808080"
+      "color" => "#808080",
+      "brand_name" => "Brand 2",
+      "product_line_name" => "Product Line 2"
     }, response_data)
   end
 end
