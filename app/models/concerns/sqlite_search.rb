@@ -43,7 +43,7 @@ module SqliteSearch
     scope :full_search, ->(query) {
       return none if query.blank?
 
-      whr = sanitize_sql(["fts_#{table_name} = ?", query])
+      whr = sanitize_sql(["fts_#{table_name} = ?", query.tr('\A\*', "").tr('^A-Za-z0-9\*', "")])
       sql = <<~SQL.strip
         SELECT #{scope_foreign_key} AS id FROM fts_#{table_name}
         WHERE #{whr} ORDER BY rank;

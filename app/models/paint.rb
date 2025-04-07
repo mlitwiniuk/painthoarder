@@ -24,7 +24,7 @@
 class Paint < ApplicationRecord
   ## CONCERNS
   include SqliteSearch
-  search_scope(:name, :code, :brand_name, :product_line_name, includes: [:brand, :product_line])
+  search_scope(:name, :code, :brand_name, :product_line_name, :name_code_normalized, includes: [:brand, :product_line])
 
   ## ATTRIBUTES
   has_one_attached :image
@@ -48,6 +48,10 @@ class Paint < ApplicationRecord
 
   def product_line_name
     product_line.name
+  end
+
+  def name_code_normalized
+    "#{name} #{code}".tr("^A-Za-z0-9\s", "")
   end
 
   ## RANSACK CONFIG
