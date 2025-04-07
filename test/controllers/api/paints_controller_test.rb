@@ -1,7 +1,6 @@
 require "test_helper"
 
 class Api::PaintsControllerTest < ActionDispatch::IntegrationTest
-
   setup do
     @user = FactoryBot.create(:confirmed_user)
     @product_line = FactoryBot.create(:product_line)
@@ -9,21 +8,18 @@ class Api::PaintsControllerTest < ActionDispatch::IntegrationTest
       product_line: @product_line,
       name: "Abaddon Black",
       code: "AB01",
-      hex_color: "#000000"
-    )
+      hex_color: "#000000")
     @paint2 = FactoryBot.create(:paint,
       product_line: @product_line,
       name: "White Scar",
       code: "WS02",
-      hex_color: "#FFFFFF"
-    )
+      hex_color: "#FFFFFF")
     @other_product_line = FactoryBot.create(:product_line)
     @other_paint = FactoryBot.create(:paint,
       product_line: @other_product_line,
       name: "Red Gore",
       code: "RG03",
-      hex_color: "#CC0000"
-    )
+      hex_color: "#CC0000")
   end
 
   test "should require authentication for index" do
@@ -55,7 +51,7 @@ class Api::PaintsControllerTest < ActionDispatch::IntegrationTest
 
   test "should get paints for specific product line" do
     sign_in @user
-    get api_paints_url, params: { product_line_id: @product_line.id }, as: :json
+    get api_paints_url, params: {product_line_id: @product_line.id}, as: :json
     assert_response :success
 
     response_data = JSON.parse(response.body)
@@ -69,7 +65,7 @@ class Api::PaintsControllerTest < ActionDispatch::IntegrationTest
 
   test "should filter paints by name query" do
     sign_in @user
-    get api_paints_url, params: { query: "Black" }, as: :json
+    get api_paints_url, params: {query: "Black"}, as: :json
     assert_response :success
 
     response_data = JSON.parse(response.body)
@@ -79,7 +75,7 @@ class Api::PaintsControllerTest < ActionDispatch::IntegrationTest
 
   test "should filter paints by code query" do
     sign_in @user
-    get api_paints_url, params: { query: "WS02" }, as: :json
+    get api_paints_url, params: {query: "WS02"}, as: :json
     assert_response :success
 
     response_data = JSON.parse(response.body)

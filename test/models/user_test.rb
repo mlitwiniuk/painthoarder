@@ -38,7 +38,7 @@ require "test_helper"
 class UserTest < ActiveSupport::TestCase
   context "validations" do
     subject { build(:user) }
-    
+
     should validate_presence_of(:email)
     should validate_uniqueness_of(:email).case_insensitive.ignoring_case_sensitivity
     should validate_presence_of(:username)
@@ -53,7 +53,7 @@ class UserTest < ActiveSupport::TestCase
   test "should create a valid user" do
     user = build(:user)
     assert user.valid?
-    assert_difference('User.count') do
+    assert_difference("User.count") do
       user.save
     end
   end
@@ -72,7 +72,7 @@ class UserTest < ActiveSupport::TestCase
     # Update confirmation attributes directly instead of using confirm method
     user.confirmed_at = Time.current
     user.save!
-    
+
     assert user.confirmed?
   end
 

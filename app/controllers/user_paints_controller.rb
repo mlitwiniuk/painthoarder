@@ -1,10 +1,10 @@
 # app/controllers/user_paints_controller.rb
 class UserPaintsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_user_paint, only: [ :show, :edit, :update ]
+  before_action :set_user_paint, only: [:show, :edit, :update]
 
   def index
-    @query = current_user.user_paints.includes(paint: { product_line: :brand })
+    @query = current_user.user_paints.includes(paint: {product_line: :brand})
 
     # Apply filters
     @query = apply_filters(@query)
@@ -16,16 +16,16 @@ class UserPaintsController < ApplicationController
     @user_paints = @query
 
     # Data for filter dropdowns - only include brands and product lines from user's owned paints
-    @brands = Brand.joins(product_lines: { paints: { user_paints: :user } })
-                  .where(user_paints: { user_id: current_user.id })
-                  .distinct
-                  .order(:name)
-    @product_lines = ProductLine.joins(paints: { user_paints: :user })
-                              .where(user_paints: { user_id: current_user.id })
-                              .includes(:brand)
-                              .distinct
-                              .order("brands.name, product_lines.name")
-    @color_categories = [ "Red", "Blue", "Green", "Yellow", "Purple", "Cyan", "White", "Black", "Gray", "Metallic", "Other" ]
+    @brands = Brand.joins(product_lines: {paints: {user_paints: :user}})
+      .where(user_paints: {user_id: current_user.id})
+      .distinct
+      .order(:name)
+    @product_lines = ProductLine.joins(paints: {user_paints: :user})
+      .where(user_paints: {user_id: current_user.id})
+      .includes(:brand)
+      .distinct
+      .order("brands.name, product_lines.name")
+    @color_categories = ["Red", "Blue", "Green", "Yellow", "Purple", "Cyan", "White", "Black", "Gray", "Metallic", "Other"]
 
     # For tab counts
     @all_count = current_user.user_paints.count
@@ -73,7 +73,7 @@ class UserPaintsController < ApplicationController
         end
 
         format.html { render :new, status: :unprocessable_entity }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("modal", partial: "user_paints/form", locals: { user_paint: @user_paint }) }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("modal", partial: "user_paints/form", locals: {user_paint: @user_paint}) }
       end
     end
   end
@@ -113,7 +113,7 @@ class UserPaintsController < ApplicationController
 
       respond_to do |format|
         format.html { render :edit }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("modal", partial: "user_paints/form", locals: { user_paint: @user_paint }) }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("modal", partial: "user_paints/form", locals: {user_paint: @user_paint}) }
       end
     end
   end
@@ -137,13 +137,13 @@ class UserPaintsController < ApplicationController
     end
 
     if params[:brand_id].present?
-      query = query.joins(paint: { product_line: :brand })
-        .where(brands: { id: params[:brand_id] })
+      query = query.joins(paint: {product_line: :brand})
+        .where(brands: {id: params[:brand_id]})
     end
 
     if params[:product_line_id].present?
       query = query.joins(paint: :product_line)
-        .where(product_lines: { id: params[:product_line_id] })
+        .where(product_lines: {id: params[:product_line_id]})
     end
 
     if params[:color].present?
@@ -152,7 +152,7 @@ class UserPaintsController < ApplicationController
 
     if params[:search].present?
       search_term = "%#{params[:search]}%"
-      query = query.joins(paint: { product_line: :brand })
+      query = query.joins(paint: {product_line: :brand})
         .where("paints.name ILIKE ? OR brands.name ILIKE ? OR product_lines.name ILIKE ?",
           search_term, search_term, search_term)
     end

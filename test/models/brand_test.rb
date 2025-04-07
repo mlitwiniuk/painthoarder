@@ -28,7 +28,7 @@ class BrandTest < ActiveSupport::TestCase
   test "can create a brand with valid attributes" do
     brand = build(:brand)
     assert brand.valid?
-    assert_difference('Brand.count') do
+    assert_difference("Brand.count") do
       brand.save
     end
   end

@@ -33,9 +33,9 @@ FactoryBot.define do
     trait :with_image do
       after(:build) do |paint|
         paint.image.attach(
-          io: File.open(Rails.root.join('test', 'fixtures', 'files', '1px.png')),
-          filename: '1px.png',
-          content_type: 'image/png'
+          io: File.open(Rails.root.join("test/fixtures/files/1px.png")),
+          filename: "1px.png",
+          content_type: "image/png"
         )
       end
     end

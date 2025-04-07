@@ -58,7 +58,7 @@ FactoryBot.define do
 
     trait :with_sign_in_tracking do
       current_sign_in_at { Time.current }
-      last_sign_in_at { Time.current - 1.day }
+      last_sign_in_at { 1.day.ago }
       current_sign_in_ip { "127.0.0.1" }
       last_sign_in_ip { "127.0.0.1" }
       sign_in_count { 1 }
