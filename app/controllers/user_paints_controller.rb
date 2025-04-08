@@ -2,12 +2,14 @@
 class UserPaintsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_user_paint, only: [:show, :edit, :update, :destroy]
+  include Filterable
 
   def index
-    @query = current_user.user_paints.includes(paint: {product_line: :brand})
+    # Initialize ransack search
+    @q = current_user.user_paints.includes(paint: {product_line: :brand}).ransack(params[:q])
 
-    # Apply filters
-    @query = apply_filters(@query)
+    # Apply additional filters that can't be handled by ransack
+    @query = apply_filters(@q.result)
 
     # Set default sort
     @query = @query.order(created_at: :desc)
@@ -25,7 +27,7 @@ class UserPaintsController < ApplicationController
       .includes(:brand)
       .distinct
       .order("brands.name, product_lines.name")
-    @color_categories = ["Red", "Blue", "Green", "Yellow", "Purple", "Cyan", "White", "Black", "Gray", "Metallic", "Other"]
+    @color_categories = ColorCategorization::COLOR_CATEGORIES
 
     # For tab counts
     @all_count = current_user.user_paints.count
@@ -166,60 +168,9 @@ class UserPaintsController < ApplicationController
     text.split(/[,;\r\n]+/).map(&:strip).reject(&:blank?).uniq
   end
 
+  # Apply Ransack filters plus special filters from Filterable concern
   def apply_filters(query)
-    # Safely apply filters
-    if params[:status].present?
-      query = query.where(status: params[:status])
-    end
-
-    if params[:brand_id].present?
-      query = query.joins(paint: {product_line: :brand})
-        .where(brands: {id: params[:brand_id]})
-    end
-
-    if params[:product_line_id].present?
-      query = query.joins(paint: :product_line)
-        .where(product_lines: {id: params[:product_line_id]})
-    end
-
-    if params[:color].present?
-      query = filter_by_color(query, params[:color].downcase)
-    end
-
-    if params[:search].present?
-      search_term = "%#{params[:search]}%"
-      query = query.joins(paint: {product_line: :brand})
-        .where("paints.name ILIKE ? OR brands.name ILIKE ? OR product_lines.name ILIKE ?",
-          search_term, search_term, search_term)
-    end
-
-    query
-  end
-
-  def filter_by_color(query, color)
-    case color
-    when "red"
-      query.joins(:paint).where("paints.red > 200 AND paints.green < 100 AND paints.blue < 100")
-    when "blue"
-      query.joins(:paint).where("paints.red < 100 AND paints.green < 100 AND paints.blue > 200")
-    when "green"
-      query.joins(:paint).where("paints.red < 100 AND paints.green > 200 AND paints.blue < 100")
-    when "yellow"
-      query.joins(:paint).where("paints.red > 200 AND paints.green > 200 AND paints.blue < 100")
-    when "purple"
-      query.joins(:paint).where("paints.red > 150 AND paints.green < 100 AND paints.blue > 150")
-    when "cyan"
-      query.joins(:paint).where("paints.red < 100 AND paints.green > 150 AND paints.blue > 150")
-    when "white"
-      query.joins(:paint).where("paints.red > 180 AND paints.green > 180 AND paints.blue > 180")
-    when "black"
-      query.joins(:paint).where("paints.red < 50 AND paints.green < 50 AND paints.blue < 50")
-    when "gray"
-      query.joins(:paint).where("ABS(paints.red - paints.green) < 30 AND ABS(paints.green - paints.blue) < 30 AND ABS(paints.red - paints.blue) < 30")
-    when "metallic"
-      query.joins(:paint).where("paints.name ILIKE '%metal%' OR paints.name ILIKE '%silver%' OR paints.name ILIKE '%gold%'")
-    else
-      query
-    end
+    # Use the shared filter logic from the Filterable concern
+    super(query)
   end
 end

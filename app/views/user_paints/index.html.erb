@@ -41,106 +41,36 @@
   <% end %>
 
   <%= turbo_frame_tag "collection-filters" do %>
-    <div class="card bg-base-200 shadow mb-6">
-      <div class="card-body p-4" data-controller="toggle">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <h2 class="card-title text-lg" data-action="click->toggle#toggle">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-            </svg>
-            Filter Collection
-          </h2>
-
-          <div class="join">
-            <%= link_to new_user_paint_path, class: "btn btn-primary join-item", data: { turbo_frame: "modal" } do %>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              Add Paint
-            <% end %>
-            <button data-action="toggle#toggle" class="btn btn-ghost join-item">
-              <span data-toggle-target="label">Filters</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 transition-transform duration-200"
-                  data-toggle-target="icon" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div data-toggle-target="content" class="hidden mt-4">
-          <%= form_with url: user_paints_path, method: :get, data: { turbo_frame: "collection-results", turbo_action: "advance", controller: "auto-submit" } do |f| %>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text">Search</span>
-                </label>
-                <%= f.text_field :search,
-                            value: params[:search],
-                            placeholder: "Paint name, brand...",
-                            class: "input input-bordered w-full",
-                            data: { action: "input->auto-submit#debouncedSubmit" } %>
-              </div>
-
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text">Brand</span>
-                </label>
-                <%= f.select :brand_id,
-                        options_from_collection_for_select(@brands, :id, :name, params[:brand_id]),
-                        { include_blank: "All Brands" },
-                        class: "select select-bordered w-full",
-                        data: { action: "change->auto-submit#submit" } %>
-              </div>
-
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text">Product Line</span>
-                </label>
-                <%= f.select :product_line_id,
-                        options_from_collection_for_select(@product_lines, :id, :to_s, params[:product_line_id]),
-                        { include_blank: "All Product Lines" },
-                        class: "select select-bordered w-full",
-                        data: { action: "change->auto-submit#submit" } %>
-              </div>
-
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text">Color</span>
-                </label>
-                <%= f.select :color,
-                        options_for_select(@color_categories, params[:color]),
-                        { include_blank: "All Colors" },
-                        class: "select select-bordered w-full",
-                        data: { action: "change->auto-submit#submit" } %>
-              </div>
-            </div>
-
-            <div class="flex justify-end mt-4">
-              <%= link_to "Clear Filters", user_paints_path, class: "btn btn-ghost ml-2" %>
-            </div>
-          <% end %>
-        </div>
-      </div>
-    </div>
+    <%= render layout: "user_paints/filter_card_with_add", locals: { title: "Filter Collection" } do %>
+      <%= render "shared/filter_form",
+          q: @q,
+          url: user_paints_path,
+          turbo_frame: "collection-results",
+          brands: @brands,
+          product_lines: @product_lines,
+          color_categories: @color_categories,
+          clear_url: user_paints_path(status: params[:status]),
+          brand_field: :paint_product_line_brand_id_eq,
+          product_line_field: :paint_product_line_id_eq %>
+    <% end %>
   <% end %>
 
   <div id="collection-counts" class="tabs tabs-boxed mb-6">
-    <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).merge(status: nil)),
+    <%= link_to user_paints_path(color: params[:color], status: nil),
             class: "tab #{params[:status] == 'all' || params[:status].blank? ? 'tab-active' : ''}" do %>
       All (<%= @all_count %>)
     <% end %>
-    <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).merge(status: :owned)),
+    <%= link_to user_paints_path(color: params[:color], status: :owned),
             class: "tab #{params[:status] == 'owned' ? 'tab-active' : ''}" do %>
       Owned (<%= @owned_count %>)
     <% end %>
 
-    <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).merge(status: :wishlist)),
+    <%= link_to user_paints_path(color: params[:color], status: :wishlist),
             class: "tab #{params[:status] == 'wishlist' ? 'tab-active' : ''}" do %>
       Wishlist (<%= @wishlist_count %>)
     <% end %>
 
-    <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).merge(status: :avoid)),
+    <%= link_to user_paints_path(color: params[:color], status: :avoid),
             class: "tab #{params[:status] == 'avoid' ? 'tab-active' : ''}" do %>
       Avoid (<%= @avoid_count %>)
     <% end %>
@@ -161,7 +91,7 @@
           </svg>
           <h2 class="text-2xl font-bold mt-4">No paints found</h2>
           <p class="mt-2 text-base-content/70">
-            <% if params[:search].present? || params[:brand_id].present? || params[:product_line_id].present? || params[:color].present? %>
+            <% if params[:q].present? || params[:color].present? %>
               No paints match your current filters
             <% else %>
               <%= params[:status] == 'owned' || params[:status].blank? ? "You haven't added any paints to your collection yet" :
@@ -170,7 +100,7 @@
             <% end %>
           </p>
           <div class="mt-6">
-            <% if params[:search].present? || params[:brand_id].present? || params[:product_line_id].present? || params[:color].present? %>
+            <% if params[:q].present? || params[:color].present? %>
               <%= link_to "Clear Filters", user_paints_path(status: params[:status]), class: "btn btn-primary" %>
             <% else %>
               <%= link_to new_user_paint_path, class: "btn btn-primary", data: { turbo_frame: "modal" } do %>
