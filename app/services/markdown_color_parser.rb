@@ -72,7 +72,7 @@ class MarkdownColorParser
 
       {
         name: name,
-        code: code,
+        code: (code == "null") ? nil : code,
         set: set,
         r: r.to_i,
         g: g.to_i,

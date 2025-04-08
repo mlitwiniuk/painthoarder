@@ -42,7 +42,7 @@ namespace :paints do
         # Create the colors associated with this brand
         result[:colors].each do |color_data|
           product_line = brand.product_lines.find_or_create_by(name: color_data[:set])
-          paint = product_line.paints.find_or_initialize_by(code: color_data[:code])
+          paint = product_line.paints.find_or_initialize_by(code: color_data[:code].presence || color_data[:name])
           paint.assign_attributes(
             name: color_data[:name],
             red: color_data[:r],
