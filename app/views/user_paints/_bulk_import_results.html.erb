@@ -23,7 +23,10 @@
               <td>
                 <%= form_with url: "#", method: :put, class: "paint-select-form", html: { id: "paint-form-#{search_term.parameterize}" } do |f| %>
                   <%= f.select :paint_id,
-                    matches.map { |p| ["#{p.brand_name} - #{p.name} (#{p.code} #{p.product_line_name})", p.id] },
+                    matches.map { |p| 
+                      status_text = @user_paint_statuses[p.id] ? "#{user_paint_status_icon(@user_paint_statuses[p.id])} #{@user_paint_statuses[p.id].upcase} - " : ""
+                      ["#{status_text} #{p.brand_name} - #{p.name} (#{p.code} #{p.product_line_name})", p.id] 
+                    },
                     { selected: matches.first.id },
                     {
                       class: "select select-bordered w-full paint-select"
