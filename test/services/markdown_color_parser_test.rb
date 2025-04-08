@@ -25,6 +25,21 @@ class MarkdownColorParserTest < ActiveSupport::TestCase
       <p align="center">Made available by <a href="https://example.com/">Example</a></p>
     MARKDOWN
 
+    @fanatics = <<~MARKDOWN
+      # Army Painter
+      ![Army_Painter](../logos/Army_Painter.png "Army_Painter")
+
+      |Name|Code|Set|R|G|B|Hex|
+      |---|---|---|---|---|---|---|
+      |Abomination Gore|WP1401|Warpaints|163|47|38|![#A32F26](https://placehold.co/15x15/A32F26/A32F26.png) `#A32F26`|
+      |Absolution Green|null|Speedpaint Set|34|49|31|![#22311F](https://placehold.co/15x15/22311F/22311F.png) `#22311F`|
+      |Absolution Green|null|Speedpaint Set 2.0|33|74|40|![#214A28](https://placehold.co/15x15/214A28/214A28.png) `#214A28`|
+      |Abyssal Black|null|D&D Nolzur's Marvelous Pigments|33|32|29|![#21201D](https://placehold.co/15x15/21201D/21201D.png) `#21201D`|
+      |Abyssal Blue|null|Warpaints Fanatic|0|80|108|![#00506C](https://placehold.co/15x15/00506C/00506C.png) `#00506C`|
+      |Aegis Aqua|null|Warpaints Fanatic|50|179|213|![#32B3D5](https://placehold.co/15x15/32B3D5/32B3D5.png) `#32B3D5`|
+      |Aegis Suit Satin Varnish|CP3027|Warpaints Primer|244|247|247|![#F4F7F7](https://placehold.co/15x15/F4F7F7/F4F7F7.png) `#F4F7F7`|
+    MARKDOWN
+
     @parser_with_code = MarkdownColorParser.new(@sample_with_code)
     @parser_without_code = MarkdownColorParser.new(@sample_without_code)
   end
@@ -76,5 +91,12 @@ class MarkdownColorParserTest < ActiveSupport::TestCase
     assert_equal "Sky Blue", colors[1][:name]
     assert_equal "Sky Blue", colors[1][:code] # Code should be set to name
     assert_equal "#4A8AC7", colors[1][:hex]
+  end
+
+  test "extracts armypainters paints" do
+    @parser_fanatics = MarkdownColorParser.new(@fanatics)
+    colors = @parser_fanatics.parse[:colors]
+
+    assert_equal 7, colors.size
   end
 end
