@@ -9,6 +9,7 @@
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/typography": "^0.5.16",
     "autoprefixer": "^10.4.21",
+    "d3": "^7.9.0",
     "daisyui": "^5.0.6",
     "heroicons": "^2.2.0",
     "tailwind-scrollbar": "^4.0.1",

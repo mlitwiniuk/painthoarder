@@ -125,6 +125,15 @@ class UserPaintsController < ApplicationController
     # Just render the form
   end
 
+  def color_wheel
+    # Get all the user's paints with their associated paint data
+    @user_paints = current_user.user_paints.includes(paint: {product_line: :brand}).all
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def bulk_search
     @paint_names = parse_paint_names(params[:paint_names])
     @search_results = {}
