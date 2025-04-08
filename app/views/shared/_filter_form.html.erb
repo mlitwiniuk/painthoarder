@@ -1,0 +1,57 @@
+<%= search_form_for q, url: url, method: :get,
+    data: { turbo_frame: turbo_frame, turbo_action: "advance", controller: "auto-submit" } do |f| %>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Search</span>
+      </label>
+      <%= text_field_tag :search, params[:search],
+            placeholder: "Search paints...",
+            class: "input input-bordered w-full",
+            data: { action: "input->auto-submit#submit" } %>
+    </div>
+
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Brand</span>
+      </label>
+      <%= f.select defined?(brand_field) ? brand_field : :product_line_brand_id_eq,
+            brands.map { |b| [b.name, b.id] },
+            { include_blank: "All Brands" },
+            class: "select select-bordered w-full",
+            data: { action: "change->auto-submit#submit" } %>
+    </div>
+
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Product Line</span>
+      </label>
+      <%= f.select defined?(product_line_field) ? product_line_field : :product_line_id_eq,
+            product_lines.map { |pl| ["#{pl.brand.name} - #{pl.name}", pl.id] },
+            { include_blank: "All Product Lines" },
+            class: "select select-bordered w-full",
+            data: { action: "change->auto-submit#submit" } %>
+    </div>
+
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text">Color</span>
+      </label>
+      <%= select_tag :color,
+            options_for_select(color_categories, params[:color]),
+            include_blank: "All Colors",
+            class: "select select-bordered w-full",
+            data: { action: "change->auto-submit#submit" } %>
+    </div>
+  </div>
+
+  <div class="flex justify-end mt-4">
+    <button type="button" class="btn btn-ghost ml-2" data-action="click->auto-submit#clearFilters">
+      Clear Filters
+    </button>
+  </div>
+
+  <%# Hidden field to track if we're clearing filters %>
+  <%= hidden_field_tag :clear_filters, "", data: { "auto-submit-target": "clearFiltersInput" } %>
+  <%= hidden_field_tag :status, params[:status] %>
+<% end %>

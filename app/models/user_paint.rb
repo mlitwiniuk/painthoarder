@@ -46,4 +46,20 @@ class UserPaint < ApplicationRecord
     return "similar" if virtual?
     super
   end
+
+  ## RANSACK CONFIG
+  # Define which attributes can be used for searching
+  def self.ransackable_attributes(auth_object = nil)
+    ["notes", "purchase_date", "purchase_price", "status"]
+  end
+
+  # Define which associations can be used for searching
+  def self.ransackable_associations(auth_object = nil)
+    ["paint"]
+  end
+
+  # Make custom sort work for associations
+  def self.ransortable_attributes(auth_object = nil)
+    ransackable_attributes(auth_object) + ["product_line_brand_name"]
+  end
 end

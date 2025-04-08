@@ -2,6 +2,7 @@
 class PaintsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_paint, only: [:show]
+  include Filterable
 
   def index
     # Initialize ransack search
@@ -19,7 +20,7 @@ class PaintsController < ApplicationController
     # Data for filter dropdowns
     @brands = Brand.order(:name)
     @product_lines = ProductLine.includes(:brand).order("brands.name, product_lines.name")
-    @color_categories = ["Red", "Blue", "Green", "Yellow", "Purple", "Cyan", "White", "Black", "Gray", "Metallic", "Other"]
+    @color_categories = ColorCategorization::COLOR_CATEGORIES
 
     # Get IDs of paints the user already has a relationship with
     @user_paint_ids = current_user.user_paints.pluck(:paint_id)
@@ -111,6 +112,7 @@ class PaintsController < ApplicationController
     @paint = Paint.includes(product_line: :brand).find(params[:id])
   end
 
+  # Apply Ransack filters plus special filters from Filterable concern
   def apply_filters(query)
     # Brand filter
     if params[:q] && params[:q][:product_line_brand_id_eq].present?
@@ -123,39 +125,8 @@ class PaintsController < ApplicationController
       query = query.where(product_line_id: params[:q][:product_line_id_eq])
     end
 
-    # Color filter
-    if params[:color].present?
-      query = filter_by_color(query, params[:color])
-    end
-
-    query
-  end
-
-  def filter_by_color(query, color)
-    case color.downcase
-    when "red"
-      query.where("paints.red > 150 AND paints.green < 100 AND paints.blue < 100")
-    when "blue"
-      query.where("paints.red < 100 AND paints.green < 100 AND paints.blue > 150")
-    when "green"
-      query.where("paints.red < 100 AND paints.green > 150 AND paints.blue < 100")
-    when "yellow"
-      query.where("paints.red > 150 AND paints.green > 150 AND paints.blue < 100")
-    when "purple"
-      query.where("paints.red > 100 AND paints.green < 100 AND paints.blue > 100")
-    when "cyan"
-      query.where("paints.red < 100 AND paints.green > 150 AND paints.blue > 150")
-    when "white"
-      query.where("paints.red > 180 AND paints.green > 180 AND paints.blue > 180")
-    when "black"
-      query.where("paints.red < 50 AND paints.green < 50 AND paints.blue < 50")
-    when "gray"
-      query.where("ABS(paints.red - paints.green) < 30 AND ABS(paints.green - paints.blue) < 30 AND ABS(paints.red - paints.blue) < 30")
-    when "metallic"
-      query.where("paints.name ILIKE '%metal%' OR paints.name ILIKE '%silver%' OR paints.name ILIKE '%gold%'")
-    else
-      query
-    end
+    # Apply special filters from concern (search and color)
+    super(query)
   end
 
   # Helper method to convert Paint objects to UserPaint objects
