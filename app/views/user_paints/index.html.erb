@@ -1,7 +1,25 @@
 <% content_for :title, "My Paint Collection | PaintHoarder" %>
 
 <div class="container mx-auto px-4 py-8">
-  <h1 class="text-3xl font-bold mb-8">My Paint Collection</h1>
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">My Paint Collection</h1>
+    <div class="flex">
+      <div class="btn-group">
+        <%= link_to user_paints_path, class: "btn btn-active" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+          </svg>
+          List View
+        <% end %>
+        <%= link_to color_wheel_user_paints_path, class: "btn" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+          </svg>
+          Color Wheel
+        <% end %>
+      </div>
+    </div>
+  </div>
 
   <%= turbo_frame_tag "dashboard-stats" do %>
     <div class="stats shadow mb-8 w-full">

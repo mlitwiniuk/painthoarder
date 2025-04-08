@@ -26,6 +26,7 @@ Rails.application.routes.draw do
     collection do
       get :bulk_import
       post :bulk_search
+      get :color_wheel
     end
   end
   authenticated :user do
