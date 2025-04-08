@@ -55,4 +55,15 @@ module ApplicationHelper
     gravatar_url = "https://robohash.org/#{hash}?gravatar=hashed&size=#{size}x#{size}&bgset=bg1"
     image_tag(gravatar_url, alt: user.username, class: "img-circle")
   end
+
+  def user_paint_status_icon(status)
+    case status
+    when "owned"
+      "✅"
+    when "wishlist"
+      "❤️"
+    when "avoid"
+      "❌"
+    end
+  end
 end

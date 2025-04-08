@@ -128,13 +128,27 @@ class UserPaintsController < ApplicationController
   def bulk_search
     @paint_names = parse_paint_names(params[:paint_names])
     @search_results = {}
+    @user_paint_statuses = {}
+
+    # Get all user's paints to check ownership status
+    user_paints = current_user.user_paints.includes(:paint).index_by(&:paint_id)
 
     @paint_names.each do |name|
       next if name.blank?
 
       # Find top 10 matches for each paint name
       matches = Paint.full_search(name).limit(10).includes(:brand, :product_line)
-      @search_results[name] = matches if matches.any?
+
+      if matches.any?
+        @search_results[name] = matches
+
+        # Check ownership status for each paint match
+        matches.each do |paint|
+          if (user_paint = user_paints[paint.id])
+            @user_paint_statuses[paint.id] = user_paint.status
+          end
+        end
+      end
     end
 
     respond_to do |format|
@@ -171,6 +185,6 @@ class UserPaintsController < ApplicationController
   # Apply Ransack filters plus special filters from Filterable concern
   def apply_filters(query)
     # Use the shared filter logic from the Filterable concern
-    super(query)
+    super
   end
 end
