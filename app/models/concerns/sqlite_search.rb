@@ -42,8 +42,10 @@ module SqliteSearch
     scope_foreign_key = to_s.foreign_key
     scope :full_search, ->(query) {
       return none if query.blank?
+      query = query.strip.gsub('\A*', "").tr("^A-Za-z0-9 ", "").split(" ").map { |s| "#{s}*" }.join(" ")
+      return none if query.blank?
 
-      whr = sanitize_sql(["fts_#{table_name} = ?", query.tr('\A\*', "").tr('^A-Za-z0-9\*', "")])
+      whr = sanitize_sql(["fts_#{table_name} = ?", query])
       sql = <<~SQL.strip
         SELECT #{scope_foreign_key} AS id FROM fts_#{table_name}
         WHERE #{whr} ORDER BY rank;
