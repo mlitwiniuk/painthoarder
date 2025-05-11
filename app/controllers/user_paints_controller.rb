@@ -53,7 +53,21 @@ class UserPaintsController < ApplicationController
   end
 
   def create
-    @user_paint = current_user.user_paints.build(user_paint_params)
+    # Set the status based on which button was pressed
+    status =
+      if params[:commit_owned]
+        "owned"
+      elsif params[:commit_wishlist]
+        "wishlist"
+      else
+        nil
+      end
+
+    # Merge status into user_paint_params
+    up_params = user_paint_params.to_h
+    up_params["status"] = status if status.present?
+
+    @user_paint = current_user.user_paints.build(up_params)
     @search_term = params[:search_term].to_s
 
     respond_to do |format|
@@ -149,10 +163,12 @@ class UserPaintsController < ApplicationController
       matches = Paint.full_search(name).limit(10).includes(:brand, :product_line)
 
       if matches.any?
-        @search_results[name] = matches
+        # Sort so owned paints come first
+        sorted_matches = matches.sort_by { |paint| user_paints[paint.id] ? 0 : 1 }
+        @search_results[name] = sorted_matches
 
         # Check ownership status for each paint match
-        matches.each do |paint|
+        sorted_matches.each do |paint|
           if (user_paint = user_paints[paint.id])
             @user_paint_statuses[paint.id] = user_paint.status
           end
