@@ -1,35 +1,41 @@
 <%# app/views/dashboard/_stats.html.erb %>
-<div class="stats shadow mb-8 w-full">
-  <div class="stat">
-    <div class="stat-figure text-primary">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+<div class="stats shadow mb-8 w-full flex flex-row flex-nowrap overflow-x-auto sm:flex-wrap sm:justify-center sm:gap-4 sm:overflow-visible">
+  <div class="stat px-3 py-2 min-w-[115px] sm:min-w-[160px] flex items-center">
+    <div class="stat-figure text-primary flex-shrink-0 mr-1">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
       </svg>
     </div>
-    <div class="stat-title">Collection Size</div>
-    <div class="stat-value text-primary"><%= @owned_paints_count %></div>
-    <div class="stat-desc">Paints in your collection</div>
+    <div class="flex-1 min-w-0">
+      <div class="stat-title text-xs">Collection <span class="hidden sm:inline">Size</span></div>
+      <div class="stat-value text-primary text-xl truncate overflow-hidden"><%= @owned_paints_count %></div>
+      <div class="stat-desc text-xs hidden sm:block">Paints in your collection</div>
+    </div>
   </div>
 
-  <div class="stat">
-    <div class="stat-figure text-secondary">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+  <div class="stat px-3 py-2 min-w-[115px] sm:min-w-[160px] flex items-center">
+    <div class="stat-figure text-secondary flex-shrink-0 mr-1">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
       </svg>
     </div>
-    <div class="stat-title">Wishlist</div>
-    <div class="stat-value text-secondary"><%= @wishlist_count %></div>
-    <div class="stat-desc">Paints you want to buy</div>
+    <div class="flex-1 min-w-0">
+      <div class="stat-title text-xs">Wishlist</div>
+      <div class="stat-value text-secondary text-xl truncate overflow-hidden"><%= @wishlist_count %></div>
+      <div class="stat-desc text-xs hidden sm:block">Paints you want to buy</div>
+    </div>
   </div>
 
-  <div class="stat">
-    <div class="stat-figure text-secondary">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+  <div class="stat px-3 py-2 min-w-[115px] sm:min-w-[160px] flex items-center">
+    <div class="stat-figure text-secondary flex-shrink-0 mr-1">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
       </svg>
     </div>
-    <div class="stat-title">Brands</div>
-    <div class="stat-value"><%= current_user.paints.distinct.joins(product_line: :brand).select('brands.id').distinct.count %></div>
-    <div class="stat-desc">Represented in your collection</div>
+    <div class="flex-1 min-w-0">
+      <div class="stat-title text-xs">Brands</div>
+      <div class="stat-value text-xl truncate overflow-hidden"><%= current_user.paints.distinct.joins(product_line: :brand).select('brands.id').distinct.count %></div>
+      <div class="stat-desc text-xs hidden sm:block">Represented in your collection</div>
+    </div>
   </div>
 </div>

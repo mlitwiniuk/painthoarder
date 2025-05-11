@@ -14,14 +14,31 @@
             <%= link_to "PaintHoarder", root_path %>
           </div>
           <!-- Navigation Links -->
-          <div class="flex grow justify-between gap-2">
+          <div class="flex grow justify-between gap-2 items-center">
             <% if user_signed_in? %>
-              <div class="flex flex-row gap-2 items-center">
+              <!-- Mobile navigation dropdown -->
+              <div class="dropdown lg:hidden">
+                <label tabindex="0" class="btn btn-ghost">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
+                </label>
+                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                  <li><%= link_to "Dashboard", user_root_path %></li>
+                  <li><%= link_to "My paints", user_paints_path %></li>
+                  <li><%= link_to "Paints", paints_path %></li>
+                  <li><%= link_to "Bulk Import", bulk_import_user_paints_path %></li>
+                </ul>
+              </div>
+
+              <!-- Desktop navigation links -->
+              <div class="hidden lg:flex flex-row gap-2 items-center">
                 <%= link_to "Dashboard", user_root_path, class: "btn btn-ghost" %>
                 <%= link_to "My paints", user_paints_path, class: "btn btn-ghost" %>
                 <%= link_to "Paints", paints_path, class: "btn btn-ghost" %>
                 <%= link_to "Bulk Import", bulk_import_user_paints_path, class: "btn btn-ghost btn-sm " %>
               </div>
+
+              <div class="flex-grow"></div> <!-- Spacer to push avatar to the right -->
+
               <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
                   <div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
@@ -33,14 +50,15 @@
                 </ul>
               </div>
             <% else %>
-              <div></div>
+              <div></div> <!-- This div is for alignment when user is not signed in -->
+              <div class="flex-grow"></div> <!-- Spacer -->
               <div>
                 <%= link_to "Login", new_user_session_path, class: "btn btn-ghost" %>
                 <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-primary" %>
               </div>
             <% end %>
-            <div title="Change Theme" class="absolute top-2 right-2">
-              <label for="my-drawer" class="btn btn-square btn-ghost drawer-button text-primary">
+            <div title="Change Theme" class="ml-auto">
+              <label for="my-drawer" class="btn btn-square btn-ghost drawer-button text-primary-content">
                 <%= icon :swatch %>
               </label>
             </div>
@@ -82,7 +100,7 @@
         <div class="container mx-auto px-4">
           <div class="footer py-10">
             <div>
-              <span class="footer-title">About MiniPaints</span>
+              <span class="footer-title">About PaintHoarder</span>
               <a class="link link-hover">Our Story</a>
               <a class="link link-hover">Team</a>
               <a class="link link-hover">Blog</a>
@@ -116,7 +134,7 @@
           </div>
           <div class="flex flex-col md:flex-row items-center justify-between py-6 border-t border-neutral-focus">
             <div class="grid grid-cols-2 md:flex items-center gap-2">
-              <div class="text-xl font-bold mr-2">MiniPaints</div>
+              <div class="text-xl font-bold mr-2">PaintHoarder</div>
               <div class="text-sm opacity-70 mr-2">© <%= Date.current.year %> All Rights Reserved</div>
               <div class="text-sm mr-2">
                 ❤️ Crafted with love by <a href="https://prograils.com" title="Ruby on Rails product company">Prograils.com</a> / <a href="https://humadroid.io" title="Powerful compliance & team engagement software (with free HR module) for SMBs">humadroid.io</a> team
