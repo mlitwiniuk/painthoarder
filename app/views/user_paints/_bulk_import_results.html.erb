@@ -20,8 +20,8 @@
             <tr id="search-term-row-<%= search_term.parameterize %>" class="search-term-row">
               <td class="font-medium"><%= search_term %></td>
               <td colspan="2">
-                <%= form_with model: UserPaint.new, local: true, html: { class: "bulk-import-action-form flex items-center gap-4" } do |f| %>
-                  <div class="w-2/3">
+                <%= form_with model: UserPaint.new, local: true, html: { class: "bulk-import-action-form flex flex-col md:flex-row items-stretch md:items-center gap-4" } do |f| %>
+                  <div class="w-full md:w-2/3">
                     <%= f.select :paint_id,
                       matches.map { |p| 
                         status_text = @user_paint_statuses[p.id] ? "#{user_paint_status_icon(@user_paint_statuses[p.id])} #{@user_paint_statuses[p.id].upcase} - " : ""
@@ -32,9 +32,9 @@
                     %>
                   </div>
                   <%= hidden_field_tag :search_term, search_term.parameterize %>
-                  <div class="flex gap-2 grow justify-end">
-                    <%= f.submit "Add to Collection", name: "commit_owned", value: "Add to Collection", class: "btn btn-sm btn-success" %>
-                    <%= f.submit "Add to Wishlist", name: "commit_wishlist", value: "Add to Wishlist", class: "btn btn-sm btn-info" %>
+                  <div class="flex flex-col sm:flex-row gap-2 grow sm:justify-end">
+                    <%= f.submit "Add to Collection", name: "commit_owned", value: "Add to Collection", class: "btn btn-sm btn-success w-full sm:w-auto" %>
+                    <%= f.submit "Add to Wishlist", name: "commit_wishlist", value: "Add to Wishlist", class: "btn btn-sm btn-info w-full sm:w-auto" %>
                   </div>
                 <% end %>
               </td>
