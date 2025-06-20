@@ -4,11 +4,11 @@
   <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
     <h1 class="text-3xl font-bold">My Paint Collection</h1>
     <div class="btn-group">
-      <%= link_to user_paints_path, class: "btn btn-active" do %>
+      <%= link_to bulk_import_user_paints_path, class: "btn" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
-        List View
+        Bulk Import
       <% end %>
       <%= link_to color_wheel_user_paints_path, class: "btn" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

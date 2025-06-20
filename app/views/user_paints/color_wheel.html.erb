@@ -10,12 +10,6 @@
           </svg>
           List View
         <% end %>
-        <%= link_to color_wheel_user_paints_path, class: "btn btn-active" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-          </svg>
-          Color Wheel
-        <% end %>
       </div>
     </div>
   </div>
@@ -28,7 +22,7 @@
         
         <!-- Color wheel visualization area -->
         <div
-          class="relative w-full h-[600px] border rounded-lg "
+          class="relative w-full h-[600px] border rounded-lg"
           data-controller="color-wheel"
           data-color-wheel-paints-value="<%= @user_paints.map do |up|
             {
@@ -44,7 +38,7 @@
         >
           <div class="absolute inset-0 flex items-center justify-center" data-color-wheel-target="wheel"></div>
           <div 
-            class="hidden absolute bg-white border rounded-lg shadow-lg p-3 w-64" 
+            class="hidden absolute bg-base-200 border rounded-lg shadow-lg p-3 w-64" 
             data-color-wheel-target="tooltip"
           ></div>
         </div>
