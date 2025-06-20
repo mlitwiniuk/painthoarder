@@ -1,9 +1,12 @@
 <div id="paint-card-<%= user_paint.paint_id %>" class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow duration-300 paint-card">
   <div class="card-body p-4">
     <div class="flex items-start gap-3">
-      <div class="w-12 h-12 rounded-full border shadow-sm" style="background-color: rgb(<%= user_paint.paint.red %>, <%= user_paint.paint.green %>, <%= user_paint.paint.blue %>);"></div>
+      <div class="w-12 h-12 rounded-full border shadow-sm relative" style="background-color: rgb(<%= user_paint.paint.red %>, <%= user_paint.paint.green %>, <%= user_paint.paint.blue %>);">
+        <%= link_to "", paint_path(user_paint.paint), class: "absolute inset-0", data: { turbo_frame: "_top" } %>
+
+      </div>
       <div class="flex flex-col">
-        <h2 class="card-title text-base mb-0"><%= user_paint.paint.name %></h2>
+        <h2 class="card-title text-base mb-0"><%= link_to user_paint.paint.name, paint_path(user_paint.paint), class: "link link-hover", data: { turbo_frame: "_top" } %></h2>
         <p class="text-xs opacity-70"><%= user_paint.paint.product_line.brand.name %> - <%= user_paint.paint.product_line.name %></p>
         <p class="text-xs opacity-50 mt-1">Code: <%= user_paint.paint.code %></p>
       </div>
