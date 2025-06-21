@@ -1,156 +1,325 @@
-<%# app/views/dashboards/show.html.erb %>
-<% content_for :title, "My Paint Collection | PaintHoarder" %>
+<% content_for :title, "Dashboard | PaintHoarder" %>
 
-<h1 class="text-3xl font-bold mb-6">My Paint Collection</h1>
-
-<%= turbo_frame_tag "dashboard-stats" do %>
-  <%= render "dashboard/stats" %>
-<% end %>
-
-<div class="tabs tabs-boxed tabs-sm mb-4 flex-nowrap overflow-x-auto">
-  <a class="tab tab-active" data-controller="tab" data-action="click->tab#activate" data-tab-target="owned">
-    Owned (<%= @owned_paints_count %>)
-  </a>
-  <a class="tab" data-controller="tab" data-action="click->tab#activate" data-tab-target="wishlist">
-    Wishlist (<%= @wishlist_count %>)
-  </a>
-  <a class="tab" data-controller="tab" data-action="click->tab#activate" data-tab-target="avoid">
-    Avoid (<%= @avoid_count %>)
-  </a>
-</div>
-
-<div class="tab-content block" data-tabs-target="content">
-  <div id="owned-tab" class="tab-pane active">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div class="card bg-base-100 shadow">
-        <div class="card-body">
-          <h2 class="card-title">Recently Added</h2>
-          <div class="divider"></div>
-          <%= turbo_frame_tag "recent-paints" do %>
-            <% if @recent_additions.any? %>
-              <ul class="space-y-2">
-                <% @recent_additions.each do |user_paint| %>
-                  <%= render "user_paints/user_paint", user_paint: user_paint %>
-                <% end %>
-              </ul>
-            <% else %>
-              <p class="text-center py-4 text-base-content/70">You haven't added any paints yet.</p>
-            <% end %>
-          <% end %>
+<div class="max-w-7xl mx-auto">
+  <!-- Hero Section with Personal Stats -->
+  <div class="relative bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl p-8 mb-8 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent"></div>
+    <div class="relative z-10">
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        <div>
+          <h1 class="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
+            Welcome back!
+          </h1>
+          <p class="text-base-content/60 text-lg">Here's what's happening with your paint collection</p>
         </div>
+
+        <!-- Personal Stats -->
+        <%= turbo_frame_tag "dashboard-stats" do %>
+          <div class="flex gap-6">
+            <div class="text-center">
+              <div class="text-3xl font-bold text-primary"><%= @owned_paints_count %></div>
+              <div class="text-sm text-base-content/60">Owned</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-secondary"><%= @wishlist_count %></div>
+              <div class="text-sm text-base-content/60">Wishlist</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-accent"><%= current_user.paints.distinct.joins(product_line: :brand).select('brands.id').distinct.count %></div>
+              <div class="text-sm text-base-content/60">Brands</div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Feed Style Navigation -->
+  <div class="sticky top-0 z-40 bg-base-100/80 backdrop-blur-xl border-b border-base-200 -mx-4 px-4 mb-8">
+    <div class="flex items-center justify-between py-4">
+      <!-- Feed Tabs -->
+      <div class="flex items-center gap-1 bg-base-200 rounded-full p-1">
+        <a class="tab px-4 py-2 rounded-full text-sm font-medium transition-all tab-active bg-primary text-primary-content shadow-sm"
+           data-tab-target="recent">
+          Recent Activity
+        </a>
+        <a class="tab px-4 py-2 rounded-full text-sm font-medium transition-all text-base-content/60 hover:text-base-content"
+           data-tab-target="insights">
+          Insights
+        </a>
+        <a class="tab px-4 py-2 rounded-full text-sm font-medium transition-all text-base-content/60 hover:text-base-content"
+           data-tab-target="wishlist">
+          Wishlist <span class="ml-1 opacity-60">(<%= @wishlist_count %>)</span>
+        </a>
       </div>
 
-      <div class="card bg-base-100 shadow">
-        <div class="card-body">
-          <h2 class="card-title">Color Distribution</h2>
-          <div class="divider"></div>
-          <%= turbo_frame_tag "color-chart" do %>
-            <% if @color_distribution.any? %>
-              <div class="space-y-2">
-                <% @color_distribution.each do |category, count| %>
-                  <div class="flex items-center">
-                    <span class="w-24"><%= category %></span>
-                    <div class="flex-1">
-                      <div class="w-full bg-gray-200 rounded-full h-2.5">
-                        <% percentage = (count.to_f / @owned_paints_count * 100).round %>
-                        <% color_map = {
-                              "Reds" => "#ff3b30",
-                              "Greens" => "#34c759",
-                              "Blues" => "#007bff",
-                              "Yellows" => "#ffcc00",
-                              "Purples" => "#af52de",
-                              "Cyans" => "#5ac8fa",
-                              "Whites" => "#f2f2f7",
-                              "Blacks" => "#1c1c1e",
-                              "Grays" => "#8e8e93",
-                              "Other" => "#ff9500"
-                            } %>
-                        <div class="h-2.5 rounded-full"
-                              style="width: <%= percentage %>%; background-color: <%= color_map[category] || '#999999' %>;">
-                        </div>
-                      </div>
+      <!-- Quick Actions -->
+      <div class="flex items-center gap-3">
+        <%= link_to user_paints_path, class: "btn btn-ghost btn-sm" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <span class="hidden sm:inline">View Collection</span>
+        <% end %>
+        <%= link_to new_user_paint_path, class: "btn btn-primary btn-sm", data: { turbo_frame: "modal" } do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span class="hidden sm:inline ml-2">Add Paint</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="dashboard-tabs-wrapper">
+    <!-- Recent Activity Tab -->
+    <div id="recent-tab" class="dashboard-tab-content block active">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Recent Additions Feed -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+              <h2 class="text-xl font-bold text-gray-900 mb-2">Recent Additions</h2>
+              <p class="text-gray-500 text-sm">Your latest paint collection updates</p>
+            </div>
+            <div class="p-6">
+              <%= turbo_frame_tag "recent-paints" do %>
+                <% if @recent_additions.any? %>
+                  <div class="space-y-4">
+                    <% @recent_additions.each do |user_paint| %>
+                      <%= render "dashboard/recent_paint_item", user_paint: user_paint %>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <div class="text-center py-12">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                      </svg>
                     </div>
-                    <span class="w-8 text-right"><%= count %></span>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">No recent activity</h3>
+                    <p class="text-gray-500 mb-4">Start adding paints to see your collection activity here</p>
+                    <%= link_to new_user_paint_path, class: "btn btn-primary", data: { turbo_frame: "modal" } do %>
+                      Add Your First Paint
+                    <% end %>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Add Widget -->
+        <div class="space-y-6">
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+              <h3 class="text-lg font-semibold text-gray-900">Quick Add</h3>
+              <p class="text-gray-500 text-sm mt-1">Search and add paints quickly</p>
+            </div>
+            <div class="p-6">
+              <div data-controller="search">
+                <div class="relative">
+                  <input type="text" placeholder="Search paints..."
+                         class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
+                         data-search-target="input"
+                         data-action="input->search#search">
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                </div>
+
+                <%= turbo_frame_tag "search-results" do %>
+                  <div data-search-target="results" class="mt-4 space-y-2 max-h-64 overflow-y-auto">
+                    <div class="text-center py-8 text-gray-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      <p class="text-sm">Type to search for paints</p>
+                    </div>
                   </div>
                 <% end %>
               </div>
-            <% else %>
-              <p class="text-center py-4 text-base-content/70">Add paints to see your color distribution.</p>
-            <% end %>
-          <% end %>
-        </div>
-      </div>
-
-      <div class="card bg-base-100 shadow">
-        <div class="card-body">
-          <h2 class="card-title">Quick Add</h2>
-          <div class="divider"></div>
-          <div data-controller="search">
-            <div class="form-control">
-              <div class="join w-full">
-                <input type="text" placeholder="Search paints..."
-                        class="input input-bordered join-item w-full"
-                        data-search-target="input"
-                        data-action="input->search#search">
-                <button class="btn join-item btn-primary">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </button>
-              </div>
             </div>
-
-            <%= turbo_frame_tag "search-results" do %>
-              <div data-search-target="results" class="mt-4 space-y-2 max-h-80 overflow-y-auto">
-                <p class="text-center py-4 text-base-content/70">Type to search for paints</p>
-              </div>
-            <% end %>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div id="wishlist-tab" class="tab-pane hidden">
-    <div class="card bg-base-100 shadow">
-      <div class="card-body">
-        <h2 class="card-title">My Wishlist</h2>
-        <div class="divider"></div>
-
-        <%= turbo_frame_tag "wishlist-items" do %>
-          <% if @wishlist_items.any? %>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <% @wishlist_items.each do |user_paint| %>
-                <%= render "user_paints/collection_paint_card", user_paint: user_paint %>
+    <!-- Insights Tab -->
+    <div id="insights-tab" class="dashboard-tab-content hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Color Distribution -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="p-6 border-b border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-900">Color Distribution</h3>
+            <p class="text-gray-500 text-sm mt-1">Breakdown of colors in your collection</p>
+          </div>
+          <div class="p-6">
+            <%= turbo_frame_tag "color-chart" do %>
+              <% if @color_distribution.any? %>
+                <div class="space-y-4">
+                  <% @color_distribution.each do |category, count| %>
+                    <div class="flex items-center gap-4">
+                      <div class="w-20 text-sm font-medium text-gray-700"><%= category %></div>
+                      <div class="flex-1">
+                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                          <% percentage = (count.to_f / @owned_paints_count * 100).round %>
+                          <%
+                            color_map = {
+                              "Reds" => "#ef4444",
+                              "Greens" => "#22c55e",
+                              "Blues" => "#3b82f6",
+                              "Yellows" => "#eab308",
+                              "Purples" => "#a855f7",
+                              "Cyans" => "#06b6d4",
+                              "Whites" => "#f1f5f9",
+                              "Blacks" => "#1f2937",
+                              "Grays" => "#6b7280",
+                              "Other" => "#f97316"
+                            }
+                          %>
+                          <div class="h-full rounded-full transition-all duration-500 ease-out"
+                               style="width: <%= percentage %>%; background-color: <%= color_map[category] || '#9ca3af' %>;">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="w-12 text-right">
+                        <span class="text-sm font-semibold text-gray-900"><%= count %></span>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              <% else %>
+                <div class="text-center py-12">
+                  <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <p class="text-gray-500">Add paints to see your color distribution</p>
+                </div>
               <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Collection Growth -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="p-6 border-b border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-900">Collection Stats</h3>
+            <p class="text-gray-500 text-sm mt-1">Your painting journey at a glance</p>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-2 gap-6">
+              <div class="text-center">
+                <div class="text-3xl font-bold text-primary mb-2"><%= @owned_paints_count %></div>
+                <div class="text-sm text-gray-500">Total Paints</div>
+              </div>
+              <div class="text-center">
+                <div class="text-3xl font-bold text-secondary mb-2"><%= current_user.paints.distinct.joins(product_line: :brand).select('brands.id').distinct.count %></div>
+                <div class="text-sm text-gray-500">Brands</div>
+              </div>
+              <div class="text-center">
+                <div class="text-3xl font-bold text-accent mb-2"><%= current_user.paints.distinct.joins(:product_line).select('product_lines.id').distinct.count %></div>
+                <div class="text-sm text-gray-500">Product Lines</div>
+              </div>
+              <div class="text-center">
+                <div class="text-3xl font-bold text-warning mb-2"><%= @wishlist_count %></div>
+                <div class="text-sm text-gray-500">Wishlist</div>
+              </div>
             </div>
-          <% else %>
-            <p class="text-center py-4 text-base-content/70">Your wishlist is empty.</p>
-          <% end %>
-        <% end %>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div id="avoid-tab" class="tab-pane hidden">
-    <div class="card bg-base-100 shadow">
-      <div class="card-body">
-        <h2 class="card-title">Paints to Avoid</h2>
-        <div class="divider"></div>
-
-        <%= turbo_frame_tag "avoid-list" do %>
-          <% avoided_paints = current_user.user_paints.avoid.includes(paint: { product_line: :brand }) %>
-          <% if avoided_paints.any? %>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <% avoided_paints.each do |user_paint| %>
-                <%= render "user_paints/collection_paint_card", user_paint: user_paint %>
-              <% end %>
-            </div>
-          <% else %>
-            <p class="text-center py-4 text-base-content/70">You haven't marked any paints to avoid.</p>
+    <!-- Wishlist Tab -->
+    <div id="wishlist-tab" class="dashboard-tab-content hidden">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100">
+          <h2 class="text-xl font-bold text-gray-900 mb-2">My Wishlist</h2>
+          <p class="text-gray-500 text-sm">Paints you want to add to your collection</p>
+        </div>
+        <div class="p-6">
+          <%= turbo_frame_tag "wishlist-items" do %>
+            <% if @wishlist_items.any? %>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <% @wishlist_items.each do |user_paint| %>
+                  <%= render "user_paints/modern_paint_card", user_paint: user_paint %>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="text-center py-12">
+                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Your wishlist is empty</h3>
+                <p class="text-gray-500 mb-4">Start adding paints you want to buy</p>
+                <%= link_to paints_path, class: "btn btn-primary" do %>
+                  Browse Paint Catalog
+                <% end %>
+              </div>
+            <% end %>
           <% end %>
-        <% end %>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<%= turbo_frame_tag "modal" %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Simple tab switching for dashboard
+  const tabButtons = document.querySelectorAll('[data-tab-target]');
+  const tabPanes = document.querySelectorAll('.dashboard-tab-content');
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('data-tab-target') + '-tab';
+
+      // Remove active class from all buttons
+      tabButtons.forEach(btn => {
+        btn.classList.remove('bg-primary', 'text-primary-content', 'shadow-sm', 'tab-active');
+        btn.classList.add('text-base-content/60', 'hover:text-base-content');
+      });
+
+      // Add active class to clicked button
+      this.classList.remove('text-base-content/60', 'hover:text-base-content');
+      this.classList.add('bg-primary', 'text-primary-content', 'shadow-sm', 'tab-active');
+
+      // Hide all tab panes
+      tabPanes.forEach(pane => {
+        pane.classList.add('hidden');
+        pane.classList.remove('block', 'active');
+      });
+
+      // Show target tab pane
+      const targetPane = document.getElementById(targetId);
+      if (targetPane) {
+        targetPane.classList.remove('hidden');
+        targetPane.classList.add('block', 'active');
+      }
+    });
+  });
+
+  // Initialize first tab as active
+  if (tabButtons.length > 0) {
+    const firstTab = tabButtons[0];
+    const firstTabId = firstTab.getAttribute('data-tab-target') + '-tab';
+    const firstPane = document.getElementById(firstTabId);
+
+    if (firstPane) {
+      firstPane.classList.remove('hidden');
+      firstPane.classList.add('block', 'active');
+    }
+  }
+});
+</script>

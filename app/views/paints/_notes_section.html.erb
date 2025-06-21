@@ -1,0 +1,10 @@
+<% if user_paint&.notes.present? %>
+  <div id="notes-section-<%= paint.id %>" class="mt-6 pt-6 border-t border-base-300">
+    <h3 class="text-lg font-semibold mb-3">Your Notes</h3>
+    <div class="bg-base-200 rounded-lg p-4">
+      <p class="whitespace-pre-line"><%= user_paint.notes %></p>
+    </div>
+  </div>
+<% else %>
+  <div id="notes-section-<%= paint.id %>"></div>
+<% end %>

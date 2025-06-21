@@ -1,0 +1,27 @@
+<% if user_paint.present? %>
+  <div id="status-badge-<%= paint.id %>" class="absolute top-4 left-4 z-10">
+    <% case user_paint.status %>
+    <% when 'owned' %>
+      <div class="badge badge-success gap-2 shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        In Your Collection
+      </div>
+    <% when 'wishlist' %>
+      <div class="badge badge-warning gap-2 shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+        In Your Wishlist
+      </div>
+    <% when 'avoid' %>
+      <div class="badge badge-error gap-2 shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 715.636 5.636m12.728 12.728L5.636 5.636" />
+        </svg>
+        Avoiding
+      </div>
+    <% end %>
+  </div>
+<% end %>

@@ -5,7 +5,9 @@ export default class extends Controller {
 
   toggle() {
     const isHidden = this.contentTarget.classList.toggle("hidden");
-    this.labelTarget.textContent = isHidden ? "Show Filters" : "Hide Filters";
-    this.iconTarget.classList.toggle("rotate-180", !isHidden);
+    if (this.hasLabelTarget)
+      this.labelTarget.textContent = isHidden ? "Show Filters" : "Hide Filters";
+    if (this.hasIconTarget)
+      this.iconTarget.classList.toggle("rotate-180", !isHidden);
   }
 }
