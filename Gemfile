@@ -82,6 +82,7 @@ group :development do
 end
 
 # Addons
+gem "acts_as_list"
 gem "devise"
 gem "enum_help"
 gem "inline_svg"

@@ -1,0 +1,57 @@
+<%= link_to :back, class: "" do %>
+  Back to projects
+<% end %>
+
+<%# Project Hero %>
+<div class="relative w-full mb-8 pt-2">
+  <% if @project.cover_photo.attached? %>
+    <%= image_tag @project.cover_photo.variant(resize_to_limit: [1600,800]), class: "w-full h-64 md:h-96 object-cover rounded-box" %>
+  <% else %>
+    <div class="w-full h-64 md:h-96 flex items-center justify-center bg-base-200 rounded-box text-base-content/50">No cover photo yet</div>
+  <% end %>
+  <div class="absolute inset-0 bg-black/40 rounded-box"></div>
+
+  <% if user_signed_in? && current_user == @project.user %>
+    <div class="dropdown dropdown-end absolute top-4 right-4 z-10">
+       <label tabindex="0" class="btn btn-ghost btn-circle btn-sm bg-base-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+          </svg>
+        </label>
+      <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40">
+        <li><%= link_to "Edit", edit_project_path(@project) %></li>
+        <li><%= link_to "Delete", @project, data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %></li>
+      </ul>
+    </div>
+  <% end %>
+  <div class="absolute bottom-4 left-4 md:bottom-8 md:left-8 text-white space-y-2">
+    <h1 class="text-2xl md:text-4xl font-bold"><%= @project.title %></h1>
+    <% if @project.description.present? %>
+      <p class="max-w-xl text-sm md:text-base"><%= simple_format(@project.description) %></p>
+    <% end %>
+    <span class="badge badge-outline capitalize"><%= @project.visibility %></span>
+  </div>
+</div>
+
+
+<%# Gallery of all photos across updates %>
+<% all_photos = @project.project_updates.flat_map(&:photos_attachments) %>
+<% if false && all_photos.any? %>
+  <h2 class="text-lg font-semibold mb-3">Gallery</h2>
+  <div class="columns-2 md:columns-3 gap-2 mb-10">
+    <% all_photos.each do |attachment| %>
+      <%= image_tag attachment.variant(resize_to_limit: [600,600]), class: "w-full mb-2 rounded-box" %>
+    <% end %>
+  </div>
+<% end %>
+
+<%# Updates timeline %>
+<% if @project.project_updates.any? %>
+  <h2 class="text-lg font-semibold mb-3">Updates (<%= @project.project_updates.size %>)</h2>
+  <div class="space-y-6">
+    <%= render @project.project_updates %>
+  </div>
+<% else %>
+  <p class="italic text-base-content/60">No updates yet.</p>
+
+<% end %>

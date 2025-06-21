@@ -1,0 +1,105 @@
+
+<%= form_with model: @project, class: "space-y-6", data: { controller: "rails-nested-form", nested_form_wrapper_selector_value: ".nested-form-wrapper" } do |f| %>
+  <% if f.object.errors.any? %>
+    <div class="alert alert-error mb-4">
+      <ul>
+        <% f.object.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="space-y-4">
+    <div>
+      <%= f.label :title, class: "label" %>
+      <%= f.text_field :title, class: "input input-bordered w-full" %>
+    </div>
+
+    <div>
+      <%= f.label :description, class: "label" %>
+      <%= f.text_area :description, rows: 4, class: "textarea textarea-bordered w-full" %>
+    </div>
+
+    <div>
+      <%= f.label :visibility, class: "label" %>
+      <%= f.select :visibility, Project.visibilities.keys.map { |v| [v.humanize, v] }, {}, class: "select select-bordered w-full" %>
+    </div>
+
+
+    <%# Cover picker from existing photos %>
+    <% existing_photos = @project.project_updates.flat_map(&:photos_attachments) %>
+    <% if existing_photos.any? %>
+      <div data-controller="cover-picker" class="mt-6">
+        <%= f.hidden_field :selected_cover_photo_id, value: @project.cover_photo&.id, data: { "cover-picker-target": "input" } %>
+        <p class="mb-2 text-sm font-semibold">Choose project cover:</p>
+        <div class="flex flex-wrap gap-2" data-cover-picker-target="gallery">
+          <% existing_photos.each do |att| %>
+            <%= image_tag att.variant(resize_to_limit: [120,120]), class: "rounded cursor-pointer #{'ring-2 ring-primary' if att.id == @project.cover_photo&.id}", data: { action: "click->cover-picker#pick", id: att.id } %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Nested Project Updates -->
+    <div data-rails-nested-form-target="target">
+      <%= f.fields_for :project_updates do |pu_form| %>
+        <div class="card bg-base-200 p-4 mb-4 nested-form-wrapper" data-rails-nested-form-target="item" data-new-record="<%= pu_form.object.new_record? %>">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-semibold">Update <%= pu_form.index + 1 %></h3>
+            <%= link_to "Remove", "#", class: "btn btn-sm", data: { action: "rails-nested-form#remove" } %>
+            <%= pu_form.hidden_field :_destroy %>
+          </div>
+          <div class="space-y-3">
+            <%= pu_form.label :title, class: "label" %>
+            <%= pu_form.text_field :title, class: "input input-bordered w-full" %>
+
+            <%= pu_form.label :description, class: "label" %>
+            <%= pu_form.text_area :description, rows: 3, class: "textarea textarea-bordered w-full" %>
+
+            <%= pu_form.label :photos, "Photos", class: "label" %>
+            <%= pu_form.file_field :photos, multiple: true, direct_upload: true, class: "file-input file-input-bordered w-full" %>
+            <% if pu_form.object.photos.attached? %>
+              <div class="flex flex-wrap gap-2">
+                <% pu_form.object.photos.each do |photo| %>
+                  <div class="relative">
+                    <%= image_tag photo.variant(resize_to_limit: [150, 150]), class: "rounded" %>
+                    <!-- add a checkbox to delete if you want -->
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      <template data-rails-nested-form-target="template">
+        <div class="card bg-base-200 p-4 mb-4 nested-form-wrapper" data-rails-nested-form-target="item" data-new-record="true">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-semibold">New Update</h3>
+            <a href="#" class="btn btn-sm" data-action="rails-nested-form#remove">Remove</a>
+            <%= hidden_field_tag "project[project_updates_attributes][NEW_RECORD][_destroy]", "0", id: nil %>
+          </div>
+          <div class="space-y-3">
+            <%# Use child_index 'NEW_RECORD' so nested-form replaces it with unique index %>
+            <%= f.fields_for :project_updates, ProjectUpdate.new, child_index: "NEW_RECORD" do |pu_form| %>
+              <%= pu_form.label :title, class: "label" %>
+              <%= pu_form.text_field :title, class: "input input-bordered w-full" %>
+
+              <%= pu_form.label :description, class: "label" %>
+              <%= pu_form.text_area :description, rows: 3, class: "textarea textarea-bordered w-full" %>
+
+              <%= pu_form.label :photos, "Photos", class: "label" %>
+              <%= pu_form.file_field :photos, multiple: true, direct_upload: true, class: "file-input file-input-bordered w-full" %>
+            <% end %>
+          </div>
+        </div>
+      </template>
+
+      <%= link_to "Add Update", "#", class: "btn btn-outline btn-primary", data: { action: "rails-nested-form#add" } %>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit %>
+  </div>
+<% end %>

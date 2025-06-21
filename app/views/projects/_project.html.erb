@@ -1,0 +1,23 @@
+<article id="<%= dom_id project %>" class="break-inside-avoid card bg-base-100 shadow hover:shadow-lg transition relative">
+  <figure class="aspect-video overflow-hidden">
+    <% if project.cover_photo.attached? %>
+      <%= image_tag project.cover_photo.variant(resize_to_limit: [600, 400]), class: "w-full h-full object-cover" %>
+    <% else %>
+      <div class="w-full h-full flex items-center justify-center bg-base-200 text-base-content/50">No cover</div>
+    <% end %>
+  </figure>
+  <div class="card-body p-4">
+    <h2 class="card-title text-lg">
+      <%= link_to project_path(project) do %>
+        <span><%= project.title %></span>
+        <div class="absolute inset-0"></div>
+      <% end %>
+    </h2>
+    <% if project.description.present? %>
+      <p class="text-sm text-base-content/80 line-clamp-3"><%= project.description %></p>
+    <% end %>
+    <div class="mt-2 flex justify-between items-start">
+      <span class="badge badge-outline capitalize"><%= project.visibility %></span>
+    </div>
+  </div>
+</article>

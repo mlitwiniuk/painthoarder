@@ -1,70 +1,69 @@
 <% content_for :title, "Paint Catalog | PaintHoarder" %>
 
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-3xl font-bold mb-8">Paint Catalog</h1>
 
-  <%= turbo_frame_tag "catalog-stats" do %>
-    <div class="stats shadow mb-8 w-full">
-      <div class="stat">
-        <div class="stat-figure text-info">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-        </div>
-        <div class="stat-title">Total Paints</div>
-        <div class="stat-value text-info"><%= Paint.count %></div>
-        <div class="stat-desc">Available in the catalog</div>
-      </div>
+<h1 class="text-3xl font-bold mb-8">Paint Catalog</h1>
 
-      <div class="stat">
-        <div class="stat-figure text-success">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
-          </svg>
-        </div>
-        <div class="stat-title">Brands</div>
-        <div class="stat-value text-success"><%= Brand.count %></div>
-        <div class="stat-desc">Represented in catalog</div>
+<%= turbo_frame_tag "catalog-stats" do %>
+  <div class="stats shadow mb-8 w-full">
+    <div class="stat">
+      <div class="stat-figure text-info">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
       </div>
-
-      <div class="stat">
-        <div class="stat-figure text-secondary">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
-          </svg>
-        </div>
-        <div class="stat-title">Product Lines</div>
-        <div class="stat-value"><%= ProductLine.count %></div>
-        <div class="stat-desc">Available across all brands</div>
-      </div>
+      <div class="stat-title">Total Paints</div>
+      <div class="stat-value text-info"><%= Paint.count %></div>
+      <div class="stat-desc">Available in the catalog</div>
     </div>
-  <% end %>
 
-  <%= turbo_frame_tag "catalog-filters" do %>
-    <%= render layout: "shared/filter_card", locals: { title: "Filter Catalog" } do %>
-      <%= render "shared/filter_form", 
-          q: @q, 
-          url: paints_path, 
-          turbo_frame: "catalog-results", 
-          brands: @brands, 
-          product_lines: @product_lines, 
-          color_categories: @color_categories, 
-          clear_url: paints_path %>
-    <% end %>
-  <% end %>
-
-  <%= turbo_frame_tag "catalog-results" do %>
-    <% if @paints.any? %>
-      <%= render 'sort_bar' %>
-      <%= render 'paint_grid' %>
-
-      <div class="mt-8 flex justify-center">
-        <%== pagy_nav(@pagy) %>
+    <div class="stat">
+      <div class="stat-figure text-success">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+        </svg>
       </div>
-    <% else %>
-      <%= render 'no_paints' %>
-    <% end %>
+      <div class="stat-title">Brands</div>
+      <div class="stat-value text-success"><%= Brand.count %></div>
+      <div class="stat-desc">Represented in catalog</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-figure text-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+        </svg>
+      </div>
+      <div class="stat-title">Product Lines</div>
+      <div class="stat-value"><%= ProductLine.count %></div>
+      <div class="stat-desc">Available across all brands</div>
+    </div>
+  </div>
+<% end %>
+
+<%= turbo_frame_tag "catalog-filters" do %>
+  <%= render layout: "shared/filter_card", locals: { title: "Filter Catalog" } do %>
+    <%= render "shared/filter_form", 
+        q: @q, 
+        url: paints_path, 
+        turbo_frame: "catalog-results", 
+        brands: @brands, 
+        product_lines: @product_lines, 
+        color_categories: @color_categories, 
+        clear_url: paints_path %>
   <% end %>
-</div>
+<% end %>
+
+<%= turbo_frame_tag "catalog-results" do %>
+  <% if @paints.any? %>
+    <%= render 'sort_bar' %>
+    <%= render 'paint_grid' %>
+
+    <div class="mt-8 flex justify-center">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  <% else %>
+    <%= render 'no_paints' %>
+  <% end %>
+<% end %>
 
 <%= turbo_frame_tag "modal" %>

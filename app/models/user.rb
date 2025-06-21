@@ -49,6 +49,7 @@ class User < ApplicationRecord
   ## ASSOCIATIONS
   has_many :user_paints
   has_many :paints, through: :user_paints
+  has_many :projects, dependent: false # via foreign key
 
   # Store user preferences in a JSON column
   store_accessor :preferences, :similar_paint_brand_ids
