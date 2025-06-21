@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="scrollbar-rounded" data-theme="painthoarder">
+<html lang="en" class="scrollbar-rounded compact" data-theme="painthoarder">
   <head>
     <%= render "layouts/head" %>
   </head>
-  <body class="min-h-screen flex flex-col  drawer drawer-end">
+  <body class="min-h-screen flex flex-col  drawer drawer-end compact">
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
     <!-- Header -->
     <header class="bg-gradient-to-r from-primary to-secondary text-primary-content">
@@ -98,6 +98,7 @@
     </main>
     <!-- Modal Container for Turbo Frame -->
     <turbo-frame id="modal"></turbo-frame>
+    <%= render 'shared/lightbox_modal' %>
     <!-- Footer (can be conditionally hidden with @hide_footer) -->
     <% unless user_signed_in? %>
       <footer class="bg-neutral text-neutral-content">
