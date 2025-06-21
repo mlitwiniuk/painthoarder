@@ -1,52 +1,50 @@
 <% content_for :title, "#{@user_paint.paint.name} | PaintHoarder" %>
 
-<div class="container mx-auto px-4 py-8">
-  <div class="flex items-center gap-3 mb-8">
-    <%= link_to user_paints_path, class: "btn btn-circle btn-ghost" do %>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-      </svg>
-    <% end %>
-    <h1 class="text-3xl font-bold"><%= @user_paint.paint.name %></h1>
+<div class="flex items-center gap-3 mb-8">
+  <%= link_to user_paints_path, class: "btn btn-circle btn-ghost" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+    </svg>
+  <% end %>
+  <h1 class="text-3xl font-bold"><%= @user_paint.paint.name %></h1>
+</div>
+
+<!-- Main paint information card -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+  <div id="<%= dom_id(@user_paint) %>" class="lg:col-span-2 card bg-base-100 shadow">
+    <%= render 'user_paints/user_paint_details', user_paint: @user_paint %>
   </div>
 
-  <!-- Main paint information card -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-    <div id="<%= dom_id(@user_paint) %>" class="lg:col-span-2 card bg-base-100 shadow">
-      <%= render 'user_paints/user_paint_details', user_paint: @user_paint %>
-    </div>
-
-    <!-- Action sidebar -->
-    <div id="quick-actions-<%= dom_id(@user_paint) %>" class="card bg-base-100 shadow h-fit">
-      <%= render 'user_paints/quick_actions', user_paint: @user_paint %>
-    </div>
+  <!-- Action sidebar -->
+  <div id="quick-actions-<%= dom_id(@user_paint) %>" class="card bg-base-100 shadow h-fit">
+    <%= render 'user_paints/quick_actions', user_paint: @user_paint %>
   </div>
+</div>
 
-  <!-- Similar paints tabs section -->
-  <div class="card bg-base-100 shadow mb-6">
-    <div class="card-body" data-controller="tab">
-      <h2 class="card-title text-xl mb-4">Similar Paints</h2>
+<!-- Similar paints tabs section -->
+<div class="card bg-base-100 shadow mb-6">
+  <div class="card-body" data-controller="tab">
+    <h2 class="card-title text-xl mb-4">Similar Paints</h2>
 
-      <div class="tabs tabs-border">
-        <input type="radio" name="similar_tab" class="tab" aria-label="RGB Similarity" />
-        <div class="tab-content border-base-300 bg-base-100 p-10">
-          <%= turbo_frame_tag "similar-paints-frame-rgb", src: similar_paint_path(@user_paint.paint, similar_type: "rgb", per_page: 12, format: :html), loading: "lazy" do %>
-            <div class="col-span-full text-center py-6">
-              <div class="loading loading-spinner loading-lg"></div>
-              <p class="text-base-content/60 mt-2">Loading RGB similar paints...</p>
-            </div>
-          <% end %>
-        </div>
+    <div class="tabs tabs-border">
+      <input type="radio" name="similar_tab" class="tab" aria-label="RGB Similarity" />
+      <div class="tab-content border-base-300 bg-base-100 p-10">
+        <%= turbo_frame_tag "similar-paints-frame-rgb", src: similar_paint_path(@user_paint.paint, similar_type: "rgb", per_page: 12, format: :html), loading: "lazy" do %>
+          <div class="col-span-full text-center py-6">
+            <div class="loading loading-spinner loading-lg"></div>
+            <p class="text-base-content/60 mt-2">Loading RGB similar paints...</p>
+          </div>
+        <% end %>
+      </div>
 
-        <input type="radio" name="similar_tab" class="tab" aria-label="HSL Similarity" />
-        <div class="tab-content border-base-300 bg-base-100 p-10">
-          <%= turbo_frame_tag "similar-paints-frame-hsl", src: similar_paint_path(@user_paint.paint, similar_type: "hsl", per_page: 12, format: :html), loading: "lazy" do %>
-            <div class="col-span-full text-center py-6">
-              <div class="loading loading-spinner loading-lg"></div>
-              <p class="text-base-content/60 mt-2">Loading HSL similar paints...</p>
-            </div>
-          <% end %>
-        </div>
+      <input type="radio" name="similar_tab" class="tab" aria-label="HSL Similarity" />
+      <div class="tab-content border-base-300 bg-base-100 p-10">
+        <%= turbo_frame_tag "similar-paints-frame-hsl", src: similar_paint_path(@user_paint.paint, similar_type: "hsl", per_page: 12, format: :html), loading: "lazy" do %>
+          <div class="col-span-full text-center py-6">
+            <div class="loading loading-spinner loading-lg"></div>
+            <p class="text-base-content/60 mt-2">Loading HSL similar paints...</p>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>

@@ -1,157 +1,155 @@
 <%# app/views/dashboards/show.html.erb %>
 <% content_for :title, "My Paint Collection | PaintHoarder" %>
 
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-3xl font-bold mb-8">My Paint Collection</h1>
+<h1 class="text-3xl font-bold mb-8">My Paint Collection</h1>
 
-  <%= turbo_frame_tag "dashboard-stats" do %>
-    <%= render "dashboard/stats" %>
-  <% end %>
+<%= turbo_frame_tag "dashboard-stats" do %>
+  <%= render "dashboard/stats" %>
+<% end %>
 
-  <div class="tabs tabs-boxed mb-6 flex-nowrap overflow-x-auto">
-    <a class="tab tab-active" data-controller="tab" data-action="click->tab#activate" data-tab-target="owned">
-      Owned (<%= @owned_paints_count %>)
-    </a>
-    <a class="tab" data-controller="tab" data-action="click->tab#activate" data-tab-target="wishlist">
-      Wishlist (<%= @wishlist_count %>)
-    </a>
-    <a class="tab" data-controller="tab" data-action="click->tab#activate" data-tab-target="avoid">
-      Avoid (<%= @avoid_count %>)
-    </a>
-  </div>
+<div class="tabs tabs-boxed mb-6 flex-nowrap overflow-x-auto">
+  <a class="tab tab-active" data-controller="tab" data-action="click->tab#activate" data-tab-target="owned">
+    Owned (<%= @owned_paints_count %>)
+  </a>
+  <a class="tab" data-controller="tab" data-action="click->tab#activate" data-tab-target="wishlist">
+    Wishlist (<%= @wishlist_count %>)
+  </a>
+  <a class="tab" data-controller="tab" data-action="click->tab#activate" data-tab-target="avoid">
+    Avoid (<%= @avoid_count %>)
+  </a>
+</div>
 
-  <div class="tab-content block" data-tabs-target="content">
-    <div id="owned-tab" class="tab-pane active">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="card bg-base-100 shadow">
-          <div class="card-body">
-            <h2 class="card-title">Recently Added</h2>
-            <div class="divider"></div>
-            <%= turbo_frame_tag "recent-paints" do %>
-              <% if @recent_additions.any? %>
-                <ul class="space-y-2">
-                  <% @recent_additions.each do |user_paint| %>
-                    <%= render "user_paints/user_paint", user_paint: user_paint %>
-                  <% end %>
-                </ul>
-              <% else %>
-                <p class="text-center py-4 text-base-content/70">You haven't added any paints yet.</p>
-              <% end %>
+<div class="tab-content block" data-tabs-target="content">
+  <div id="owned-tab" class="tab-pane active">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="card bg-base-100 shadow">
+        <div class="card-body">
+          <h2 class="card-title">Recently Added</h2>
+          <div class="divider"></div>
+          <%= turbo_frame_tag "recent-paints" do %>
+            <% if @recent_additions.any? %>
+              <ul class="space-y-2">
+                <% @recent_additions.each do |user_paint| %>
+                  <%= render "user_paints/user_paint", user_paint: user_paint %>
+                <% end %>
+              </ul>
+            <% else %>
+              <p class="text-center py-4 text-base-content/70">You haven't added any paints yet.</p>
             <% end %>
-          </div>
+          <% end %>
         </div>
+      </div>
 
-        <div class="card bg-base-100 shadow">
-          <div class="card-body">
-            <h2 class="card-title">Color Distribution</h2>
-            <div class="divider"></div>
-            <%= turbo_frame_tag "color-chart" do %>
-              <% if @color_distribution.any? %>
-                <div class="space-y-2">
-                  <% @color_distribution.each do |category, count| %>
-                    <div class="flex items-center">
-                      <span class="w-24"><%= category %></span>
-                      <div class="flex-1">
-                        <div class="w-full bg-gray-200 rounded-full h-2.5">
-                          <% percentage = (count.to_f / @owned_paints_count * 100).round %>
-                          <% color_map = {
-                               "Reds" => "#ff3b30",
-                               "Greens" => "#34c759",
-                               "Blues" => "#007bff",
-                               "Yellows" => "#ffcc00",
-                               "Purples" => "#af52de",
-                               "Cyans" => "#5ac8fa",
-                               "Whites" => "#f2f2f7",
-                               "Blacks" => "#1c1c1e",
-                               "Grays" => "#8e8e93",
-                               "Other" => "#ff9500"
-                             } %>
-                          <div class="h-2.5 rounded-full"
-                               style="width: <%= percentage %>%; background-color: <%= color_map[category] || '#999999' %>;">
-                          </div>
+      <div class="card bg-base-100 shadow">
+        <div class="card-body">
+          <h2 class="card-title">Color Distribution</h2>
+          <div class="divider"></div>
+          <%= turbo_frame_tag "color-chart" do %>
+            <% if @color_distribution.any? %>
+              <div class="space-y-2">
+                <% @color_distribution.each do |category, count| %>
+                  <div class="flex items-center">
+                    <span class="w-24"><%= category %></span>
+                    <div class="flex-1">
+                      <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <% percentage = (count.to_f / @owned_paints_count * 100).round %>
+                        <% color_map = {
+                              "Reds" => "#ff3b30",
+                              "Greens" => "#34c759",
+                              "Blues" => "#007bff",
+                              "Yellows" => "#ffcc00",
+                              "Purples" => "#af52de",
+                              "Cyans" => "#5ac8fa",
+                              "Whites" => "#f2f2f7",
+                              "Blacks" => "#1c1c1e",
+                              "Grays" => "#8e8e93",
+                              "Other" => "#ff9500"
+                            } %>
+                        <div class="h-2.5 rounded-full"
+                              style="width: <%= percentage %>%; background-color: <%= color_map[category] || '#999999' %>;">
                         </div>
                       </div>
-                      <span class="w-8 text-right"><%= count %></span>
                     </div>
-                  <% end %>
-                </div>
-              <% else %>
-                <p class="text-center py-4 text-base-content/70">Add paints to see your color distribution.</p>
-              <% end %>
+                    <span class="w-8 text-right"><%= count %></span>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="text-center py-4 text-base-content/70">Add paints to see your color distribution.</p>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="card bg-base-100 shadow">
+        <div class="card-body">
+          <h2 class="card-title">Quick Add</h2>
+          <div class="divider"></div>
+          <div data-controller="search">
+            <div class="form-control">
+              <div class="join w-full">
+                <input type="text" placeholder="Search paints..."
+                        class="input input-bordered join-item w-full"
+                        data-search-target="input"
+                        data-action="input->search#search">
+                <button class="btn join-item btn-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <%= turbo_frame_tag "search-results" do %>
+              <div data-search-target="results" class="mt-4 space-y-2 max-h-80 overflow-y-auto">
+                <p class="text-center py-4 text-base-content/70">Type to search for paints</p>
+              </div>
             <% end %>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
 
-        <div class="card bg-base-100 shadow">
-          <div class="card-body">
-            <h2 class="card-title">Quick Add</h2>
-            <div class="divider"></div>
-            <div data-controller="search">
-              <div class="form-control">
-                <div class="join w-full">
-                  <input type="text" placeholder="Search paints..."
-                         class="input input-bordered join-item w-full"
-                         data-search-target="input"
-                         data-action="input->search#search">
-                  <button class="btn join-item btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
+  <div id="wishlist-tab" class="tab-pane hidden">
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title">My Wishlist</h2>
+        <div class="divider"></div>
 
-              <%= turbo_frame_tag "search-results" do %>
-                <div data-search-target="results" class="mt-4 space-y-2 max-h-80 overflow-y-auto">
-                  <p class="text-center py-4 text-base-content/70">Type to search for paints</p>
-                </div>
+        <%= turbo_frame_tag "wishlist-items" do %>
+          <% if @wishlist_items.any? %>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <% @wishlist_items.each do |user_paint| %>
+                <%= render "user_paints/collection_paint_card", user_paint: user_paint %>
               <% end %>
             </div>
-          </div>
-        </div>
+          <% else %>
+            <p class="text-center py-4 text-base-content/70">Your wishlist is empty.</p>
+          <% end %>
+        <% end %>
       </div>
     </div>
+  </div>
 
-    <div id="wishlist-tab" class="tab-pane hidden">
-      <div class="card bg-base-100 shadow">
-        <div class="card-body">
-          <h2 class="card-title">My Wishlist</h2>
-          <div class="divider"></div>
+  <div id="avoid-tab" class="tab-pane hidden">
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title">Paints to Avoid</h2>
+        <div class="divider"></div>
 
-          <%= turbo_frame_tag "wishlist-items" do %>
-            <% if @wishlist_items.any? %>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <% @wishlist_items.each do |user_paint| %>
-                  <%= render "user_paints/collection_paint_card", user_paint: user_paint %>
-                <% end %>
-              </div>
-            <% else %>
-              <p class="text-center py-4 text-base-content/70">Your wishlist is empty.</p>
-            <% end %>
+        <%= turbo_frame_tag "avoid-list" do %>
+          <% avoided_paints = current_user.user_paints.avoid.includes(paint: { product_line: :brand }) %>
+          <% if avoided_paints.any? %>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <% avoided_paints.each do |user_paint| %>
+                <%= render "user_paints/collection_paint_card", user_paint: user_paint %>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-center py-4 text-base-content/70">You haven't marked any paints to avoid.</p>
           <% end %>
-        </div>
-      </div>
-    </div>
-
-    <div id="avoid-tab" class="tab-pane hidden">
-      <div class="card bg-base-100 shadow">
-        <div class="card-body">
-          <h2 class="card-title">Paints to Avoid</h2>
-          <div class="divider"></div>
-
-          <%= turbo_frame_tag "avoid-list" do %>
-            <% avoided_paints = current_user.user_paints.avoid.includes(paint: { product_line: :brand }) %>
-            <% if avoided_paints.any? %>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <% avoided_paints.each do |user_paint| %>
-                  <%= render "user_paints/collection_paint_card", user_paint: user_paint %>
-                <% end %>
-              </div>
-            <% else %>
-              <p class="text-center py-4 text-base-content/70">You haven't marked any paints to avoid.</p>
-            <% end %>
-          <% end %>
-        </div>
+        <% end %>
       </div>
     </div>
   </div>

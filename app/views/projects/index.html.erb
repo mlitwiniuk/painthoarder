@@ -1,0 +1,17 @@
+<% content_for :title, "Projects" %>
+
+<div class="flex justify-between items-center mb-6">
+  <h1 class="text-2xl font-bold"><%= params[:action] == "public_index" ? "Public Projects" : "My Projects" %></h1>
+  <div>
+    <% if params[:action] == "public_index" %>
+      <%= link_to "My Projects", projects_path, class: "btn btn-primary" %>
+    <% else %>
+      <%= link_to "Public Projects", public_projects_path, class: "btn btn-primary" %>
+    <% end %>
+    <%= link_to "New Project", new_project_path, class: "btn btn-secondary" %>
+  </div>
+</div>
+
+<div id="projects" class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+  <%= render @projects %>
+</div>

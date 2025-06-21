@@ -34,6 +34,14 @@ Rails.application.routes.draw do
     root "dashboard#index", as: :user_root
   end
 
+  # Projects
+  resources :projects do
+    collection do
+      get :public, to: "projects#public_index"
+    end
+  end
+  get "/p/:token", to: "projects#restricted", as: :restricted_project
+
   resources :pages
 
   root "pages#welcome"
