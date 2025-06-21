@@ -42,7 +42,7 @@
     <% end %>
 
     <!-- Nested Project Updates -->
-    <div data-rails-nested-form-target="target">
+    <div >
       <%= f.fields_for :project_updates do |pu_form| %>
         <div class="card bg-base-200 p-4 mb-4 nested-form-wrapper" data-rails-nested-form-target="item" data-new-record="<%= pu_form.object.new_record? %>">
           <div class="flex justify-between items-center mb-2">
@@ -72,6 +72,7 @@
           </div>
         </div>
       <% end %>
+      <div data-rails-nested-form-target="target"></div>
       <template data-rails-nested-form-target="template">
         <div class="card bg-base-200 p-4 mb-4 nested-form-wrapper" data-rails-nested-form-target="item" data-new-record="true">
           <div class="flex justify-between items-center mb-2">
