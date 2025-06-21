@@ -24,10 +24,18 @@
 
     <% photos = project_update.photos_attachments %>
     <% if photos.any? %>
-      <div class="w-full flex flex-wrap gap-1 mb-2">
-        <% photos.each do |att| %>
-          <%= image_tag att.variant(resize_to_fill: [150,150]), class: "rounded-box h-24 object-cover #{'ring-2 ring-primary' if att == project_update.primary_photo}" %>
-        <% end %>
+      <div data-controller="lightbox" class="w-full">
+        <div class="flex flex-wrap gap-1 mb-2">
+          <% photos.each do |att| %>
+            <%= image_tag att.variant(resize_to_fill: [150,150]),
+                class: "rounded-box h-24 object-cover #{'ring-2 ring-primary' if att == project_update.primary_photo}",
+                data: {
+                  lightbox_target: "thumbnail",
+                  action: "click->lightbox#open",
+                  full_url: url_for(att)
+                } %>
+          <% end %>
+        </div>
       </div>
     <% end %>
   </div>
