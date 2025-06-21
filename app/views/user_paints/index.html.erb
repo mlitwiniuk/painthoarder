@@ -3,13 +3,13 @@
   <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
     <h1 class="text-3xl font-bold">My Paint Collection</h1>
     <div class="btn-group">
-      <%= link_to bulk_import_user_paints_path, class: "btn" do %>
+      <%= link_to bulk_import_user_paints_path, class: "btn btn-sm" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
         Bulk Import
       <% end %>
-      <%= link_to color_wheel_user_paints_path, class: "btn" do %>
+      <%= link_to color_wheel_user_paints_path, class: "btn btn-sm" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
         </svg>
@@ -19,7 +19,7 @@
   </div>
 
   <%= turbo_frame_tag "dashboard-stats" do %>
-    <div class="stats shadow mb-8 w-full">
+    <div class="stats stats-compact shadow mb-6 w-full">
       <div class="stat">
         <div class="stat-figure text-primary">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
@@ -70,7 +70,7 @@
     <% end %>
   <% end %>
 
-  <div id="collection-counts" class="tabs tabs-boxed mb-6">
+  <div id="collection-counts" class="tabs tabs-boxed tabs-sm mb-4">
     <%= link_to user_paints_path(color: params[:color], status: nil),
             class: "tab #{params[:status] == 'all' || params[:status].blank? ? 'tab-active' : ''}" do %>
       All (<%= @all_count %>)
@@ -93,7 +93,7 @@
 
   <%= turbo_frame_tag "collection-results" do %>
     <% if @user_paints.any? %>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
         <% @user_paints.each do |user_paint| %>
           <%= render 'user_paints/collection_paint_card', user_paint: user_paint %>
         <% end %>

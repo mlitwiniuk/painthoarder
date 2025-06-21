@@ -17,6 +17,7 @@ export default {
   },
   daisyui: {
     themes: [
+      "corporate",
       {
         painthoarder: {
           primary: "#6D28D9", // purple
