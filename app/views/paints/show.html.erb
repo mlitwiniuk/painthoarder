@@ -1,173 +1,147 @@
 <% content_for :title, "#{@paint.name} | PaintHoarder" %>
 
-<div class="flex items-center gap-3 mb-8">
-  <%= link_to paints_path, class: "btn btn-circle btn-ghost" do %>
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-    </svg>
-  <% end %>
-  <h1 class="text-3xl font-bold"><%= @paint.name %></h1>
-</div>
+<div class="max-w-7xl mx-auto p-4">
+  <!-- Header with Back Navigation -->
+  <div class="flex items-center gap-4 mb-6">
+    <%= link_to paints_path, class: "btn btn-circle btn-ghost hover:btn-primary" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+    <% end %>
+    <div class="flex-1">
+      <h1 class="text-2xl font-bold"><%= @paint.name %></h1>
+      <p class="text-base-content/60">
+        <%= @paint.product_line.brand.name %> • <%= @paint.product_line.name %>
+      </p>
+    </div>
+  </div>
 
-<!-- Main paint information card -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-  <div class="lg:col-span-2 card bg-base-100 shadow">
-    <div class="card-body">
-      <div class="flex flex-col md:flex-row gap-6">
-        <!-- Color swatch -->
-        <div class="flex-shrink-0">
-          <div class="w-32 h-32 rounded-lg shadow border" style="background-color: rgb(<%= @paint.red %>, <%= @paint.green %>, <%= @paint.blue %>);"></div>
-        </div>
+  <!-- Main Paint Card -->
+  <div class="card bg-base-100 shadow-xl border border-base-300 mb-8">
+    <!-- Color Hero Section -->
+    <div class="relative h-48 sm:h-56 overflow-hidden rounded-t-2xl"
+         style="background: linear-gradient(135deg, <%= @paint.hex_color %> 0%, <%= @paint.hex_color %>dd 50%, <%= @paint.hex_color %>88 100%);">
 
-        <!-- Paint details -->
-        <div class="flex-grow">
-          <h2 class="card-title text-2xl mb-2"><%= @paint.name %></h2>
-          <div class="flex flex-col gap-2">
+      <!-- Status Badge -->
+      <%= render 'status_badge', paint: @paint, user_paint: @user_paint %>
+
+      <!-- Color Information Overlay -->
+      <div class="absolute bottom-4 left-4 right-4">
+        <div class="bg-base-100/90 backdrop-blur-sm rounded-2xl p-4">
+          <div class="grid grid-cols-3 gap-4 text-center">
             <div>
-              <span class="text-base-content/60">Brand:</span>
+              <div class="text-xs text-base-content/60 font-medium uppercase tracking-wide">HEX</div>
+              <div class="font-mono text-sm font-bold"><%= @paint.hex_color %></div>
+            </div>
+            <div>
+              <div class="text-xs text-base-content/60 font-medium uppercase tracking-wide">RGB</div>
+              <div class="font-mono text-sm font-bold">
+                <%= @paint.red %>, <%= @paint.green %>, <%= @paint.blue %>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-base-content/60 font-medium uppercase tracking-wide">HSL</div>
+              <% h, s, l = rgb_to_hsl(@paint.red, @paint.green, @paint.blue) %>
+              <div class="font-mono text-sm font-bold">
+                <%= h %>°, <%= s %>%, <%= l %>%
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paint Details -->
+    <div class="card-body">
+      <!-- Collection Actions -->
+      <% if @user_paint %>
+        <div class="flex flex-wrap gap-2 mb-4">
+          <%= render 'user_paints/status_actions', user_paint: @user_paint %>
+        </div>
+      <% end %>
+
+      <!-- Paint Information Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Paint Details -->
+        <div>
+          <h3 class="text-lg font-semibold mb-3">Paint Details</h3>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center p-3 bg-base-200 rounded-lg">
+              <span class="text-base-content/70">Brand</span>
               <span class="font-medium"><%= @paint.product_line.brand.name %></span>
             </div>
-            <div>
-              <span class="text-base-content/60">Product Line:</span>
+            <div class="flex justify-between items-center p-3 bg-base-200 rounded-lg">
+              <span class="text-base-content/70">Product Line</span>
               <span class="font-medium"><%= @paint.product_line.name %></span>
             </div>
-            
-            <% if @user_paint %>
-              <div>
-                <span class="text-base-content/60">Status:</span>
-                <% if @user_paint.owned? %>
-                  <span class="badge badge-success">In Your Collection</span>
-                <% elsif @user_paint.wishlist? %>
-                  <span class="badge badge-warning">In Your Wishlist</span>
-                <% elsif @user_paint.avoid? %>
-                  <span class="badge badge-error">In Your Avoid List</span>
-                <% end %>
+            <div class="flex justify-between items-center p-3 bg-base-200 rounded-lg">
+              <span class="text-base-content/70">Color Name</span>
+              <span class="font-medium"><%= @paint.name %></span>
+            </div>
+            <% if @paint.code.present? %>
+              <div class="flex justify-between items-center p-3 bg-base-200 rounded-lg">
+                <span class="text-base-content/70">Code</span>
+                <span class="font-medium"><%= @paint.code %></span>
               </div>
             <% end %>
-
-            <div>
-              <span class="text-base-content/60">Code:</span>
-              <span class="font-medium"><%= @paint.code %></span>
-            </div>
-
-            <div>
-              <span class="text-base-content/60">Color (RGB):</span>
-              <span class="font-mono text-sm">rgb(<%= @paint.red %>, <%= @paint.green %>, <%= @paint.blue %>)</span>
-            </div>
-
-            <div>
-              <span class="text-base-content/60">Color (HEX):</span>
-              <span class="font-mono text-sm"><%= @paint.hex_color %></span>
-            </div>
-            
-            <% h, s, l = rgb_to_hsl(@paint.red, @paint.green, @paint.blue) %>
-            <div>
-              <span class="text-base-content/60">Color (HSL):</span>
-              <span class="font-mono text-sm">hsl(<%= h %>°, <%= s %>%, <%= l %>%)</span>
-            </div>
           </div>
         </div>
+
+        <!-- Collection Options -->
+        <div>
+          <%= render 'collection_options', paint: @paint, user_paint: @user_paint %>
+        </div>
       </div>
+
+      <!-- Notes Section for existing user paint -->
+      <%= render 'notes_section', paint: @paint, user_paint: @user_paint %>
     </div>
   </div>
 
-  <!-- Action sidebar -->
-  <div class="card bg-base-200 shadow h-fit">
+  <!-- Similar Paints Section -->
+  <div class="card bg-base-100 shadow-xl border border-base-300">
     <div class="card-body">
-      <h3 class="card-title">Collection Options</h3>
-      <div class="divider my-1"></div>
-      
-      <% if @user_paint.nil? %>
-        <%= form_with model: @new_user_paint, url: user_paints_path, method: :post, class: "space-y-4" do |f| %>
-          <%= f.hidden_field :paint_id, value: @paint.id %>
-          
-          <div class="form-control">
-            <label class="label font-medium">
-              <span class="label-text">Add to Your Collection</span>
-            </label>
-            <div class="btn-group w-full">
-              <% UserPaint.statuses.keys.each do |status| %>
-                <label class="btn flex-1 <%= status == 'owned' ? 'btn-primary' : 'btn-outline' %> <%= f.object.status == status ? 'btn-active' : '' %>">
-                  <%= f.radio_button :status, status, checked: status == 'owned' %>
-                  <%= status.capitalize %>
-                </label>
-              <% end %>
+      <h2 class="card-title text-2xl mb-6">Similar Paints</h2>
+
+      <!-- Modern Tab Navigation -->
+      <div data-controller="similar-tabs">
+        <div  class="flex gap-1 bg-base-200 rounded-lg p-1 mb-6 w-fit">
+          <button class="px-4 py-2 rounded-md text-sm font-medium transition-all bg-base-100 text-base-content shadow-sm"
+                  data-similar-tabs-target="tab"
+                  data-tab="rgb"
+                  data-action="click->similar-tabs#switch">
+            RGB Similarity
+          </button>
+          <button class="px-4 py-2 rounded-md text-sm font-medium transition-all text-base-content/60 hover:text-base-content"
+                  data-similar-tabs-target="tab"
+                  data-tab="hsl"
+                  data-action="click->similar-tabs#switch">
+            HSL Similarity
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="rgb-content" class="similar-tab-content" data-similar-tabs-target="content">
+          <%= turbo_frame_tag "similar-paints-frame-rgb",
+              src: similar_paint_path(@paint, similar_type: "rgb", per_page: 12, format: :html),
+              loading: "lazy" do %>
+            <div class="flex flex-col items-center justify-center py-12">
+              <div class="loading loading-spinner loading-lg text-primary mb-4"></div>
+              <p class="text-base-content/60">Loading RGB similar paints...</p>
             </div>
-          </div>
-          
-          <div class="form-control">
-            <label class="label font-medium">
-              <span class="label-text">Purchase Date (Optional)</span>
-            </label>
-            <%= f.date_field :purchase_date, class: "input input-bordered" %>
-          </div>
-          
-          <div class="form-control">
-            <label class="label font-medium">
-              <span class="label-text">Purchase Price (Optional)</span>
-            </label>
-            <%= f.number_field :purchase_price, step: 0.01, class: "input input-bordered", placeholder: "0.00" %>
-          </div>
-          
-          <div class="form-control">
-            <label class="label font-medium">
-              <span class="label-text">Notes (Optional)</span>
-            </label>
-            <%= f.text_area :notes, class: "textarea textarea-bordered h-24", placeholder: "Add any notes about this paint..." %>
-          </div>
-          
-          <div class="form-control mt-6">
-            <%= f.submit "Add to Collection", class: "btn btn-primary btn-block" %>
-          </div>
-        <% end %>
-      <% else %>
-        <ul class="menu p-0">
-          <li>
-            <%= link_to user_paint_path(@user_paint), class: "flex items-center" do %>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              View in Your Collection
-            <% end %>
-          </li>
-          <li>
-            <%= link_to edit_user_paint_path(@user_paint), data: { turbo_frame: "modal" }, class: "flex items-center" do %>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
-              Edit Your Entry
-            <% end %>
-          </li>
-        </ul>
-      <% end %>
-    </div>
-  </div>
-</div>
+          <% end %>
+        </div>
 
-<!-- Similar Paints Section -->
-<div class="card bg-base-100 shadow mb-8">
-  <div class="card-body">
-    <h2 class="card-title text-xl mb-4">Similar Paints</h2>
-    <div class="tabs tabs-border">
-      <input type="radio" name="similar_tab" class="tab" aria-label="RGB Similarity" />
-      <div class="tab-content border-base-300 bg-base-100 p-10">
-        <%= turbo_frame_tag "similar-paints-frame-rgb", src: similar_paint_path(@paint, similar_type: "rgb", per_page: 12, format: :html), loading: "lazy" do %>
-          <div class="col-span-full text-center py-6">
-            <div class="loading loading-spinner loading-lg"></div>
-            <p class="text-base-content/60 mt-2">Loading RGB similar paints...</p>
-          </div>
-        <% end %>
-      </div>
-
-      <input type="radio" name="similar_tab" class="tab" aria-label="HSL Similarity" />
-      <div class="tab-content border-base-300 bg-base-100 p-10">
-        <%= turbo_frame_tag "similar-paints-frame-hsl", src: similar_paint_path(@paint, similar_type: "hsl", per_page: 12, format: :html), loading: "lazy" do %>
-          <div class="col-span-full text-center py-6">
-            <div class="loading loading-spinner loading-lg"></div>
-            <p class="text-base-content/60 mt-2">Loading HSL similar paints...</p>
-          </div>
-        <% end %>
+        <div id="hsl-content" class="similar-tab-content hidden" data-similar-tabs-target="content">
+          <%= turbo_frame_tag "similar-paints-frame-hsl",
+              src: similar_paint_path(@paint, similar_type: "hsl", per_page: 12, format: :html),
+              loading: "lazy" do %>
+            <div class="flex flex-col items-center justify-center py-12">
+              <div class="loading loading-spinner loading-lg text-primary mb-4"></div>
+              <p class="text-base-content/60">Loading HSL similar paints...</p>
+            </div>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>

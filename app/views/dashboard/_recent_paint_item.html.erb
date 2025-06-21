@@ -1,0 +1,76 @@
+<div class="flex items-start gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors group">
+  <!-- Paint Color Circle -->
+  <div class="flex-shrink-0">
+    <div class="w-12 h-12 rounded-full border-2 border-white shadow-lg flex-shrink-0 relative overflow-hidden"
+         style="background: linear-gradient(135deg, <%= user_paint.paint.hex_color %> 0%, <%= user_paint.paint.hex_color %>dd 100%);">
+      <!-- Status indicator dot -->
+      <div class="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm
+                  <%= case user_paint.status
+                      when 'owned' then 'bg-green-500'
+                      when 'wishlist' then 'bg-amber-500'
+                      when 'avoid' then 'bg-red-500'
+                      else 'bg-gray-400'
+                      end %>">
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="flex-1 min-w-0">
+    <!-- Action Description -->
+    <div class="flex items-center gap-2 mb-1">
+      <span class="text-sm text-gray-600">You</span>
+      <span class="text-sm font-medium text-gray-900">
+        <%= case user_paint.status
+            when 'owned' then 'added'
+            when 'wishlist' then 'wishlisted'
+            when 'avoid' then 'marked to avoid'
+            else 'updated'
+            end %>
+      </span>
+      <span class="text-sm text-gray-600">a new paint</span>
+    </div>
+
+    <!-- Paint Info -->
+    <%= link_to user_paint_path(user_paint),
+        data: { turbo_frame: "_top" },
+        class: "block group-hover:text-primary transition-colors" do %>
+      <h3 class="font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-1">
+        <%= user_paint.paint.name %>
+      </h3>
+      <div class="flex items-center gap-2 text-sm text-gray-500 mt-1">
+        <span class="font-medium"><%= user_paint.paint.product_line.brand.name %></span>
+        <span>•</span>
+        <span><%= user_paint.paint.product_line.name %></span>
+        <span>•</span>
+        <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded"><%= user_paint.paint.hex_color %></span>
+      </div>
+    <% end %>
+
+    <!-- Timestamp -->
+    <div class="flex items-center justify-between mt-3">
+      <span class="text-xs text-gray-400">
+        <%= time_ago_in_words(user_paint.created_at) %> ago
+      </span>
+
+      <!-- Quick Actions -->
+      <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2">
+        <%= link_to user_paint_path(user_paint),
+            data: { turbo_frame: "_top" },
+            class: "text-gray-400 hover:text-gray-600 transition-colors" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+        <% end %>
+        <%= link_to edit_user_paint_path(user_paint),
+            data: { turbo_frame: "modal" },
+            class: "text-gray-400 hover:text-gray-600 transition-colors" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

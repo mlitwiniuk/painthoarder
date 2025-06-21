@@ -16,7 +16,7 @@
   <%# Regular paint addition - update dashboard components %>
   <%# Add the new paint to the recent additions on dashboard %>
   <%= turbo_stream.prepend "recent-paints" do %>
-    <%= render "user_paints/user_paint", user_paint: @user_paint %>
+    <%= render "dashboard/recent_paint_item", user_paint: @user_paint %>
   <% end %>
 
   <%# Update the dashboard stats %>
@@ -26,6 +26,21 @@
 
   <%# Update the paint in search results if present %>
   <% paint_id = @user_paint.paint_id %>
+<% end %>
+
+<%# Update the collection options section on paint show page %>
+<%= turbo_stream.replace "collection-options-#{paint_id}" do %>
+  <%= render "paints/collection_options", paint: @user_paint.paint, user_paint: @user_paint %>
+<% end %>
+
+<%# Update the status badge in the hero section %>
+<%= turbo_stream.replace "status-badge-#{paint_id}" do %>
+  <%= render "paints/status_badge", paint: @user_paint.paint, user_paint: @user_paint %>
+<% end %>
+
+<%# Update the notes section %>
+<%= turbo_stream.replace "notes-section-#{paint_id}" do %>
+  <%= render "paints/notes_section", paint: @user_paint.paint, user_paint: @user_paint %>
 <% end %>
 
 <%# Replace the paint card in all similar paints sections %>

@@ -3,185 +3,227 @@
   <head>
     <%= render "layouts/head" %>
   </head>
-  <body class="min-h-screen flex flex-col  drawer drawer-end compact">
+  <body class="min-h-screen flex flex-col bg-base-50 drawer drawer-end compact">
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
-    <!-- Header -->
-    <header class="bg-gradient-to-r from-primary to-secondary text-primary-content">
-      <div class="container mx-auto px-4 py-4">
+
+    <!-- Modern Header -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200">
+      <div class="max-w-7xl mx-auto px-4 py-3">
         <nav class="flex justify-between items-center">
           <!-- Logo -->
-          <div class="text-2xl font-bold">
-            <%= link_to "PaintHoarder", root_path %>
+          <div class="flex items-center">
+            <%= link_to root_path, class: "flex items-center gap-3 group" do %>
+              <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                </svg>
+              </div>
+              <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                PaintHoarder
+              </span>
+            <% end %>
           </div>
-          <!-- Navigation Links -->
-          <div class="flex grow justify-between gap-2 items-center">
-            <% if user_signed_in? %>
-              <!-- Mobile navigation dropdown -->
-              <div class="dropdown lg:hidden">
-                <label tabindex="0" class="btn btn-ghost">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
+
+          <% if user_signed_in? %>
+            <!-- Desktop Navigation -->
+            <div class="hidden lg:flex items-center gap-1 bg-base-100 rounded-full p-1">
+              <%= link_to user_root_path,
+                  class: "px-4 py-2 rounded-full text-sm font-medium transition-all #{current_page?(user_root_path) ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}" do %>
+                Dashboard
+              <% end %>
+              <%= link_to user_paints_path,
+                  class: "px-4 py-2 rounded-full text-sm font-medium transition-all #{current_page?(user_paints_path) ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}" do %>
+                Collection
+              <% end %>
+              <%= link_to paints_path,
+                  class: "px-4 py-2 rounded-full text-sm font-medium transition-all #{current_page?(paints_path) ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}" do %>
+                Explore
+              <% end %>
+              <%= link_to public_projects_path,
+                  class: "px-4 py-2 rounded-full text-sm font-medium transition-all #{current_page?(public_projects_path) ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}" do %>
+                Projects
+              <% end %>
+            </div>
+
+            <!-- Right Side Actions -->
+            <div class="flex items-center gap-3">
+              <!-- Theme Switcher -->
+              <label for="my-drawer" class="btn btn-ghost btn-circle btn-sm hover:bg-gray-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                </svg>
+              </label>
+
+              <!-- Mobile Menu -->
+              <div class="dropdown dropdown-end lg:hidden">
+                <label tabindex="0" class="btn btn-ghost btn-circle btn-sm hover:bg-gray-100">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+                  </svg>
                 </label>
-                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                  <li><%= link_to "Dashboard", user_root_path %></li>
-                  <li><%= link_to "Projects", public_projects_path %></li>
-                  <li><%= link_to "My collection", user_paints_path %></li>
-                  <li><%= link_to "Paints", paints_path %></li>
-                  <li><%= link_to "Bulk Import", bulk_import_user_paints_path %></li>
+                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-xl bg-white rounded-xl w-52 border border-gray-200">
+                  <li><%= link_to "Dashboard", user_root_path, class: "text-gray-700 hover:bg-gray-50" %></li>
+                  <li><%= link_to "Collection", user_paints_path, class: "text-gray-700 hover:bg-gray-50" %></li>
+                  <li><%= link_to "Explore", paints_path, class: "text-gray-700 hover:bg-gray-50" %></li>
+                  <li><%= link_to "Projects", public_projects_path, class: "text-gray-700 hover:bg-gray-50" %></li>
+                  <li><%= link_to "Bulk Import", bulk_import_user_paints_path, class: "text-gray-700 hover:bg-gray-50" %></li>
                 </ul>
               </div>
 
-              <!-- Desktop navigation links -->
-              <div class="hidden lg:flex flex-row gap-2 items-center">
-                <%= link_to "Dashboard", user_root_path, class: "btn btn-ghost" %>
-                <%= link_to "Projects", public_projects_path, class: "btn btn-ghost" %>
-                <%= link_to "My collection", user_paints_path, class: "btn btn-ghost" %>
-                <%= link_to "Paints", paints_path, class: "btn btn-ghost" %>
-                <%= link_to "Bulk Import", bulk_import_user_paints_path, class: "btn btn-ghost btn-sm " %>
-              </div>
-
-              <div class="flex-grow"></div> <!-- Spacer to push avatar to the right -->
-
+              <!-- User Avatar -->
               <div class="dropdown dropdown-end">
-                <label tabindex="0" class="btn btn-ghost btn-circle avatar">
-                  <div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
+                <label tabindex="0" class="btn btn-ghost btn-circle avatar hover:bg-gray-100">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-sm font-medium shadow-sm">
                     <%= gravatar_for current_user %>
                   </div>
                 </label>
-                <ul tabindex="0" class="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 text-base-content rounded-box w-52">
-                  <li><%= button_to "Logout", destroy_user_session_path, method: :delete %></li>
+                <ul tabindex="0" class="mt-3 p-2 shadow-xl menu menu-compact dropdown-content bg-white rounded-xl w-52 border border-gray-200">
+                  <li class="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
+                    <%= current_user.email %>
+                  </li>
+                  <li><%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "text-gray-700 hover:bg-gray-50 w-full text-left" %></li>
                 </ul>
               </div>
-            <% else %>
-              <div></div> <!-- This div is for alignment when user is not signed in -->
-              <div class="flex-grow"></div> <!-- Spacer -->
-              <div>
-                <%= link_to "Login", new_user_session_path, class: "btn btn-ghost" %>
-                <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-primary" %>
-              </div>
-            <% end %>
-            <div title="Change Theme" class="ml-auto">
-              <label for="my-drawer" class="btn btn-square btn-ghost drawer-button text-primary-content">
-                <%= icon :swatch %>
-              </label>
             </div>
-          </div>
+          <% else %>
+            <!-- Guest Navigation -->
+            <div class="flex items-center gap-3">
+              <%= link_to "Sign In", new_user_session_path, class: "btn btn-ghost btn-sm text-gray-600 hover:text-gray-900" %>
+              <%= link_to "Get Started", new_user_registration_path, class: "btn btn-primary btn-sm shadow-sm" %>
+            </div>
+          <% end %>
         </nav>
       </div>
     </header>
+
     <!-- Flash Messages -->
     <% if flash.any? %>
-      <div class="container mx-auto px-4 py-2">
-        <div class="flex justify-end"  id="flash-messages">
-          <% flash.each do |type, message| %>
-            <div class="alert <%= type == 'notice' ? 'alert-info' : 'alert-error' %> shadow-lg mb-4 flex flex-row gap-2">
-              <div class="flex flex-row gap-2">
-                <% if type == 'notice' %>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <% else %>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                <% end %>
-                <span><%= message %></span>
-              </div>
-              <div class="flex-none">
-                <button type="button" class="btn btn-sm btn-ghost" onclick="this.parentElement.parentElement.remove()">✕</button>
-              </div>
+      <div class="fixed top-20 right-4 z-50 max-w-md space-y-2" id="flash-messages">
+        <% flash.each do |type, message| %>
+          <div class="alert <%= type == 'notice' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800' %> shadow-lg rounded-xl border p-4 flex items-start gap-3">
+            <div class="flex-shrink-0">
+              <% if type == 'notice' %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              <% else %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              <% end %>
             </div>
-          <% end %>
-        </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium"><%= message %></p>
+            </div>
+            <button type="button" class="flex-shrink-0 ml-2 text-gray-400 hover:text-gray-600 transition-colors" onclick="this.parentElement.remove()">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        <% end %>
       </div>
     <% end %>
+
     <!-- Main Content -->
     <main class="flex-grow drawer-content">
-      <div class="container mx-auto px-4 py-8">
-        <%= yield %>
+      <div class="min-h-screen">
+        <div class="max-w-7xl mx-auto p-4">
+          <%= yield %>
+        </div>
       </div>
     </main>
-    <!-- Modal Container for Turbo Frame -->
+
+    <!-- Modal Container -->
     <turbo-frame id="modal"></turbo-frame>
-    <%= render 'shared/lightbox_modal' %>
-    <!-- Footer (can be conditionally hidden with @hide_footer) -->
+
+    <!-- Modern Footer for Guests -->
     <% unless user_signed_in? %>
-      <footer class="bg-neutral text-neutral-content">
-        <div class="container mx-auto px-4">
-          <div class="footer py-10">
-            <div>
-              <span class="footer-title">About PaintHoarder</span>
-              <a class="link link-hover">Our Story</a>
-              <a class="link link-hover">Team</a>
-              <a class="link link-hover">Blog</a>
-              <a class="link link-hover">Press Kit</a>
-            </div>
-            <div>
-              <span class="footer-title">Features</span>
-              <a class="link link-hover">Collection Management</a>
-              <a class="link link-hover">Wishlist</a>
-              <a class="link link-hover">Color Matching</a>
-              <a class="link link-hover">Community</a>
-            </div>
-            <div>
-              <span class="footer-title">Legal</span>
-              <a class="link link-hover">Terms of Service</a>
-              <a class="link link-hover">Privacy Policy</a>
-              <a class="link link-hover">Cookie Policy</a>
-            </div>
-            <div>
-              <span class="footer-title">Newsletter</span>
-              <div class="form-control w-full md:w-80">
-                <label class="label">
-                  <span class="label-text text-neutral-content opacity-70">Get painting tips and app updates</span>
-                </label>
-                <div class="relative">
-                  <input type="text" placeholder="username@site.com" class="input input-bordered w-full pr-16 bg-neutral-focus text-neutral-content" />
-                  <button class="btn btn-primary absolute top-0 right-0 rounded-l-none">Subscribe</button>
+      <footer class="bg-white border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 py-12">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="col-span-1 md:col-span-2">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                  </svg>
                 </div>
+                <span class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  PaintHoarder
+                </span>
               </div>
+              <p class="text-gray-600 mb-6 max-w-md">
+                The ultimate tool for miniature painters to organize, discover, and share their paint collections with the community.
+              </p>
+              <div class="flex gap-4">
+                <a href="https://github.com/mlitwiniuk/painthoarder" target="_blank" class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-4">Features</h3>
+              <ul class="space-y-2 text-gray-600">
+                <li><a href="#" class="hover:text-gray-900 transition-colors">Collection Management</a></li>
+                <li><a href="#" class="hover:text-gray-900 transition-colors">Color Matching</a></li>
+                <li><a href="#" class="hover:text-gray-900 transition-colors">Wishlist Tracking</a></li>
+                <li><a href="#" class="hover:text-gray-900 transition-colors">Community Sharing</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 class="font-semibold text-gray-900 mb-4">Company</h3>
+              <ul class="space-y-2 text-gray-600">
+                <li><a href="#" class="hover:text-gray-900 transition-colors">About Us</a></li>
+                <li><a href="#" class="hover:text-gray-900 transition-colors">Privacy Policy</a></li>
+                <li><a href="#" class="hover:text-gray-900 transition-colors">Terms of Service</a></li>
+                <li><a href="#" class="hover:text-gray-900 transition-colors">Contact</a></li>
+              </ul>
             </div>
           </div>
-          <div class="flex flex-col md:flex-row items-center justify-between py-6 border-t border-neutral-focus">
-            <div class="grid grid-cols-2 md:flex items-center gap-2">
-              <div class="text-xl font-bold mr-2">PaintHoarder</div>
-              <div class="text-sm opacity-70 mr-2">© <%= Date.current.year %> All Rights Reserved</div>
-              <div class="text-sm mr-2">
-                ❤️ Crafted with love by <a href="https://prograils.com" title="Ruby on Rails product company">Prograils.com</a> / <a href="https://humadroid.io" title="Powerful compliance & team engagement software (with free HR module) for SMBs">humadroid.io</a> team
-              </div>
-              <div class="text-sm">Made in EU 🇪🇺</div>
+
+          <div class="border-t border-gray-200 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-sm text-gray-500">
+              © <%= Date.current.year %> PaintHoarder. All rights reserved.
             </div>
-            <div class="flex space-x-4 mt-4 md:mt-0">
-              <a href="https://github.com/mlitwiniuk/painthoarder" target="_blank" class="btn btn-circle btn-outline">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
-                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
-                </svg>
-              </a>
+            <div class="text-sm text-gray-500">
+              ❤️ Crafted with love by <a href="https://prograils.com" class="hover:text-gray-700 transition-colors">Prograils.com</a> team • Made in EU 🇪🇺
             </div>
           </div>
         </div>
       </footer>
     <% end %>
+
+    <!-- Theme Drawer -->
     <div class="drawer-side">
       <label for="my-drawer" class="drawer-overlay"></label>
-      <ul class="menu px-4 py-0 w-80 bg-base-200 text-base-content" data-controller="theme">
-        <% themes.each do |theme| %>
-          <li>
-            <a tabindex="0" class="after:absolute after:inset-0" data-action="click->theme#switch" data-theme-value="<%= theme %>"><%= theme.humanize %>
-              <div class="flex flex-wrap gap-1 ms-auto" data-theme="<%= theme %>">
-                <div class="bg-primary flex aspect-square w-5 items-center justify-center rounded lg:w-6">
-                  <div class="text-primary-content text-sm font-bold">A</div>
-                </div>
-                <div class="bg-secondary flex aspect-square w-5 items-center justify-center rounded lg:w-6">
-                  <div class="text-secondary-content text-sm font-bold">A</div>
-                </div>
-                <div class="bg-accent flex aspect-square w-5 items-center justify-center rounded lg:w-6">
-                  <div class="text-accent-content text-sm font-bold">A</div>
-                </div>
-                <div class="bg-neutral flex aspect-square w-5 items-center justify-center rounded lg:w-6">
-                  <div class="text-neutral-content text-sm font-bold">A</div>
-                </div>
+      <div class="w-80 bg-white shadow-2xl h-full" data-controller="theme">
+        <div class="p-6 border-b border-gray-200">
+          <h2 class="text-xl font-bold text-gray-900">Choose Theme</h2>
+          <p class="text-sm text-gray-500 mt-1">Customize your PaintHoarder experience</p>
+        </div>
+        <div class="p-4 space-y-2">
+          <% themes.each do |theme| %>
+            <button class="w-full flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 transition-colors group"
+                    data-action="click->theme#switch"
+                    data-theme-value="<%= theme %>">
+              <span class="font-medium text-gray-900 capitalize"><%= theme.humanize %></span>
+              <div class="flex gap-1" data-theme="<%= theme %>">
+                <div class="bg-primary w-4 h-4 rounded-full shadow-sm"></div>
+                <div class="bg-secondary w-4 h-4 rounded-full shadow-sm"></div>
+                <div class="bg-accent w-4 h-4 rounded-full shadow-sm"></div>
+                <div class="bg-neutral w-4 h-4 rounded-full shadow-sm"></div>
               </div>
-            </a>
-          </li>
-        <% end %>
-      </ul>
+            </button>
+          <% end %>
+        </div>
+      </div>
     </div>
+
     <%= render "layouts/analytics" %>
   </body>
 </html>

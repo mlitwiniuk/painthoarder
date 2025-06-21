@@ -1,57 +1,306 @@
-<%= link_to :back, class: "" do %>
-  Back to projects
-<% end %>
+<% content_for :title, @project.title %>
 
-<%# Project Hero %>
-<div class="relative w-full mb-8 pt-2">
-  <% if @project.cover_photo.attached? %>
-    <%= image_tag @project.cover_photo.variant(resize_to_limit: [1600,800]), class: "w-full h-64 md:h-96 object-cover rounded-box" %>
-  <% else %>
-    <div class="w-full h-64 md:h-96 flex items-center justify-center bg-base-200 rounded-box text-base-content/50">No cover photo yet</div>
-  <% end %>
-  <div class="absolute inset-0 bg-black/40 rounded-box"></div>
+<!-- Navigation Bar -->
+<div class="navbar bg-base-100 border-b border-base-200 mb-6">
+  <div class="navbar-start">
+    <%= link_to :back, class: "btn btn-ghost btn-sm gap-2" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      Back
+    <% end %>
+  </div>
 
-  <% if user_signed_in? && current_user == @project.user %>
-    <div class="dropdown dropdown-end absolute top-4 right-4 z-10">
-       <label tabindex="0" class="btn btn-ghost btn-circle btn-sm bg-base-200">
+  <div class="navbar-center">
+    <div class="flex items-center gap-2">
+      <div class="avatar placeholder">
+        <div class="bg-neutral text-neutral-content rounded-full w-8">
+          <span class="text-xs"><%= @project.user.email.first.upcase %></span>
+        </div>
+      </div>
+      <span class="font-medium text-base-content">
+        <%= @project.user.email.split('@').first %>
+      </span>
+    </div>
+  </div>
+
+  <div class="navbar-end">
+    <% if user_signed_in? && current_user == @project.user %>
+      <div class="dropdown dropdown-end">
+        <label tabindex="0" class="btn btn-ghost btn-circle btn-sm">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
           </svg>
         </label>
-      <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40">
-        <li><%= link_to "Edit", edit_project_path(@project) %></li>
-        <li><%= link_to "Delete", @project, data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %></li>
-      </ul>
-    </div>
-  <% end %>
-  <div class="absolute bottom-4 left-4 md:bottom-8 md:left-8 text-white space-y-2">
-    <h1 class="text-2xl md:text-4xl font-bold"><%= @project.title %></h1>
-    <% if @project.description.present? %>
-      <p class="max-w-xl text-sm md:text-base"><%= simple_format(@project.description) %></p>
+        <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-48 border border-base-200">
+          <li>
+            <%= link_to edit_project_path(@project), class: "gap-2" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edit Project
+            <% end %>
+          </li>
+          <li>
+            <%= link_to @project, data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this project?" }, class: "gap-2 text-error" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Delete Project
+            <% end %>
+          </li>
+        </ul>
+      </div>
     <% end %>
-    <span class="badge badge-outline capitalize"><%= @project.visibility %></span>
   </div>
 </div>
 
+<!-- Project Hero Section -->
+<div class="card bg-base-100 shadow-xl mb-8">
+  <figure class="relative">
+    <% if @project.cover_photo.attached? %>
+      <%= image_tag @project.cover_photo.variant(resize_to_limit: [1600,600]),
+          class: "w-full h-64 md:h-80 lg:h-96 object-cover" %>
+    <% else %>
+      <div class="w-full h-64 md:h-80 lg:h-96 bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+        <div class="text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-base-content/30 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p class="text-base-content/50 text-lg">No cover photo</p>
+        </div>
+      </div>
+    <% end %>
 
-<%# Gallery of all photos across updates %>
-<% all_photos = @project.project_updates.flat_map(&:photos_attachments) %>
-<% if false && all_photos.any? %>
-  <h2 class="text-lg font-semibold mb-3">Gallery</h2>
-  <div class="columns-2 md:columns-3 gap-2 mb-10">
-    <% all_photos.each do |attachment| %>
-      <%= image_tag attachment.variant(resize_to_limit: [600,600]), class: "w-full mb-2 rounded-box" %>
+    <!-- Project status badge -->
+    <div class="absolute top-4 right-4">
+      <div class="badge badge-lg <%= @project.visibility == 'public' ? 'badge-success' : 'badge-warning' %> gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <% if @project.visibility == 'public' %>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
+          <% else %>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          <% end %>
+        </svg>
+        <%= @project.visibility.capitalize %>
+      </div>
+    </div>
+  </figure>
+
+  <div class="card-body">
+    <!-- Project Title and Description -->
+    <div class="mb-6">
+      <h1 class="text-3xl md:text-4xl font-bold text-base-content mb-3">
+        <%= @project.title %>
+      </h1>
+      <% if @project.description.present? %>
+        <div class="prose prose-lg max-w-none text-base-content/80">
+          <%= simple_format(@project.description) %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Project Stats -->
+    <div class="stats stats-horizontal shadow-sm bg-base-200 mb-6">
+      <div class="stat">
+        <div class="stat-figure text-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+        </div>
+        <div class="stat-title">Updates</div>
+        <div class="stat-value text-primary"><%= @project.project_updates.count %></div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-figure text-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div class="stat-title">Photos</div>
+        <div class="stat-value text-secondary">
+          <%= @project.project_updates.joins(:photos_attachments).count %>
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-figure text-accent">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="stat-title">Created</div>
+        <div class="stat-value text-accent text-sm">
+          <%= @project.created_at.strftime("%b %Y") %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <% if user_signed_in? && current_user == @project.user %>
+      <div class="flex flex-wrap gap-2 mb-6">
+        <%= link_to new_project_project_update_path(@project), class: "btn btn-primary gap-2" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Add Update
+        <% end %>
+        <%= link_to edit_project_path(@project), class: "btn btn-secondary gap-2" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Edit Project
+        <% end %>
+      </div>
     <% end %>
   </div>
-<% end %>
+</div>
 
-<%# Updates timeline %>
-<% if @project.project_updates.any? %>
-  <h2 class="text-lg font-semibold mb-3">Updates (<%= @project.project_updates.size %>)</h2>
-  <div class="space-y-6">
-    <%= render @project.project_updates %>
-  </div>
-<% else %>
-  <p class="italic text-base-content/60">No updates yet.</p>
+<!-- Project Updates Timeline -->
+<div class="space-y-6">
+  <% if @project.project_updates.any? %>
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-bold text-base-content flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Project Timeline
+      </h2>
+      <div class="badge badge-neutral badge-lg">
+        <%= pluralize(@project.project_updates.count, 'update') %>
+      </div>
+    </div>
 
-<% end %>
+    <!-- Timeline -->
+    <div class="relative">
+      <!-- Timeline line -->
+      <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-base-300"></div>
+
+      <div class="space-y-8">
+        <% @project.project_updates.includes(:user_paints, photos_attachments: :blob).order(created_at: :desc).each_with_index do |update, index| %>
+          <div class="relative flex items-start">
+            <!-- Timeline dot -->
+            <div class="absolute left-2 w-4 h-4 bg-primary rounded-full border-4 border-base-100 shadow-lg z-10"></div>
+
+            <!-- Update content -->
+            <div class="ml-12 w-full">
+              <article class="card bg-base-100 shadow-lg border border-base-200 hover:shadow-xl transition-shadow duration-300">
+                <div class="card-body p-6">
+                  <!-- Update header -->
+                  <div class="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 class="text-xl font-semibold text-base-content mb-1">
+                        <%= update.title.presence || "Update ##{update.position}" %>
+                      </h3>
+                      <time class="text-sm text-base-content/60 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <%= update.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                      </time>
+                    </div>
+                    <% if index == 0 %>
+                      <div class="badge badge-accent badge-sm">Latest</div>
+                    <% end %>
+                  </div>
+
+                  <!-- Update description -->
+                  <% if update.description.present? %>
+                    <div class="prose prose-sm max-w-none text-base-content/80 mb-4">
+                      <%= simple_format(update.description) %>
+                    </div>
+                  <% end %>
+
+                  <!-- Paints used -->
+                  <% if update.user_paints.any? %>
+                    <div class="mb-4">
+                      <h4 class="text-sm font-medium text-base-content/70 mb-2 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4 4 4 0 004-4V5z" />
+                        </svg>
+                        Paints Used
+                      </h4>
+                      <div class="flex flex-wrap gap-2">
+                        <% update.user_paints.limit(12).each do |up| %>
+                          <div class="badge badge-outline badge-lg hover:badge-primary transition-colors cursor-pointer" title="<%= up.paint.name %>">
+                            <%= truncate(up.paint.name, length: 25) %>
+                          </div>
+                        <% end %>
+                        <% if update.user_paints.count > 12 %>
+                          <div class="badge badge-ghost badge-lg">
+                            +<%= update.user_paints.count - 12 %> more
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+
+                  <!-- Photos -->
+                  <% photos = update.photos_attachments %>
+                  <% if photos.any? %>
+                    <div data-controller="lightbox" class="w-full">
+                      <h4 class="text-sm font-medium text-base-content/70 mb-3 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Photos (<%= photos.count %>)
+                      </h4>
+                      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                        <% photos.each do |att| %>
+                          <div class="relative group cursor-pointer">
+                            <%= image_tag att.variant(resize_to_fill: [300,300]),
+                                class: "w-full aspect-square object-cover rounded-lg shadow-md group-hover:shadow-lg transition-shadow duration-300 #{'ring-2 ring-primary' if att == update.primary_photo}",
+                                data: {
+                                  lightbox_target: "thumbnail",
+                                  action: "click->lightbox#open",
+                                  full_url: url_for(att)
+                                } %>
+                            <% if att == update.primary_photo %>
+                              <div class="absolute top-2 right-2">
+                                <div class="badge badge-primary badge-xs">Primary</div>
+                              </div>
+                            <% end %>
+                            <!-- Hover overlay -->
+                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                              </svg>
+                            </div>
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </article>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <!-- Empty state for no updates -->
+    <div class="text-center py-16">
+      <div class="max-w-md mx-auto">
+        <div class="mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-base-content mb-2">No updates yet</h3>
+        <p class="text-base-content/70 mb-6">
+          Start documenting your progress by adding your first project update with photos and details.
+        </p>
+        <% if user_signed_in? && current_user == @project.user %>
+          <%= link_to new_project_project_update_path(@project), class: "btn btn-primary btn-lg gap-2" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add First Update
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

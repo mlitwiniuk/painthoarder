@@ -11,39 +11,144 @@
 @import "./components/slider.css";
 
 @layer base {
-  html { font-size: 0.9375rem; }  /* 15 px; adjust to taste */
+  html {
+    font-size: 0.9375rem;
+  } /* 15 px; adjust to taste */
 }
 
 .scrollbar-rounded {
-  @apply scrollbar-thin scrollbar-thumb-primary hover:scrollbar-thumb-primary active:scrollbar-thumb-primary scrollbar-track-base-200
+  @apply scrollbar-thin scrollbar-thumb-primary hover:scrollbar-thumb-primary active:scrollbar-thumb-primary scrollbar-track-base-200;
 }
 
 .ts-control {
-  @apply border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-lg gap-2
+  @apply border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-lg gap-2;
 }
 
 .ts-wrapper.plugin-remove_button .item {
-  @apply rounded-md
+  @apply rounded-md;
 }
 .ts-wrapper.multi .ts-control > div {
-  @apply p-0 m-0 pl-1
+  @apply p-0 m-0 pl-1;
 }
 
 .ts-wrapper.plugin-remove_button .item .remove {
-  @apply border-none text-lg leading-none py-1 rounded-r-lg
+  @apply border-none text-lg leading-none py-1 rounded-r-lg;
 }
 
 .ts-dropdown {
-  @apply rounded-md border border-solid border-t border-gray-300
+  @apply rounded-md border border-solid border-t border-gray-300;
 }
 
 .ts-dropdown [data-selectable].option:first-child {
-  @apply rounded-t-md
+  @apply rounded-t-md;
 }
 
 .ts-dropdown [data-selectable].option:last-child {
-  @apply rounded-b-md
+  @apply rounded-b-md;
 }
-.ts-dropdown .create:hover, .ts-dropdown .option:hover, .ts-dropdown .active {
-  @apply bg-indigo-100 text-indigo-900
+.ts-dropdown .create:hover,
+.ts-dropdown .option:hover,
+.ts-dropdown .active {
+  @apply bg-indigo-100 text-indigo-900;
+}
+
+/* Modern paint card styles */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Glassmorphism effects */
+.glass {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Smooth transitions for modern feel */
+.transition-all-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Modern shadow variations */
+.shadow-soft {
+  box-shadow:
+    0 2px 15px -3px rgba(0, 0, 0, 0.07),
+    0 10px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+/* Modern button hover effects */
+.btn-modern {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+.btn-modern:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Status badge animations */
+.badge-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Modern grid hover effects */
+.grid-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for modern browsers */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
