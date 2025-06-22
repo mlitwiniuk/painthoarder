@@ -11,6 +11,7 @@ class PagesController < ApplicationController
     @last_users = User.order(created_at: :desc).limit(5)
     @user_count = User.count
     @paint_count = Paint.count
+    @project_count = Project.count
 
     # Redirect to dashboard if already logged in
     redirect_to user_root_path if user_signed_in?
