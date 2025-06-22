@@ -39,7 +39,7 @@ class Project < ApplicationRecord
   validates :title, presence: true
   validates :visibility, presence: true
   validates :secret_token, uniqueness: true, allow_nil: true
-  validates :cover_photo, content_type: {in: [:png, :jpeg], spoofing_protection: true}, size: {less_than: 5.megabytes}
+  validates :cover_photo, content_type: ACCEPTED_CONTENT_TYPES, size: {less_than: 5.megabytes}
 
   scope :viewable_by, lambda { |user|
     where(
