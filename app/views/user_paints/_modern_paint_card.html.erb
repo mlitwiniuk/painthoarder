@@ -1,4 +1,4 @@
-<div id="<%= dom_id(user_paint) %>" class="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200">
+<div id="<%= dom_id(user_paint) %>" class="group relative bg-base-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-base-300 hover:border-base-content/20">
   <!-- Paint Color Preview - Hero Section -->
   <div class="relative aspect-square overflow-hidden">
     <!-- Main Color Display -->
@@ -12,22 +12,22 @@
     <div class="absolute top-3 left-3 z-10">
       <% case user_paint.status %>
       <% when 'owned' %>
-        <div class="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg backdrop-blur-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="badge badge-success gap-1 px-3 py-2 text-xs font-medium shadow-lg backdrop-blur-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
           Owned
         </div>
       <% when 'wishlist' %>
-        <div class="bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg backdrop-blur-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="badge badge-secondary gap-1 px-3 py-2 text-xs font-medium shadow-lg backdrop-blur-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
           Want
         </div>
       <% when 'avoid' %>
-        <div class="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg backdrop-blur-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="badge badge-error gap-1 px-3 py-2 text-xs font-medium shadow-lg backdrop-blur-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
           </svg>
           Avoid
@@ -38,14 +38,14 @@
     <!-- Quick Actions Menu -->
     <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
       <div class="dropdown dropdown-end">
-        <label tabindex="0" class="btn btn-ghost btn-sm btn-circle bg-white/90 hover:bg-white text-gray-700 shadow-lg backdrop-blur-sm">
+        <label tabindex="0" class="btn btn-ghost btn-sm btn-circle bg-base-100/90 hover:bg-base-100 text-base-content/70 shadow-lg backdrop-blur-sm">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
           </svg>
         </label>
-        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-xl bg-white rounded-xl w-44 border border-gray-200">
+        <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-xl bg-base-100 rounded-xl w-44 border border-base-300">
           <li>
-            <%= link_to user_paint_path(user_paint), data: { turbo_frame: "_top" }, class: "text-gray-700 hover:bg-gray-50" do %>
+            <%= link_to user_paint_path(user_paint), data: { turbo_frame: "_top" }, class: "text-base-content/70 hover:bg-base-200" do %>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -54,7 +54,7 @@
             <% end %>
           </li>
           <li>
-            <%= link_to edit_user_paint_path(user_paint), data: { turbo_frame: "modal" }, class: "text-gray-700 hover:bg-gray-50" do %>
+            <%= link_to edit_user_paint_path(user_paint), data: { turbo_frame: "modal" }, class: "text-base-content/70 hover:bg-base-200" do %>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
@@ -64,7 +64,7 @@
           <li>
             <%= button_to user_paint_path(user_paint), method: :delete,
                 data: { turbo_confirm: "Remove this paint from your collection?" },
-                class: "flex items-center w-full text-red-600 hover:bg-red-50" do %>
+                class: "flex items-center w-full text-error hover:bg-error/10" do %>
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
@@ -77,9 +77,9 @@
 
     <!-- Color Harmony Indicator (subtle dots) -->
     <div class="absolute bottom-3 left-3 flex gap-1">
-      <div class="w-2 h-2 rounded-full bg-white/40 backdrop-blur-sm"></div>
-      <div class="w-2 h-2 rounded-full bg-white/30 backdrop-blur-sm"></div>
-      <div class="w-2 h-2 rounded-full bg-white/20 backdrop-blur-sm"></div>
+      <div class="w-2 h-2 rounded-full bg-base-100/40 backdrop-blur-sm"></div>
+      <div class="w-2 h-2 rounded-full bg-base-100/30 backdrop-blur-sm"></div>
+      <div class="w-2 h-2 rounded-full bg-base-100/20 backdrop-blur-sm"></div>
     </div>
   </div>
 
@@ -87,10 +87,10 @@
   <div class="p-4">
     <!-- Paint Name & Brand -->
     <%= link_to user_paint_path(user_paint), data: { turbo_frame: "_top" }, class: "block group/link" do %>
-      <h3 class="font-bold text-gray-900 text-lg mb-1 group-hover/link:text-primary transition-colors line-clamp-1">
+      <h3 class="font-bold text-base-content text-lg mb-1 group-hover/link:text-primary transition-colors line-clamp-1">
         <%= user_paint.paint.name %>
       </h3>
-      <div class="flex items-center text-sm text-gray-500 mb-3">
+      <div class="flex items-center text-sm text-base-content/60 mb-3">
         <span class="font-medium"><%= user_paint.paint.product_line.brand.name %></span>
         <span class="mx-2">•</span>
         <span><%= user_paint.paint.product_line.name %></span>
@@ -101,13 +101,13 @@
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
         <!-- Hex Color Code -->
-        <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-mono rounded-lg">
+        <span class="px-2 py-1 bg-base-200 text-base-content/60 text-xs font-mono rounded-lg">
           <%= user_paint.paint.hex_color %>
         </span>
 
         <!-- Purchase Date -->
         <% if user_paint.purchase_date.present? %>
-          <span class="text-xs text-gray-400">
+          <span class="text-xs text-base-content/40">
             <%= user_paint.purchase_date.strftime("%b %Y") %>
           </span>
         <% end %>
@@ -115,8 +115,8 @@
 
       <% if false %>
         <!-- Heart/Like Button (placeholder for future social features) -->
-        <button class="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 hover:text-red-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <button class="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-base-200 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-base-content/40 hover:text-error transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>

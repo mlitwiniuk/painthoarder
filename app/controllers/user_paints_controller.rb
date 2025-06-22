@@ -38,6 +38,36 @@ class UserPaintsController < ApplicationController
     respond_to do |format|
       format.html
       format.turbo_stream
+      format.json {
+        # Handle search parameter for AJAX requests
+        if params[:search].present?
+          search_term = params[:search].strip
+          @user_paints = @user_paints.joins(paint: {product_line: :brand})
+                                    .where("paints.name LIKE ? OR brands.name LIKE ? OR product_lines.name LIKE ?",
+                                           "%#{search_term}%", "%#{search_term}%", "%#{search_term}%")
+        end
+
+        render json: {
+          user_paints: @user_paints.limit(params[:limit] || 20).map do |user_paint|
+            {
+              id: user_paint.id,
+              paint: {
+                id: user_paint.paint.id,
+                name: user_paint.paint.name,
+                hex_color: user_paint.paint.hex_color,
+                product_line: {
+                  id: user_paint.paint.product_line.id,
+                  name: user_paint.paint.product_line.name,
+                  brand: {
+                    id: user_paint.paint.product_line.brand.id,
+                    name: user_paint.paint.product_line.brand.name
+                  }
+                }
+              }
+            }
+          end
+        }
+      }
     end
   end
 

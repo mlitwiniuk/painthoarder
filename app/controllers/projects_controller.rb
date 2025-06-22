@@ -21,6 +21,20 @@ class ProjectsController < ApplicationController
 
   # GET /projects/1 or /projects/1.json
   def show
+    # Preload current user's paints for optimization if user is signed in
+    if user_signed_in?
+      # Get all paint IDs from project updates
+      paint_ids = @project.project_updates
+                          .joins(user_paints: :paint)
+                          .distinct
+                          .pluck('paints.id')
+
+      # Load current user's paints for these specific paints
+      @current_user_paints = current_user.user_paints
+                                        .includes(:paint)
+                                        .where(paint_id: paint_ids)
+                                        .index_by(&:paint_id)
+    end
   end
 
   # GET /projects/new
@@ -83,7 +97,7 @@ class ProjectsController < ApplicationController
     # avoid duplicate attachment if already set
     if @project.cover_photo.attached?
       @project.cover_photo.purge_later unless @project.cover_photo.id == attachment.id
-      already_attached = @project.cover_photo.attachments.exists?(id: attachment.id)
+      already_attached = @project.cover_photo.attachments.exists?(id: attachment.id) if @project.cover_photo.attachments
     else
       already_attached = false
     end

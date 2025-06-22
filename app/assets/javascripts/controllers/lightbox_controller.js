@@ -12,6 +12,7 @@ export default class extends Controller {
     if (!this.hasModalTarget) {
       this.buildModal();
     }
+    console.log("Lightbox connected");
   }
 
   // ------------------------------------------------------------------
@@ -23,7 +24,7 @@ export default class extends Controller {
     wrapper.dataset.lightboxTarget = "modal";
 
     wrapper.innerHTML = `
-      <div class="modal-box p-0 relative max-w-5xl">
+      <div class="modal-box p-0 relative max-w-7xl">
         <button class="btn btn-circle absolute top-2 right-2" data-action="click->lightbox#close">✕</button>
         <button class="btn btn-circle absolute left-2 top-1/2 z-10" data-action="click->lightbox#prev">❮</button>
         <button class="btn btn-circle absolute right-2 top-1/2 z-10" data-action="click->lightbox#next">❯</button>
@@ -41,6 +42,7 @@ export default class extends Controller {
     event.preventDefault();
     this.index = this.thumbnailTargets.indexOf(event.currentTarget);
     this.showCurrent();
+    console.log("Lightbox opened");
   }
 
   next() {
@@ -49,7 +51,9 @@ export default class extends Controller {
   }
 
   prev() {
-    this.index = (this.index - 1 + this.thumbnailTargets.length) % this.thumbnailTargets.length;
+    this.index =
+      (this.index - 1 + this.thumbnailTargets.length) %
+      this.thumbnailTargets.length;
     this.showCurrent();
   }
 
@@ -88,4 +92,3 @@ export default class extends Controller {
     }
   }
 }
-

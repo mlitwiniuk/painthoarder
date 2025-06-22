@@ -1,0 +1,71 @@
+<div class="flex items-center gap-3 p-2 rounded-lg bg-base-100 border border-base-200 hover:border-base-300 transition-colors group">
+  <!-- Color Preview -->
+  <div class="relative flex-shrink-0">
+    <div class="w-12 h-12 rounded-lg overflow-hidden shadow-sm"
+         style="background: linear-gradient(135deg, <%= user_paint.paint.hex_color %> 0%, <%= user_paint.paint.hex_color %>dd 100%);">
+      <!-- Subtle overlay for depth -->
+      <div class="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/10"></div>
+    </div>
+
+    <!-- Status Indicator Dot -->
+    <% if user_signed_in? %>
+      <% current_user_paint = @current_user_paints&.dig(user_paint.paint.id) %>
+      <% if current_user_paint %>
+        <div class="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-base-100 <%= case current_user_paint.status
+                                                                                                  when 'owned' then 'bg-success'
+                                                                                                  when 'wishlist' then 'bg-warning'
+                                                                                                  when 'avoid' then 'bg-error'
+                                                                                                  else 'bg-base-300'
+                                                                                                  end %>"></div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <!-- Paint Info -->
+  <div class="flex-1 min-w-0">
+    <%= link_to paint_path(user_paint.paint), data: { turbo_frame: "_top" }, class: "block group/link" do %>
+      <h4 class="font-semibold text-sm text-base-content group-hover/link:text-primary transition-colors truncate">
+        <%= user_paint.paint.name %>
+      </h4>
+      <div class="flex items-center gap-2 mt-1">
+        <!-- Brand Badge -->
+        <span class="badge badge-outline badge-xs">
+          <%= user_paint.paint.product_line.brand.name %>
+        </span>
+
+        <!-- Hex Code -->
+        <span class="text-xs text-base-content/60 font-mono">
+          <%= user_paint.paint.hex_color %>
+        </span>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Quick Action -->
+  <% if user_signed_in? %>
+    <% current_user_paint = @current_user_paints&.dig(user_paint.paint.id) %>
+    <div class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+      <% if current_user_paint %>
+        <!-- Edit Current User's Paint -->
+        <%= link_to edit_user_paint_path(current_user_paint),
+            data: { turbo_frame: "modal" },
+            class: "btn btn-circle btn-xs btn-ghost hover:btn-primary",
+            title: "Edit" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        <% end %>
+      <% else %>
+        <!-- Add to Wishlist Button -->
+        <%= link_to new_user_paint_path(paint_id: user_paint.paint.id, status: 'wishlist'),
+            data: { turbo_frame: "modal" },
+            class: "btn btn-circle btn-xs btn-ghost hover:btn-warning",
+            title: "Add to Wishlist" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

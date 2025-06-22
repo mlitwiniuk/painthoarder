@@ -1,0 +1,19 @@
+<%= turbo_frame_tag "modal" do %>
+  <div class="modal modal-open" data-controller="modal" data-action="click->modal#closeBackground keyup@window->modal#closeWithKeyboard">
+    <div class="modal-box max-w-2xl w-full max-h-[90vh] p-0 bg-base-100">
+      <!-- Modal Header -->
+      <div class="sticky top-0 z-10 bg-base-100 border-b border-base-200 px-6 py-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-base-content">Create New Update</h2>
+          <button class="btn btn-ghost btn-circle btn-sm" data-action="click->modal#close">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <%= render 'form', editing: false %>
+    </div>
+  </div>
+<% end %>

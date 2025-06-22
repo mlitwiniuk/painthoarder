@@ -1,0 +1,285 @@
+<%= form_with model: [@project, @project_update],
+    data: { turbo_frame: "_top" },
+    class: "space-y-0",
+    multipart: true do |form| %>
+
+  <div class="max-h-[calc(90vh-80px)] overflow-y-auto">
+    <!-- Current Photos Section (Edit Only) -->
+    <% if editing && @project_update.photos.any? %>
+      <div class="p-6 border-b border-base-200">
+        <div class="space-y-4">
+          <div class="flex items-center gap-2 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
+            </svg>
+            <span class="font-medium text-base-content">Current Photos</span>
+          </div>
+
+          <!-- Current Photos Grid -->
+          <div class="mb-2 text-sm text-base-content/70">
+            <span class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Check photos to remove them when saving
+            </span>
+          </div>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <% @project_update.photos_attachments.each_with_index do |attachment, index| %>
+              <div class="relative group">
+                <%= image_tag attachment.variant(resize_to_fill: [200,200]),
+                    class: "w-full aspect-square object-cover rounded-lg shadow-md #{'ring-2 ring-primary' if attachment == @project_update.primary_photo}" %>
+
+                <% if attachment == @project_update.primary_photo %>
+                  <div class="absolute top-2 right-2">
+                    <div class="badge badge-primary badge-xs">Primary</div>
+                  </div>
+                <% end %>
+
+                <!-- Delete Photo Checkbox -->
+                <div class="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <label class="cursor-pointer bg-base-100 rounded-full p-1 shadow-md hover:bg-error hover:text-error-content transition-colors tooltip tooltip-bottom" data-tip="Mark for deletion">
+                    <%= check_box_tag "project_update[remove_photos][]", attachment.id, false,
+                        class: "checkbox checkbox-error checkbox-sm",
+                        onchange: "this.closest('.group').classList.toggle('opacity-50', this.checked); this.closest('.group').classList.toggle('grayscale', this.checked);" %>
+                  </label>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Primary Photo Selection -->
+          <div class="hidden p-3 bg-base-200 rounded-lg">
+            <label class="block text-sm font-medium text-base-content/70 mb-2">
+              Primary Photo (will be featured first)
+            </label>
+            <%= form.select :primary_photo_id,
+                options_from_collection_for_select(
+                  @project_update.photos_attachments,
+                  :id,
+                  ->(attachment) { "Photo #{@project_update.photos_attachments.index(attachment) + 1}" },
+                  @project_update.primary_photo&.id
+                ),
+                { include_blank: "No primary photo" },
+                { class: "select select-bordered select-sm w-full" } %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Photo Upload Section -->
+    <div class="p-6 border-b border-base-200">
+      <div class="space-y-4">
+        <div class="flex items-center gap-2 mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 <%= editing ? 'text-success' : 'text-primary' %>" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <% if editing %>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            <% else %>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z" />
+            <% end %>
+          </svg>
+          <span class="font-medium text-base-content"><%= editing ? "Add New Photos" : "Photos" %></span>
+          <span class="text-sm text-base-content/60">(optional)</span>
+        </div>
+
+        <!-- Photo Upload Area -->
+        <div class="relative" data-controller="photo-preview">
+          <%= form.file_field :photos,
+              multiple: true,
+              accept: "image/*",
+              class: "file-input file-input-bordered file-input-#{editing ? 'success' : 'primary'} w-full",
+              data: { photo_preview_target: "input", action: "change->photo-preview#handleFileChange" } %>
+
+          <!-- Upload Instructions -->
+          <div class="mt-2 text-sm text-base-content/60">
+            <% if editing %>
+              <p>Select additional photos to add to this update. Existing photos will be preserved.</p>
+            <% else %>
+              <p>Select multiple photos to showcase your progress. You can choose a primary photo after uploading.</p>
+            <% end %>
+          </div>
+
+          <!-- Photo Preview Area -->
+          <div id="photo-preview" class="hidden mt-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3" data-photo-preview-target="container">
+              <!-- Photos will be previewed here -->
+            </div>
+
+            <% unless editing %>
+              <!-- Primary Photo Selection -->
+              <div class="mt-4 p-3 bg-base-200 rounded-lg hidden" data-photo-preview-target="primarySelector">
+                <label class="block text-sm font-medium text-base-content/70 mb-2">
+                  Choose Primary Photo (will be featured first)
+                </label>
+                <select class="select select-bordered select-sm w-full" data-photo-preview-target="primarySelect">
+                  <option value="">No primary photo</option>
+                </select>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="p-6 space-y-6">
+      <!-- Title Field -->
+      <div class="form-control">
+        <div class="flex items-center gap-2 mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a2 2 0 012-2z" />
+          </svg>
+          <label class="label-text font-medium">Update Title</label>
+          <span class="text-sm text-base-content/60">(optional)</span>
+        </div>
+        <%= form.text_field :title,
+            class: "input input-bordered w-full text-lg",
+            placeholder: "What did you work on?",
+            maxlength: 100 %>
+        <div class="label">
+          <span class="label-text-alt text-base-content/60">Leave blank to auto-generate (e.g., "Update #3")</span>
+        </div>
+      </div>
+
+      <!-- Description Field -->
+      <div class="form-control">
+        <div class="flex items-center gap-2 mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <label class="label-text font-medium">Progress Description</label>
+        </div>
+        <%= form.text_area :description,
+            class: "textarea textarea-bordered w-full h-32 resize-none",
+            placeholder: "Share your progress, techniques used, challenges faced, or any insights from this session...",
+            maxlength: 2000 %>
+        <div class="label">
+          <span class="label-text-alt text-base-content/60">
+            <span data-controller="character-counter" data-character-counter-max-value="2000">
+              <span data-character-counter-target="count"><%= @project_update.description&.length || 0 %></span>/2000 characters
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Paints Used Section -->
+      <div class="form-control">
+        <div class="flex items-center gap-2 mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4 4 4 0 004-4V5z" />
+          </svg>
+          <label class="label-text font-medium">Paints Used</label>
+          <span class="text-sm text-base-content/60">(optional)</span>
+        </div>
+
+        <div class="bg-base-200 rounded-lg p-4">
+          <!-- Current Paints (Edit Only) -->
+          <% if editing && @project_update.user_paints.any? %>
+            <div class="mb-4">
+              <h4 class="text-sm font-medium text-base-content/70 mb-2">Currently Selected Paints</h4>
+              <div class="flex flex-wrap gap-2">
+                <% @project_update.paint_usages.each do |paint_usage| %>
+                  <div class="badge badge-primary gap-2">
+                    <%= paint_usage.user_paint.paint.name %>
+                    <%= hidden_field_tag "project_update[paint_usages_attributes][#{paint_usage.id}][user_paint_id]", paint_usage.user_paint_id %>
+                    <%= hidden_field_tag "project_update[paint_usages_attributes][#{paint_usage.id}][id]", paint_usage.id %>
+                    <button type="button"
+                            class="btn btn-ghost btn-xs btn-circle"
+                            onclick="this.parentElement.style.display='none'; this.nextElementSibling.value='1'">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                    <%= hidden_field_tag "project_update[paint_usages_attributes][#{paint_usage.id}][_destroy]", "0" %>
+                  </div>
+                <% end %>
+              </div>
+              <div class="divider divider-neutral"></div>
+            </div>
+          <% end %>
+
+          <div id="paints-container" data-controller="paint-selector">
+            <!-- Paint Selection Area -->
+            <div class="space-y-3">
+              <div class="flex gap-2">
+                <input type="text"
+                       placeholder="<%= editing ? 'Search your paints to add more...' : 'Search your paints...' %>"
+                       class="input input-bordered input-sm flex-1"
+                       data-paint-selector-target="search"
+                       data-action="input->paint-selector#search">
+                <button type="button"
+                        class="btn btn-primary btn-sm"
+                        data-action="click->paint-selector#addPaint">
+                  Add Paint
+                </button>
+              </div>
+
+              <!-- Selected Paints List -->
+              <div class="min-h-[60px] border-2 border-dashed border-base-300 rounded-lg p-3"
+                   data-paint-selector-target="selectedPaints">
+                <div class="text-center text-base-content/50 text-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4 4 4 0 004-4V5z" />
+                  </svg>
+                  <%= editing ? "Search and add additional paints you used" : "Search and add paints you used in this session" %>
+                </div>
+              </div>
+
+              <!-- Search Results -->
+              <div class="hidden max-h-40 overflow-y-auto border border-base-300 rounded-lg"
+                   data-paint-selector-target="results">
+                <!-- Search results will appear here -->
+              </div>
+            </div>
+          </div>
+
+          <div class="text-xs text-base-content/60 mt-2">
+            <p>Only paints from your collection will be shown. Add paints to your collection first if needed.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="sticky bottom-0 bg-base-100 border-t border-base-200 px-6 py-4">
+    <div class="flex items-center justify-between">
+      <div class="text-sm text-base-content/60">
+        <span class="flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <%= editing ? "Changes will be saved according to your project's privacy settings" : "Your update will be visible according to your project's privacy settings" %>
+        </span>
+      </div>
+
+      <div class="flex gap-3">
+        <button type="button"
+                class="btn btn-ghost"
+                data-action="click->modal#close">
+          Cancel
+        </button>
+        <%= form.submit (editing ? "Update Progress" : "Share Update"),
+            class: "btn btn-primary gap-2" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Display -->
+  <% if @project_update.errors.any? %>
+    <div class="alert alert-error mx-6 mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold">Please fix the following errors:</h3>
+        <ul class="list-disc list-inside">
+          <% @project_update.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+<% end %>
