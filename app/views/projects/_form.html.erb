@@ -1,106 +1,267 @@
+  <div class="card bg-base-100 shadow-xl border border-base-200">
+    <%= form_with model: @project, class: "space-y-0", multipart: true do |form| %>
 
-<%= form_with model: @project, class: "space-y-6", data: { controller: "rails-nested-form", nested_form_wrapper_selector_value: ".nested-form-wrapper" } do |f| %>
-  <% if f.object.errors.any? %>
-    <div class="alert alert-error mb-4">
-      <ul>
-        <% f.object.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="space-y-4">
-    <div>
-      <%= f.label :title, class: "label" %>
-      <%= f.text_field :title, class: "input input-bordered w-full" %>
-    </div>
-
-    <div>
-      <%= f.label :description, class: "label" %>
-      <%= f.text_area :description, rows: 4, class: "textarea textarea-bordered w-full" %>
-    </div>
-
-    <div>
-      <%= f.label :visibility, class: "label" %>
-      <%= f.select :visibility, Project.visibilities.keys.map { |v| [v.humanize, v] }, {}, class: "select select-bordered w-full" %>
-    </div>
-
-
-    <%# Cover picker from existing photos %>
-    <% existing_photos = @project.project_updates.flat_map(&:photos_attachments) %>
-    <% if existing_photos.any? %>
-      <div data-controller="cover-picker" class="mt-6">
-        <%= f.hidden_field :selected_cover_photo_id, value: @project.cover_photo&.id, data: { "cover-picker-target": "input" } %>
-        <p class="mb-2 text-sm font-semibold">Choose project cover:</p>
-        <div class="flex flex-wrap gap-2" data-cover-picker-target="gallery">
-          <% existing_photos.each do |att| %>
-            <%= image_tag att.variant(resize_to_limit: [120,120]), class: "rounded cursor-pointer #{'ring-2 ring-primary' if att.id == @project.cover_photo&.id}", data: { action: "click->cover-picker#pick", id: att.id } %>
-          <% end %>
-        </div>
+      <!-- Form Header -->
+      <div class="bg-gradient-to-r from-primary/5 to-secondary/5 px-8 py-6 border-b border-base-200">
+        <h2 class="text-2xl font-bold text-base-content mb-2">
+          <%= @project.new_record? ? "Create New Project" : "Edit Project" %>
+        </h2>
+        <p class="text-base-content/70">
+          <%= @project.new_record? ?
+              "Start documenting your miniature painting journey with a new project." :
+              "Update your project details and settings." %>
+        </p>
       </div>
-    <% end %>
 
-    <!-- Nested Project Updates -->
-    <div >
-      <%= f.fields_for :project_updates do |pu_form| %>
-        <div class="card bg-base-200 p-4 mb-4 nested-form-wrapper" data-rails-nested-form-target="item" data-new-record="<%= pu_form.object.new_record? %>">
-          <div class="flex justify-between items-center mb-2">
-            <h3 class="font-semibold">Update <%= pu_form.index + 1 %></h3>
-            <%= link_to "Remove", "#", class: "btn btn-sm", data: { action: "rails-nested-form#remove" } %>
-            <%= pu_form.hidden_field :_destroy %>
-          </div>
-          <div class="space-y-3">
-            <%= pu_form.label :title, class: "label" %>
-            <%= pu_form.text_field :title, class: "input input-bordered w-full" %>
-
-            <%= pu_form.label :description, class: "label" %>
-            <%= pu_form.text_area :description, rows: 3, class: "textarea textarea-bordered w-full" %>
-
-            <%= pu_form.label :photos, "Photos", class: "label" %>
-            <%= pu_form.file_field :photos, multiple: true, direct_upload: true, class: "file-input file-input-bordered w-full" %>
-            <% if pu_form.object.photos.attached? %>
-              <div class="flex flex-wrap gap-2">
-                <% pu_form.object.photos.each do |photo| %>
-                  <div class="relative">
-                    <%= image_tag photo.variant(resize_to_limit: [150, 150]), class: "rounded" %>
-                    <!-- add a checkbox to delete if you want -->
-                  </div>
-                <% end %>
-              </div>
-            <% end %>
+      <!-- Error Display -->
+      <% if @project.errors.any? %>
+        <div class="alert alert-error mx-8 mt-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <h3 class="font-bold">Please fix the following errors:</h3>
+            <ul class="list-disc list-inside mt-2">
+              <% @project.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
           </div>
         </div>
       <% end %>
-      <div data-rails-nested-form-target="target"></div>
-      <template data-rails-nested-form-target="template">
-        <div class="card bg-base-200 p-4 mb-4 nested-form-wrapper" data-rails-nested-form-target="item" data-new-record="true">
-          <div class="flex justify-between items-center mb-2">
-            <h3 class="font-semibold">New Update</h3>
-            <a href="#" class="btn btn-sm" data-action="rails-nested-form#remove">Remove</a>
-            <%= hidden_field_tag "project[project_updates_attributes][NEW_RECORD][_destroy]", "0", id: nil %>
+
+      <div class="p-8 space-y-8">
+        <!-- Project Details Section -->
+        <section>
+          <div class="flex items-center gap-2 mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            <h3 class="text-xl font-semibold text-base-content">Project Information</h3>
           </div>
-          <div class="space-y-3">
-            <%# Use child_index 'NEW_RECORD' so nested-form replaces it with unique index %>
-            <%= f.fields_for :project_updates, ProjectUpdate.new, child_index: "NEW_RECORD" do |pu_form| %>
-              <%= pu_form.label :title, class: "label" %>
-              <%= pu_form.text_field :title, class: "input input-bordered w-full" %>
 
-              <%= pu_form.label :description, class: "label" %>
-              <%= pu_form.text_area :description, rows: 3, class: "textarea textarea-bordered w-full" %>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Title Field -->
+            <div class="form-control lg:col-span-2">
+              <div class="flex items-center gap-2 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a2 2 0 012-2z" />
+                </svg>
+                <label class="label-text font-medium text-base-content">Project Title</label>
+                <span class="text-error">*</span>
+              </div>
+              <%= form.text_field :title,
+                  class: "input input-bordered input-lg w-full #{@project.errors[:title].any? ? 'input-error' : ''}",
+                  placeholder: "Give your project a memorable name...",
+                  required: true,
+                  maxlength: 100 %>
+              <div class="label">
+                <span class="label-text-alt text-base-content/60">
+                  This will be the main title displayed for your project
+                </span>
+              </div>
+            </div>
 
-              <%= pu_form.label :photos, "Photos", class: "label" %>
-              <%= pu_form.file_field :photos, multiple: true, direct_upload: true, class: "file-input file-input-bordered w-full" %>
+            <!-- Description Field -->
+            <div class="form-control lg:col-span-2">
+              <div class="flex items-center gap-2 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <label class="label-text font-medium text-base-content">Project Description</label>
+                <span class="text-sm text-base-content/60">(optional)</span>
+              </div>
+              <%= form.text_area :description,
+                  class: "textarea textarea-bordered w-full h-28 resize-none #{@project.errors[:description].any? ? 'textarea-error' : ''}",
+                  placeholder: "Describe your project, the miniatures you're painting, techniques you want to try, or any other details...",
+                  maxlength: 1000 %>
+              <div class="label">
+                <span class="label-text-alt text-base-content/60">
+                  <span data-controller="character-counter" data-character-counter-max-value="1000">
+                    <span data-character-counter-target="count">0</span>/1000 characters
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Visibility Setting -->
+            <div class="form-control">
+              <div class="flex items-center gap-2 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <label class="label-text font-medium text-base-content">Privacy Setting</label>
+              </div>
+              <%= form.select :visibility,
+                  options_for_select([
+                    ['🌍 Public - Anyone can view', 'public'],
+                    ['🔒 Private - Only you can view', 'private'],
+                    ['🔗 Restricted - Anyone with link can view', 'restricted']
+                  ], @project.visibility),
+                  {},
+                  class: "select select-bordered w-full #{@project.errors[:visibility].any? ? 'select-error' : ''}" %>
+              <div class="label">
+                <span class="label-text-alt text-base-content/60">
+                  You can change this later in project settings
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Cover Photo Section -->
+        <% existing_photos = @project.persisted? ? @project.project_updates.flat_map(&:photos_attachments) : [] %>
+        <% if existing_photos.any? %>
+          <section>
+            <div class="flex items-center gap-2 mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <h3 class="text-xl font-semibold text-base-content">Project Cover</h3>
+            </div>
+
+            <div class="bg-base-200 rounded-lg p-6" data-controller="cover-picker">
+              <%= form.hidden_field :selected_cover_photo_id,
+                  value: @project.cover_photo&.id,
+                  data: { "cover-picker-target": "input" } %>
+
+              <div class="mb-4">
+                <p class="text-sm font-medium text-base-content/80 mb-2">
+                  Choose a cover photo from your project updates:
+                </p>
+                <p class="text-xs text-base-content/60">
+                  This image will represent your project in listings and previews
+                </p>
+              </div>
+
+              <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3" data-cover-picker-target="gallery">
+                <% existing_photos.each do |attachment| %>
+                  <div class="relative group cursor-pointer"
+                       data-action="click->cover-picker#pick"
+                       data-id="<%= attachment.id %>">
+                    <%= image_tag attachment.variant(resize_to_fill: [120,120]),
+                        class: "w-full aspect-square object-cover rounded-lg shadow-sm group-hover:shadow-md transition-all duration-200 #{attachment.id == @project.cover_photo&.id ? 'ring-2 ring-primary' : ''}" %>
+
+                    <% if attachment.id == @project.cover_photo&.id %>
+                      <div class="absolute -top-2 -right-2">
+                        <div class="badge badge-primary badge-sm">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    <% end %>
+
+                    <!-- Hover overlay -->
+                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center">
+                      <div class="text-white text-xs font-medium">
+                        <%= attachment.id == @project.cover_photo&.id ? 'Current Cover' : 'Set as Cover' %>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+
+              <% if @project.cover_photo&.id %>
+                <div class="mt-4 pt-4 border-t border-base-300">
+                  <button type="button"
+                          class="btn btn-ghost btn-sm"
+                          data-action="click->cover-picker#clear">
+                    Remove Cover Photo
+                  </button>
+                </div>
+              <% end %>
+            </div>
+          </section>
+        <% elsif @project.persisted? %>
+          <section>
+            <div class="flex items-center gap-2 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-base-content/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <h3 class="text-xl font-semibold text-base-content/50">Project Cover</h3>
+            </div>
+            <div class="alert alert-info">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <h4 class="font-medium">No photos yet</h4>
+                <p class="text-sm">Add some project updates with photos, then you can select a cover image.</p>
+              </div>
+            </div>
+          </section>
+        <% end %>
+
+        <!-- Next Steps for New Projects -->
+        <% if @project.new_record? %>
+          <section>
+            <div class="bg-gradient-to-r from-success/10 to-primary/10 rounded-lg p-6 border border-success/20">
+              <div class="flex items-start gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-success flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <h4 class="font-semibold text-base-content mb-2">What's next?</h4>
+                  <p class="text-sm text-base-content/80 mb-3">
+                    After creating your project, you'll be able to:
+                  </p>
+                  <ul class="text-sm text-base-content/70 space-y-1">
+                    <li class="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Add progress updates with photos and descriptions
+                    </li>
+                    <li class="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Track which paints you use for each session
+                    </li>
+                    <li class="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Share your progress with the community
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        <% end %>
+      </div>
+
+      <!-- Form Footer -->
+      <div class="sticky bottom-0 bg-base-100 border-t border-base-200 px-8 py-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2 text-sm text-base-content/60">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <span>Your data is secure and follows your privacy settings</span>
+          </div>
+
+          <div class="flex gap-3">
+            <%= link_to "Cancel",
+                @project.persisted? ? @project : projects_path,
+                class: "btn btn-ghost" %>
+            <%= form.submit @project.new_record? ? "Create Project" : "Update Project",
+                class: "btn btn-primary gap-2" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <%= @project.new_record? ? "Create Project" : "Update Project" %>
             <% end %>
           </div>
         </div>
-      </template>
+      </div>
 
-      <%= link_to "Add Update", "#", class: "btn btn-outline btn-primary", data: { action: "rails-nested-form#add" } %>
-    </div>
+    <% end %>
   </div>
 
-  <div class="form-actions">
-    <%= f.button :submit %>
-  </div>
-<% end %>
+<style>
+
+</style>

@@ -1,13 +1,13 @@
 import { Controller } from "@hotwired/stimulus";
 import TomSelect from "tom-select";
-require("tom-select/dist/css/tom-select.min.css");
+// require("tom-select/dist/css/tom-select.min.css");
 
 export default class extends Controller {
   static targets = ["brandSelect", "productLineSelect", "paintSelect"];
   static values = {
     brandId: Number,
     productLineId: Number,
-    paintId: Number
+    paintId: Number,
   };
 
   connect() {
@@ -21,34 +21,40 @@ export default class extends Controller {
     // Store all data for client-side filtering
     this.paintsData = {
       brands: [],
-      productLines: {},  // Indexed by brand_id
-      paints: {}         // Indexed by product_line_id
+      productLines: {}, // Indexed by brand_id
+      paints: {}, // Indexed by product_line_id
     };
 
     // Load all data and initialize selects
     this.loadAllData().then(() => {
       this.initializeBrandSelect();
-      
+
       // If we have initial values (editing mode), initialize the dropdowns
       if (this.hasBrandIdValue && this.brandIdValue) {
         // For edit mode, initialize the selects with the pre-selected values
         setTimeout(() => {
           if (this.tomSelectInstances.brand) {
-            this.tomSelectInstances.brand.setValue(this.brandIdValue.toString());
-            
+            this.tomSelectInstances.brand.setValue(
+              this.brandIdValue.toString(),
+            );
+
             if (this.hasProductLineIdValue && this.productLineIdValue) {
               // Initialize product line select with the saved value
               this.initializeProductLineSelect(this.brandIdValue);
               setTimeout(() => {
                 if (this.tomSelectInstances.productLine) {
-                  this.tomSelectInstances.productLine.setValue(this.productLineIdValue.toString());
-                  
+                  this.tomSelectInstances.productLine.setValue(
+                    this.productLineIdValue.toString(),
+                  );
+
                   if (this.hasPaintIdValue && this.paintIdValue) {
                     // Initialize paint select with the saved value
                     this.initializePaintSelect(this.productLineIdValue);
                     setTimeout(() => {
                       if (this.tomSelectInstances.paint) {
-                        this.tomSelectInstances.paint.setValue(this.paintIdValue.toString());
+                        this.tomSelectInstances.paint.setValue(
+                          this.paintIdValue.toString(),
+                        );
                       }
                     }, 100);
                   }
@@ -76,15 +82,15 @@ export default class extends Controller {
   async loadAllData() {
     try {
       // Load all brands
-      const brandsResponse = await fetch('/api/brands');
+      const brandsResponse = await fetch("/api/brands");
       this.paintsData.brands = await brandsResponse.json();
 
       // Load all product lines
-      const productLinesResponse = await fetch('/api/product_lines');
+      const productLinesResponse = await fetch("/api/product_lines");
       const allProductLines = await productLinesResponse.json();
-      
+
       // Group product lines by brand_id
-      allProductLines.forEach(productLine => {
+      allProductLines.forEach((productLine) => {
         if (!this.paintsData.productLines[productLine.brand_id]) {
           this.paintsData.productLines[productLine.brand_id] = [];
         }
@@ -92,18 +98,18 @@ export default class extends Controller {
       });
 
       // Load all paints
-      const paintsResponse = await fetch('/api/paints');
+      const paintsResponse = await fetch("/api/paints");
       const allPaints = await paintsResponse.json();
-      
+
       // Group paints by product_line_id
-      allPaints.forEach(paint => {
+      allPaints.forEach((paint) => {
         if (!this.paintsData.paints[paint.product_line_id]) {
           this.paintsData.paints[paint.product_line_id] = [];
         }
         this.paintsData.paints[paint.product_line_id].push(paint);
       });
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error("Error loading data:", error);
     }
   }
 

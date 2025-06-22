@@ -39,6 +39,7 @@ Rails.application.routes.draw do
     collection do
       get :public, to: "projects#public_index"
     end
+    resources :project_updates, except: [:index, :show]
   end
   get "/p/:token", to: "projects#restricted", as: :restricted_project
 

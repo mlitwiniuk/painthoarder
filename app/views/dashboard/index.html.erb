@@ -1,270 +1,208 @@
-<% content_for :title, "Dashboard | PaintHoarder" %>
+<% content_for :title, "Dashboard" %>
 
-<div class="max-w-7xl mx-auto">
-  <!-- Hero Section with Personal Stats -->
-  <div class="relative bg-gradient-to-br from-primary/10 to-accent/10 rounded-3xl p-8 mb-8 overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent"></div>
-    <div class="relative z-10">
-      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-        <div>
-          <h1 class="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
-            Welcome back!
-          </h1>
-          <p class="text-base-content/60 text-lg">Here's what's happening with your paint collection</p>
+<!-- Dashboard Header -->
+<div class="mb-8">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-base-content">Welcome back, <%= current_user.name || current_user.email.split('@').first.capitalize %>! 🎨</h1>
+      <p class="text-base-content/60 mt-1">Here's what's happening with your paint collection</p>
+    </div>
+    <%= link_to user_paints_path, class: "btn btn-primary btn-lg shadow-lg hover:shadow-xl transition-all lg:w-auto w-full" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+      View My Collection
+    <% end %>
+  </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <div class="stats shadow-lg bg-base-100 border border-base-300">
+    <div class="stat place-items-center">
+      <div class="stat-title text-base-content/60">Total Paints</div>
+      <div class="stat-value text-primary"><%= current_user.user_paints.count %></div>
+      <div class="stat-desc text-base-content/50">In your collection</div>
+    </div>
+  </div>
+
+  <div class="stats shadow-lg bg-base-100 border border-base-300">
+    <div class="stat place-items-center">
+      <div class="stat-title text-base-content/60">Wishlist</div>
+      <div class="stat-value text-secondary"><%= current_user.user_paints.wishlist.count %></div>
+      <div class="stat-desc text-base-content/50">Paints to buy</div>
+    </div>
+  </div>
+
+  <div class="stats shadow-lg bg-base-100 border border-base-300">
+    <div class="stat place-items-center">
+      <div class="stat-title text-base-content/60">Brands</div>
+      <div class="stat-value text-accent"><%= current_user.user_paints.joins(paint: :brand).distinct.count('product_line.brand_id') %></div>
+      <div class="stat-desc text-base-content/50">Different brands</div>
+    </div>
+  </div>
+
+  <div class="stats shadow-lg bg-base-100 border border-base-300">
+    <div class="stat place-items-center">
+      <div class="stat-title text-base-content/60">This Month</div>
+      <div class="stat-value text-info"><%= current_user.user_paints.where(created_at: 1.month.ago..Time.current).count %></div>
+      <div class="stat-desc text-base-content/50">New additions</div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+  <!-- Recent Paints Section -->
+  <div class="xl:col-span-2">
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+      <div class="card-body">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="card-title text-xl text-base-content">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Recently Added Paints
+          </h2>
+          <%= link_to "View All", user_paints_path, class: "btn btn-ghost btn-sm text-base-content/60 hover:text-base-content" %>
         </div>
 
-        <!-- Personal Stats -->
-        <%= turbo_frame_tag "dashboard-stats" do %>
-          <div class="flex gap-6">
-            <div class="text-center">
-              <div class="text-3xl font-bold text-primary"><%= @owned_paints_count %></div>
-              <div class="text-sm text-base-content/60">Owned</div>
+        <% if current_user.user_paints.any? %>
+          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <% current_user.user_paints.includes(:paint => :brand).order(created_at: :desc).limit(12).each do |user_paint| %>
+              <div class="group relative">
+                <div class="aspect-square rounded-xl border-2 border-base-300 overflow-hidden shadow-sm hover:shadow-lg transition-all group-hover:scale-105">
+                  <div class="w-full h-full flex items-center justify-center" style="background-color: <%= user_paint.paint.hex_color || '#666' %>;">
+                    <% if user_paint.paint.hex_color %>
+                      <div class="w-full h-full" style="background: linear-gradient(135deg, <%= user_paint.paint.hex_color %> 0%, <%= user_paint.paint.hex_color %>dd 100%);"></div>
+                    <% else %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-base-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                      </svg>
+                    <% end %>
+                  </div>
+                </div>
+                <div class="mt-2 text-center">
+                  <p class="text-xs font-medium text-base-content/80 truncate"><%= user_paint.paint.name %></p>
+                  <p class="text-xs text-base-content/50 truncate"><%= user_paint.paint.brand.name %></p>
+                </div>
+
+                <!-- Status badge -->
+                <% if user_paint.wishlist? %>
+                  <div class="absolute -top-1 -right-1 w-4 h-4 bg-secondary rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-secondary-content" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="text-center py-12">
+            <div class="w-20 h-20 mx-auto bg-base-200 rounded-full flex items-center justify-center mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
             </div>
-            <div class="text-center">
-              <div class="text-3xl font-bold text-secondary"><%= @wishlist_count %></div>
-              <div class="text-sm text-base-content/60">Wishlist</div>
-            </div>
-            <div class="text-center">
-              <div class="text-3xl font-bold text-accent"><%= current_user.paints.distinct.joins(product_line: :brand).select('brands.id').distinct.count %></div>
-              <div class="text-sm text-base-content/60">Brands</div>
-            </div>
+            <h3 class="text-lg font-semibold text-base-content/80 mb-2">Start Your Collection</h3>
+            <p class="text-base-content/60 mb-4">Add your first paints to begin organizing your collection</p>
+            <%= link_to "Browse Paints", paints_path, class: "btn btn-primary" %>
           </div>
         <% end %>
       </div>
     </div>
   </div>
 
-  <!-- Activity Feed Style Navigation -->
-  <div class="sticky top-0 z-40 bg-base-100/80 backdrop-blur-xl border-b border-base-200 -mx-4 px-4 mb-8">
-    <div class="flex items-center justify-between py-4">
-      <!-- Feed Tabs -->
-      <div class="flex items-center gap-1 bg-base-200 rounded-full p-1">
-        <a class="tab px-4 py-2 rounded-full text-sm font-medium transition-all tab-active bg-primary text-primary-content shadow-sm"
-           data-tab-target="recent">
+  <!-- Sidebar -->
+  <div class="space-y-6">
+    <!-- Quick Actions -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+      <div class="card-body">
+        <h3 class="card-title text-lg text-base-content mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Quick Actions
+        </h3>
+        <div class="space-y-3">
+          <%= link_to paints_path, class: "btn btn-ghost btn-sm justify-start w-full" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Explore Paints
+          <% end %>
+
+          <%= link_to bulk_import_user_paints_path, class: "btn btn-ghost btn-sm justify-start w-full" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            Bulk Import
+          <% end %>
+
+          <%= link_to user_paints_path(filter: :wishlist), class: "btn btn-ghost btn-sm justify-start w-full" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            My Wishlist
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Brand Breakdown -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+      <div class="card-body">
+        <h3 class="card-title text-lg text-base-content mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Top Brands
+        </h3>
+
+        <% brand_counts = current_user.user_paints.joins(paint: :brand).group('brands.name').count.sort_by(&:last).reverse.first(5) %>
+        <% if brand_counts.any? %>
+          <div class="space-y-3">
+            <% brand_counts.each do |brand_name, count| %>
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-base-content/80"><%= brand_name %></span>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm text-base-content/60"><%= count %></span>
+                  <div class="w-12 bg-base-300 rounded-full h-2">
+                    <div class="bg-primary h-2 rounded-full transition-all" style="width: <%= [count.to_f / brand_counts.first.last * 100, 100].min %>%"></div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-sm text-base-content/50">No brands in your collection yet</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Recent Activity (Placeholder for future social features) -->
+    <div class="card bg-base-100 shadow-lg border border-base-300">
+      <div class="card-body">
+        <h3 class="card-title text-lg text-base-content mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
           Recent Activity
-        </a>
-        <a class="tab px-4 py-2 rounded-full text-sm font-medium transition-all text-base-content/60 hover:text-base-content"
-           data-tab-target="insights">
-          Insights
-        </a>
-        <a class="tab px-4 py-2 rounded-full text-sm font-medium transition-all text-base-content/60 hover:text-base-content"
-           data-tab-target="wishlist">
-          Wishlist <span class="ml-1 opacity-60">(<%= @wishlist_count %>)</span>
-        </a>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="flex items-center gap-3">
-        <%= link_to user_paints_path, class: "btn btn-ghost btn-sm" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
-          <span class="hidden sm:inline">View Collection</span>
-        <% end %>
-        <%= link_to new_user_paint_path, class: "btn btn-primary btn-sm", data: { turbo_frame: "modal" } do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          <span class="hidden sm:inline ml-2">Add Paint</span>
-        <% end %>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tab Content -->
-  <div class="dashboard-tabs-wrapper">
-    <!-- Recent Activity Tab -->
-    <div id="recent-tab" class="dashboard-tab-content block active">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Recent Additions Feed -->
-        <div class="lg:col-span-2">
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-6 border-b border-gray-100">
-              <h2 class="text-xl font-bold text-gray-900 mb-2">Recent Additions</h2>
-              <p class="text-gray-500 text-sm">Your latest paint collection updates</p>
-            </div>
-            <div class="p-6">
-              <%= turbo_frame_tag "recent-paints" do %>
-                <% if @recent_additions.any? %>
-                  <div class="space-y-4">
-                    <% @recent_additions.each do |user_paint| %>
-                      <%= render "dashboard/recent_paint_item", user_paint: user_paint %>
-                    <% end %>
-                  </div>
-                <% else %>
-                  <div class="text-center py-12">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                      </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">No recent activity</h3>
-                    <p class="text-gray-500 mb-4">Start adding paints to see your collection activity here</p>
-                    <%= link_to new_user_paint_path, class: "btn btn-primary", data: { turbo_frame: "modal" } do %>
-                      Add Your First Paint
-                    <% end %>
-                  </div>
-                <% end %>
-              <% end %>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Add Widget -->
-        <div class="space-y-6">
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-6 border-b border-gray-100">
-              <h3 class="text-lg font-semibold text-gray-900">Quick Add</h3>
-              <p class="text-gray-500 text-sm mt-1">Search and add paints quickly</p>
-            </div>
-            <div class="p-6">
-              <div data-controller="search">
-                <div class="relative">
-                  <input type="text" placeholder="Search paints..."
-                         class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
-                         data-search-target="input"
-                         data-action="input->search#search">
-                  <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </div>
-                </div>
-
-                <%= turbo_frame_tag "search-results" do %>
-                  <div data-search-target="results" class="mt-4 space-y-2 max-h-64 overflow-y-auto">
-                    <div class="text-center py-8 text-gray-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
-                      <p class="text-sm">Type to search for paints</p>
-                    </div>
-                  </div>
-                <% end %>
+        </h3>
+        <div class="space-y-3">
+          <% current_user.user_paints.order(created_at: :desc).limit(3).each do |user_paint| %>
+            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-base-200 transition-colors">
+              <div class="w-6 h-6 rounded-full border border-base-300" style="background-color: <%= user_paint.paint.hex_color || '#666' %>;"></div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-base-content/80 truncate">Added <%= user_paint.paint.name %></p>
+                <p class="text-xs text-base-content/50"><%= time_ago_in_words(user_paint.created_at) %> ago</p>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
+          <% end %>
 
-    <!-- Insights Tab -->
-    <div id="insights-tab" class="dashboard-tab-content hidden">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Color Distribution -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="p-6 border-b border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-900">Color Distribution</h3>
-            <p class="text-gray-500 text-sm mt-1">Breakdown of colors in your collection</p>
-          </div>
-          <div class="p-6">
-            <%= turbo_frame_tag "color-chart" do %>
-              <% if @color_distribution.any? %>
-                <div class="space-y-4">
-                  <% @color_distribution.each do |category, count| %>
-                    <div class="flex items-center gap-4">
-                      <div class="w-20 text-sm font-medium text-gray-700"><%= category %></div>
-                      <div class="flex-1">
-                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                          <% percentage = (count.to_f / @owned_paints_count * 100).round %>
-                          <%
-                            color_map = {
-                              "Reds" => "#ef4444",
-                              "Greens" => "#22c55e",
-                              "Blues" => "#3b82f6",
-                              "Yellows" => "#eab308",
-                              "Purples" => "#a855f7",
-                              "Cyans" => "#06b6d4",
-                              "Whites" => "#f1f5f9",
-                              "Blacks" => "#1f2937",
-                              "Grays" => "#6b7280",
-                              "Other" => "#f97316"
-                            }
-                          %>
-                          <div class="h-full rounded-full transition-all duration-500 ease-out"
-                               style="width: <%= percentage %>%; background-color: <%= color_map[category] || '#9ca3af' %>;">
-                          </div>
-                        </div>
-                      </div>
-                      <div class="w-12 text-right">
-                        <span class="text-sm font-semibold text-gray-900"><%= count %></span>
-                      </div>
-                    </div>
-                  <% end %>
-                </div>
-              <% else %>
-                <div class="text-center py-12">
-                  <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                  </div>
-                  <p class="text-gray-500">Add paints to see your color distribution</p>
-                </div>
-              <% end %>
-            <% end %>
-          </div>
-        </div>
-
-        <!-- Collection Growth -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="p-6 border-b border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-900">Collection Stats</h3>
-            <p class="text-gray-500 text-sm mt-1">Your painting journey at a glance</p>
-          </div>
-          <div class="p-6">
-            <div class="grid grid-cols-2 gap-6">
-              <div class="text-center">
-                <div class="text-3xl font-bold text-primary mb-2"><%= @owned_paints_count %></div>
-                <div class="text-sm text-gray-500">Total Paints</div>
-              </div>
-              <div class="text-center">
-                <div class="text-3xl font-bold text-secondary mb-2"><%= current_user.paints.distinct.joins(product_line: :brand).select('brands.id').distinct.count %></div>
-                <div class="text-sm text-gray-500">Brands</div>
-              </div>
-              <div class="text-center">
-                <div class="text-3xl font-bold text-accent mb-2"><%= current_user.paints.distinct.joins(:product_line).select('product_lines.id').distinct.count %></div>
-                <div class="text-sm text-gray-500">Product Lines</div>
-              </div>
-              <div class="text-center">
-                <div class="text-3xl font-bold text-warning mb-2"><%= @wishlist_count %></div>
-                <div class="text-sm text-gray-500">Wishlist</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Wishlist Tab -->
-    <div id="wishlist-tab" class="dashboard-tab-content hidden">
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-6 border-b border-gray-100">
-          <h2 class="text-xl font-bold text-gray-900 mb-2">My Wishlist</h2>
-          <p class="text-gray-500 text-sm">Paints you want to add to your collection</p>
-        </div>
-        <div class="p-6">
-          <%= turbo_frame_tag "wishlist-items" do %>
-            <% if @wishlist_items.any? %>
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <% @wishlist_items.each do |user_paint| %>
-                  <%= render "user_paints/modern_paint_card", user_paint: user_paint %>
-                <% end %>
-              </div>
-            <% else %>
-              <div class="text-center py-12">
-                <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Your wishlist is empty</h3>
-                <p class="text-gray-500 mb-4">Start adding paints you want to buy</p>
-                <%= link_to paints_path, class: "btn btn-primary" do %>
-                  Browse Paint Catalog
-                <% end %>
-              </div>
-            <% end %>
+          <% if current_user.user_paints.none? %>
+            <p class="text-sm text-base-content/50 text-center py-4">No activity yet</p>
           <% end %>
         </div>
       </div>
@@ -272,54 +210,15 @@
   </div>
 </div>
 
-<%= turbo_frame_tag "modal" %>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Simple tab switching for dashboard
-  const tabButtons = document.querySelectorAll('[data-tab-target]');
-  const tabPanes = document.querySelectorAll('.dashboard-tab-content');
-
-  tabButtons.forEach(button => {
-    button.addEventListener('click', function(e) {
-      e.preventDefault();
-      const targetId = this.getAttribute('data-tab-target') + '-tab';
-
-      // Remove active class from all buttons
-      tabButtons.forEach(btn => {
-        btn.classList.remove('bg-primary', 'text-primary-content', 'shadow-sm', 'tab-active');
-        btn.classList.add('text-base-content/60', 'hover:text-base-content');
-      });
-
-      // Add active class to clicked button
-      this.classList.remove('text-base-content/60', 'hover:text-base-content');
-      this.classList.add('bg-primary', 'text-primary-content', 'shadow-sm', 'tab-active');
-
-      // Hide all tab panes
-      tabPanes.forEach(pane => {
-        pane.classList.add('hidden');
-        pane.classList.remove('block', 'active');
-      });
-
-      // Show target tab pane
-      const targetPane = document.getElementById(targetId);
-      if (targetPane) {
-        targetPane.classList.remove('hidden');
-        targetPane.classList.add('block', 'active');
-      }
-    });
-  });
-
-  // Initialize first tab as active
-  if (tabButtons.length > 0) {
-    const firstTab = tabButtons[0];
-    const firstTabId = firstTab.getAttribute('data-tab-target') + '-tab';
-    const firstPane = document.getElementById(firstTabId);
-
-    if (firstPane) {
-      firstPane.classList.remove('hidden');
-      firstPane.classList.add('block', 'active');
-    }
-  }
-});
-</script>
+<!-- Coming Soon Banner -->
+<div class="mt-8">
+  <div class="alert alert-info shadow-lg">
+    <div>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <div>
+        <h3 class="font-bold">More social features coming soon!</h3>
+        <div class="text-xs">Share your painted miniatures, discover community projects, and connect with fellow painters.</div>
+      </div>
+    </div>
+  </div>
+</div>
