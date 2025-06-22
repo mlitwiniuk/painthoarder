@@ -1,0 +1,25 @@
+<!-- Theme Drawer -->
+<div class="drawer-side">
+  <label for="my-drawer" class="drawer-overlay"></label>
+  <div class="w-80 bg-base-100 shadow-2xl h-full z-50" data-controller="theme">
+    <div class="p-6 border-b border-base-300">
+      <h2 class="text-xl font-bold text-base-content">Choose Theme</h2>
+      <p class="text-sm text-base-content/50 mt-1">Customize your PaintHoarder experience</p>
+    </div>
+    <div class="p-4 space-y-2">
+      <% themes.each do |theme| %>
+        <button class="w-full flex items-center justify-between p-4 rounded-xl hover:bg-base-200 transition-colors group"
+                data-action="click->theme#switch:prevent:capture"
+                data-theme-theme-param="<%= theme %>">
+          <span class="font-medium text-base-content capitalize"><%= theme.humanize %></span>
+          <div class="flex gap-1" data-theme="<%= theme %>">
+            <div class="bg-primary w-4 h-4 rounded-full shadow-sm"></div>
+            <div class="bg-secondary w-4 h-4 rounded-full shadow-sm"></div>
+            <div class="bg-accent w-4 h-4 rounded-full shadow-sm"></div>
+            <div class="bg-neutral w-4 h-4 rounded-full shadow-sm"></div>
+          </div>
+        </button>
+      <% end %>
+    </div>
+  </div>
+</div>
