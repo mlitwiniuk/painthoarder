@@ -1,4 +1,7 @@
 <% content_for :title, params[:action] == "public_index" ? "Community Projects" : "My Projects" %>
+<% content_for :description, params[:action] == "public_index" ? "Discover amazing miniature painting projects from the PaintHoarder community. Get inspired by fellow painters' work, techniques, and creative ideas." : "Manage and showcase your miniature painting projects. Document your progress, share your hobby journey, and track your painting improvements." %>
+<% render_og_tags(projects_index_og_tags(params[:action] == "public_index")) %>
+<% render_structured_data(projects_index_structured_data(@projects, params[:action] == "public_index")) %>
 
 <div class="min-h-screen bg-base-100">
   <!-- Mobile-first sticky header -->

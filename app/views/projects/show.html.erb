@@ -1,4 +1,7 @@
 <% content_for :title, @project.title %>
+<% content_for :description, @project.description.present? ? strip_tags(@project.description).truncate(160) : "#{@project.user.username || @project.user.email.split('@').first}'s miniature painting project: #{@project.title}. Discover amazing miniature painting techniques and progress updates." %>
+<% render_og_tags(project_og_tags(@project)) %>
+<% render_structured_data(project_structured_data(@project)) %>
 
 <div class="min-h-screen bg-base-100">
   <!-- Mobile-first sticky header -->
