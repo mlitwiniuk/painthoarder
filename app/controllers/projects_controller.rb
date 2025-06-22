@@ -1,7 +1,7 @@
 class ProjectsController < ApplicationController
   before_action :authenticate_user!, except: %i[public_index restricted show]
   before_action :set_project, only: %i[show edit update destroy]
-  before_action :set_current_user_paints, only: %i[show ]
+  before_action :set_current_user_paints, only: %i[show]
 
   # GET /projects/my (default index)
   def index
@@ -79,7 +79,11 @@ class ProjectsController < ApplicationController
   private
 
   def set_cover_photo!
-    return if params[:project][:selected_cover_photo_id].blank?
+    if params[:project][:selected_cover_photo_id].blank?
+      @project.cover_photo.purge_later
+      @project.update(cover_photo: nil)
+      return
+    end
 
     attachment = ActiveStorage::Attachment.find_by(id: params[:project][:selected_cover_photo_id])
     return unless attachment
@@ -133,15 +137,15 @@ class ProjectsController < ApplicationController
     if user_signed_in?
       # Get all paint IDs from project updates
       paint_ids = @project.project_updates
-                          .joins(user_paints: :paint)
-                          .distinct
-                          .pluck('paints.id')
+        .joins(user_paints: :paint)
+        .distinct
+        .pluck("paints.id")
 
       # Load current user's paints for these specific paints
       @current_user_paints = current_user.user_paints
-                                        .includes(:paint)
-                                        .where(paint_id: paint_ids)
-                                        .index_by(&:paint_id)
+        .includes(:paint)
+        .where(paint_id: paint_ids)
+        .index_by(&:paint_id)
     end
   end
 end
