@@ -50,7 +50,7 @@ class Project < ApplicationRecord
   private
 
   def ensure_secret_token
-    return unless visibility_restricted? && secret_token.blank?
+    return if secret_token.present?
 
     self.secret_token = SecureRandom.urlsafe_base64(16) while secret_token.blank? || Project.exists?(secret_token:)
   end
