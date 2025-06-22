@@ -34,6 +34,7 @@ class ProjectUpdate < ApplicationRecord
   accepts_nested_attributes_for :paint_usages, allow_destroy: true
 
   validates :position, numericality: {only_integer: true}, allow_nil: true
+  validates :photos, content_type: {in: [:png, :jpeg], spoofing_protection: true}, size: {less_than: 5.megabytes}, total_size: {less_than: 50.megabytes}
 
   default_scope { order(position: :asc) }
 end
