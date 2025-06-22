@@ -86,7 +86,7 @@
         <div class="relative" data-controller="photo-preview">
           <%= form.file_field :photos,
               multiple: true,
-              accept: "image/*",
+              accept: ACCEPTED_CONTENT_TYPES,
               class: "file-input file-input-bordered file-input-#{editing ? 'success' : 'primary'} w-full",
               data: { photo_preview_target: "input", action: "change->photo-preview#handleFileChange" } %>
 
