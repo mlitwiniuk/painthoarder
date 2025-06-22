@@ -24,6 +24,7 @@
 #  user_id         (user_id => users.id) ON DELETE => cascade
 #
 class Project < ApplicationRecord
+  scope :visibility_restricted_or_public, -> { where(visibility: [:restricted, :public]) }
   attr_accessor :selected_cover_photo_id
   enum :visibility, {private: 0, restricted: 1, public: 2}, prefix: true
 
