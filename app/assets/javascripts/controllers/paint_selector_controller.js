@@ -108,6 +108,12 @@ export default class extends Controller {
     const brandName = button.dataset.brandName;
     const lineName = button.dataset.lineName;
 
+    if (!paintId) {
+      debugger;
+      console.error("Invalid paint ID:", paintId);
+      return;
+    }
+
     if (this.selectedPaintIds.has(paintId)) {
       return; // Already selected
     }
