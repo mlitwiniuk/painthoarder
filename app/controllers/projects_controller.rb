@@ -1,6 +1,7 @@
 class ProjectsController < ApplicationController
   before_action :authenticate_user!, except: %i[public_index restricted show]
   before_action :set_project, only: %i[show edit update destroy]
+  before_action :set_current_user_paints, only: %i[show ]
 
   # GET /projects/my (default index)
   def index
@@ -15,26 +16,15 @@ class ProjectsController < ApplicationController
 
   # GET /p/:token
   def restricted
-    @project = Project.visibility_restricted.find_by!(secret_token: params[:token])
+    @project = Project.visibility_restricted_or_public.find_by!(secret_token: params[:token])
+    set_current_user_paints
     render :show
   end
 
   # GET /projects/1 or /projects/1.json
   def show
     # Preload current user's paints for optimization if user is signed in
-    if user_signed_in?
-      # Get all paint IDs from project updates
-      paint_ids = @project.project_updates
-                          .joins(user_paints: :paint)
-                          .distinct
-                          .pluck('paints.id')
-
-      # Load current user's paints for these specific paints
-      @current_user_paints = current_user.user_paints
-                                        .includes(:paint)
-                                        .where(paint_id: paint_ids)
-                                        .index_by(&:paint_id)
-    end
+    redirect_to restricted_project_path(@project.secret_token) unless @project.visibility_private?
   end
 
   # GET /projects/new
@@ -137,5 +127,21 @@ class ProjectsController < ApplicationController
     end
 
     params_hash
+  end
+
+  def set_current_user_paints
+    if user_signed_in?
+      # Get all paint IDs from project updates
+      paint_ids = @project.project_updates
+                          .joins(user_paints: :paint)
+                          .distinct
+                          .pluck('paints.id')
+
+      # Load current user's paints for these specific paints
+      @current_user_paints = current_user.user_paints
+                                        .includes(:paint)
+                                        .where(paint_id: paint_ids)
+                                        .index_by(&:paint_id)
+    end
   end
 end
