@@ -1,13 +1,193 @@
-<%= simple_form_for(@page) do |f| %>
-  <%= f.error_notification %>
-  <%= f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present? %>
-  <div class="form-inputs">
-    <%= f.input :title %>
-    <%= f.input :content, as: :tinymce %>
-    <%= f.input :published %>
-    <%= f.input :status %>
+<div class="bg-base-100 rounded-2xl shadow-sm border border-base-300 overflow-hidden">
+  <%= simple_form_for(@page, html: { class: "space-y-0" }) do |f| %>
+    <%= f.error_notification %>
+    <%= f.error_notification message: f.object.errors[:base].to_sentence if f.object.errors[:base].present? %>
+
+    <!-- Form Header -->
+    <div class="border-b border-base-300 p-6">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-base-content">
+            <%= @page.persisted? ? 'Edit Post' : 'Create New Post' %>
+          </h2>
+          <p class="text-sm text-base-content/60">
+            Share valuable content with the miniature painting community
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Content -->
+    <div class="p-6 space-y-6">
+      <!-- Title Field -->
+      <div class="form-control">
+        <%= f.label :title, class: "label" do %>
+          <span class="label-text font-semibold text-base-content">Post Title</span>
+          <span class="label-text-alt text-error">*</span>
+        <% end %>
+        <%= f.input :title,
+            wrapper: false,
+            label: false,
+            input_html: {
+              class: "input input-bordered w-full text-lg font-medium placeholder:text-base-content/40 focus:border-primary",
+              placeholder: "Enter an engaging title for your post..."
+            } %>
+        <div class="label">
+          <span class="label-text-alt text-base-content/50">Make it descriptive and engaging</span>
+        </div>
+      </div>
+
+      <!-- Content Field -->
+      <div class="form-control">
+        <%= f.label :content, class: "label" do %>
+          <span class="label-text font-semibold text-base-content">Content</span>
+          <span class="label-text-alt text-error">*</span>
+        <% end %>
+        <%= f.rich_textarea :content,
+            class: "min-h-[300px] rounded-xl border-base-300 focus:border-primary",
+            placeholder: "Share your knowledge, tips, tutorials, or community updates..." %>
+        <div class="label">
+          <span class="label-text-alt text-base-content/50">Use rich formatting to make your content engaging</span>
+        </div>
+      </div>
+
+      <!-- Settings Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Published Toggle -->
+        <div class="form-control">
+          <%= f.label :published, class: "label" do %>
+            <span class="label-text font-semibold text-base-content">Visibility</span>
+          <% end %>
+          <div class="bg-base-200 rounded-xl p-4">
+            <label class="cursor-pointer label justify-start gap-3">
+              <%= f.check_box :published,
+                  class: "toggle toggle-primary",
+                  data: {
+                    stimulus_controller: "toggle",
+                    action: "change->toggle#update"
+                  } %>
+              <div>
+                <span class="label-text font-medium text-base-content">Make this post public</span>
+                <div class="label-text-alt text-base-content/60">
+                  When enabled, this post will be visible to all community members
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Status Selection -->
+        <div class="form-control">
+          <%= f.label :status, class: "label" do %>
+            <span class="label-text font-semibold text-base-content">Post Status</span>
+          <% end %>
+          <%= f.select :status,
+              options_for_select([
+                ['Draft - Save for later', 'draft'],
+                ['Published - Make it live', 'issued'],
+                ['Archived - Hide from feed', 'archived']
+              ], @page.status),
+              {},
+              {
+                class: "select select-bordered w-full focus:border-primary"
+              } %>
+          <div class="label">
+            <span class="label-text-alt text-base-content/50">Choose how to handle this post</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="border-t border-base-300 p-6 bg-base-50">
+      <div class="flex items-center justify-between">
+        <!-- Cancel Link -->
+        <div class="flex items-center gap-4">
+          <%= link_to pages_path, class: "text-base-content/60 hover:text-base-content transition-colors" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Cancel
+          <% end %>
+
+          <% if @page.persisted? %>
+            <%= link_to page_path(@page), class: "text-base-content/60 hover:text-base-content transition-colors" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              Preview
+            <% end %>
+          <% end %>
+        </div>
+
+        <!-- Save Actions -->
+        <div class="flex items-center gap-3">
+          <% if @page.persisted? %>
+            <!-- Save as Draft -->
+            <%= f.button :submit, "Save Draft",
+                name: "page[status]",
+                value: "draft",
+                class: "btn btn-ghost gap-2",
+                formnovalidate: true do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              Save Draft
+            <% end %>
+          <% end %>
+
+          <!-- Primary Save Button -->
+          <%= f.button :submit,
+              (@page.persisted? ? "Update Post" : "Create Post"),
+              class: "btn btn-primary gap-2 shadow-sm" do %>
+            <% if @page.persisted? %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Update Post
+            <% else %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Create Post
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<!-- Writing Tips Sidebar -->
+<div class="mt-6 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl border border-primary/20 p-6">
+  <h3 class="font-semibold text-base-content mb-4 flex items-center gap-2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    Writing Tips
+  </h3>
+  <div class="space-y-3 text-sm text-base-content/70">
+    <div class="flex items-start gap-2">
+      <div class="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+      <span>Use clear, descriptive titles that explain what readers will learn</span>
+    </div>
+    <div class="flex items-start gap-2">
+      <div class="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+      <span>Include step-by-step instructions for tutorials</span>
+    </div>
+    <div class="flex items-start gap-2">
+      <div class="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+      <span>Add images to illustrate your techniques and results</span>
+    </div>
+    <div class="flex items-start gap-2">
+      <div class="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+      <span>Share your personal experiences and lessons learned</span>
+    </div>
   </div>
-  <div class="form-actions">
-    <%= f.button :submit %>
-  </div>
-<% end %>
+</div>

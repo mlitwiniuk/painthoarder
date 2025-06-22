@@ -6,10 +6,15 @@
 #  content    :text
 #  prefrences :json
 #  published  :boolean          default(FALSE)
+#  slug       :string
 #  status     :integer          default("draft"), not null
 #  title      :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
+#
+# Indexes
+#
+#  index_pages_on_slug  (slug) UNIQUE
 #
 require "test_helper"
 

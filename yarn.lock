@@ -1656,7 +1656,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rails/activestorage@npm:^8.0.200":
+"@rails/actiontext@npm:^8.0.200":
+  version: 8.0.200
+  resolution: "@rails/actiontext@npm:8.0.200"
+  dependencies:
+    "@rails/activestorage": "npm:>= 8.0.0-alpha"
+  peerDependencies:
+    trix: ^2.0.0
+  checksum: 10c0/6a3ab58587cf3b8b3a4a0bed0df446b18b97fb995a71f12a733140bc3788758ee6c3b5b78c22df116e19c32ceb061de425b3f201e7e474eb4f7067822248097b
+  languageName: node
+  linkType: hard
+
+"@rails/activestorage@npm:>= 8.0.0-alpha, @rails/activestorage@npm:^8.0.200":
   version: 8.0.200
   resolution: "@rails/activestorage@npm:8.0.200"
   dependencies:
@@ -2072,7 +2083,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/trusted-types@npm:^2.0.2":
+"@types/trusted-types@npm:^2.0.2, @types/trusted-types@npm:^2.0.7":
   version: 2.0.7
   resolution: "@types/trusted-types@npm:2.0.7"
   checksum: 10c0/4c4855f10de7c6c135e0d32ce462419d8abbbc33713b31d294596c0cc34ae1fa6112a2f9da729c8f7a20707782b0d69da3b1f8df6645b0366d08825ca1522e0c
@@ -2179,6 +2190,7 @@ __metadata:
     "@hotwired/stimulus": "npm:^3.2.2"
     "@hotwired/turbo-rails": "npm:^8.0.13"
     "@rails/actioncable": "npm:^8.0.200"
+    "@rails/actiontext": "npm:^8.0.200"
     "@rails/activestorage": "npm:^8.0.200"
     "@rails/request.js": "npm:^0.0.11"
     "@stimulus-components/rails-nested-form": "npm:^5.0.0"
@@ -2198,6 +2210,7 @@ __metadata:
     tailwindcss-displaymodes: "npm:^1.0.8"
     tinymce: "npm:^7.7.2"
     tom-select: "npm:^2.4.3"
+    trix: "npm:^2.1.15"
     workbox-cli: "npm:^7.3.0"
     workbox-precaching: "npm:^7.3.0"
     workbox-recipes: "npm:^7.3.0"
@@ -3221,6 +3234,18 @@ __metadata:
   dependencies:
     path-type: "npm:^4.0.0"
   checksum: 10c0/dcac00920a4d503e38bb64001acb19df4efc14536ada475725e12f52c16777afdee4db827f55f13a908ee7efc0cb282e2e3dbaeeb98c0993dd93d1802d3bf00c
+  languageName: node
+  linkType: hard
+
+"dompurify@npm:^3.2.5":
+  version: 3.2.6
+  resolution: "dompurify@npm:3.2.6"
+  dependencies:
+    "@types/trusted-types": "npm:^2.0.7"
+  dependenciesMeta:
+    "@types/trusted-types":
+      optional: true
+  checksum: 10c0/c8f8e5b0879a0d93c84a2e5e78649a47d0c057ed0f7850ca3d573d2cca64b84fb1ff85bd4b20980ade69c4e5b80ae73011340f1c2ff375c7ef98bb8268e1d13a
   languageName: node
   linkType: hard
 
@@ -6678,6 +6703,15 @@ __metadata:
   version: 3.0.1
   resolution: "trim-newlines@npm:3.0.1"
   checksum: 10c0/03cfefde6c59ff57138412b8c6be922ecc5aec30694d784f2a65ef8dcbd47faef580b7de0c949345abdc56ec4b4abf64dd1e5aea619b200316e471a3dd5bf1f6
+  languageName: node
+  linkType: hard
+
+"trix@npm:^2.1.15":
+  version: 2.1.15
+  resolution: "trix@npm:2.1.15"
+  dependencies:
+    dompurify: "npm:^3.2.5"
+  checksum: 10c0/fb1b53d03e13d007a21c7417bbc994b24073a48d51b94bee679f8bb748b2e2cf9469372b3292d40f27bf502a88ab27d43a0c3c08928b708f65741c1f9eca7c77
   languageName: node
   linkType: hard
 

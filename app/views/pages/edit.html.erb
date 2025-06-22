@@ -1,9 +1,158 @@
-<div class=" prose prose-sm md:prose-base mb-3">
-  <h1>Editing page</h1>
-</div>
-<%= render "form", page: @page %>
-<br>
-<div>
-  <%= link_to "Show this page", @page %> |
-  <%= link_to "Back to pages", pages_path %>
+<% content_for :hero do %>
+  <div class="bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 border-b border-base-300">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+      <!-- Back Navigation -->
+      <div class="mb-6">
+        <%= link_to @page, class: "inline-flex items-center gap-2 text-base-content/60 hover:text-base-content transition-colors group" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Post
+        <% end %>
+      </div>
+
+      <!-- Page Header -->
+      <div class="max-w-2xl">
+        <h1 class="text-3xl lg:text-4xl font-bold text-base-content leading-tight mb-4">
+          Edit Post
+        </h1>
+        <p class="text-lg text-base-content/70 mb-6">
+          Update your content to keep it fresh and valuable for the community. Make improvements, add new insights, or correct any information.
+        </p>
+
+        <!-- Post Info -->
+        <div class="flex items-center gap-4 text-sm text-base-content/60">
+          <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Created <%= @page.created_at.strftime("%B %d, %Y") %></span>
+          </div>
+          <% if @page.updated_at != @page.created_at %>
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              <span>Last updated <%= @page.updated_at.strftime("%B %d, %Y") %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<div class="max-w-4xl mx-auto">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main Form -->
+    <div class="lg:col-span-2">
+      <%= render "form", page: @page %>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="lg:col-span-1">
+      <div class="sticky top-24 space-y-6">
+        <!-- Quick Actions -->
+        <div class="bg-base-100 rounded-2xl shadow-sm border border-base-300 p-6">
+          <h3 class="font-semibold text-base-content mb-4">Quick Actions</h3>
+          <div class="space-y-3">
+            <%= link_to @page, class: "flex items-center gap-3 p-3 rounded-xl hover:bg-base-200 transition-colors group" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-base-content/60 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <span class="text-sm font-medium">Preview Post</span>
+            <% end %>
+            <%= link_to pages_path, class: "flex items-center gap-3 p-3 rounded-xl hover:bg-base-200 transition-colors group" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-base-content/60 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+              <span class="text-sm font-medium">All Posts</span>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Post Statistics -->
+        <div class="bg-base-100 rounded-2xl shadow-sm border border-base-300 p-6">
+          <h3 class="font-semibold text-base-content mb-4">Post Statistics</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-base-content/60">Status</span>
+              <% case @page.status %>
+              <% when 'draft' %>
+                <div class="badge badge-ghost badge-sm">Draft</div>
+              <% when 'issued' %>
+                <div class="badge badge-success badge-sm">Published</div>
+              <% when 'archived' %>
+                <div class="badge badge-neutral badge-sm">Archived</div>
+              <% end %>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-base-content/60">Visibility</span>
+              <span class="text-base-content">
+                <%= @page.published? ? 'Public' : 'Private' %>
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-base-content/60">Word Count</span>
+              <span class="text-base-content">~<%= @page.content.to_s.split.length %> words</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-base-content/60">Reading Time</span>
+              <span class="text-base-content">~<%= (@page.content.to_s.split.length / 200.0).ceil %> min</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit History -->
+        <div class="bg-gradient-to-br from-accent/5 to-primary/5 rounded-2xl border border-accent/20 p-6">
+          <h3 class="font-semibold text-base-content mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Version History
+          </h3>
+          <div class="space-y-3 text-sm text-base-content/70">
+            <div class="flex items-start gap-2">
+              <div class="w-1.5 h-1.5 bg-accent rounded-full mt-2 flex-shrink-0"></div>
+              <div>
+                <span class="block">Current version</span>
+                <span class="text-xs text-base-content/50">Last saved <%= time_ago_in_words(@page.updated_at) %> ago</span>
+              </div>
+            </div>
+            <div class="flex items-start gap-2">
+              <div class="w-1.5 h-1.5 bg-base-300 rounded-full mt-2 flex-shrink-0"></div>
+              <div>
+                <span class="block">Original version</span>
+                <span class="text-xs text-base-content/50">Created <%= time_ago_in_words(@page.created_at) %> ago</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="bg-error/5 rounded-2xl border border-error/20 p-6">
+          <h3 class="font-semibold text-error mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            Danger Zone
+          </h3>
+          <p class="text-sm text-base-content/60 mb-4">
+            Permanently delete this post and all its content. This action cannot be undone.
+          </p>
+          <%= button_to page_path(@page), method: :delete,
+              data: {
+                turbo_confirm: "Are you sure you want to delete this post? This action cannot be undone and will remove the post from the community feed."
+              },
+              class: "btn btn-error btn-sm gap-2" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Delete Post
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
