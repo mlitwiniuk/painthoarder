@@ -23,4 +23,11 @@ class ApplicationController < ActionController::Base
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: %i[username email password password_confirmation])
   end
+
+  def authorize_admin!
+    unless current_user&.admin?
+      flash[:alert] = "You are not authorized to perform this action."
+      redirect_to root_path
+    end
+  end
 end

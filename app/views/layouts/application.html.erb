@@ -187,10 +187,12 @@
             <div>
               <h3 class="font-semibold text-base-content mb-4">Company</h3>
               <ul class="space-y-2 text-base-content/60">
-                <li><a href="#" class="hover:text-base-content transition-colors">About Us</a></li>
-                <li><a href="#" class="hover:text-base-content transition-colors">Privacy Policy</a></li>
-                <li><a href="#" class="hover:text-base-content transition-colors">Terms of Service</a></li>
-                <li><a href="#" class="hover:text-base-content transition-colors">Contact</a></li>
+                <li>
+                  <%= link_to "Privacy Policy", page_path("privacy-policy"), class: "hover:text-base-content transition-colors" %>
+                </li>
+                <li>
+                  <%= link_to "Terms of Service", page_path("terms-of-service"), class: "hover:text-base-content transition-colors" %>
+                </li>
               </ul>
             </div>
           </div>

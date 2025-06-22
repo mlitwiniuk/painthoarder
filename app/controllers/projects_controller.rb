@@ -1,7 +1,8 @@
 class ProjectsController < ApplicationController
-  before_action :authenticate_user!, except: %i[public_index restricted show]
+  before_action :authenticate_user!, except: %i[public_index restricted]
   before_action :set_project, only: %i[show edit update destroy]
   before_action :set_current_user_paints, only: %i[show]
+  before_action :ensure_owner, only: %i[edit update destroy]
 
   # GET /projects/my (default index)
   def index
@@ -101,6 +102,10 @@ class ProjectsController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_project
     @project = Project.find(params[:id])
+  end
+
+  def ensure_owner
+    redirect_to projects_path, alert: "You don't have permission to access this project." unless current_user == @project.user
   end
 
   # Only allow a list of trusted parameters through.

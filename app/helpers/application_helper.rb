@@ -330,4 +330,18 @@ module ApplicationHelper
       }
     }
   end
+
+  # Calculate reading time for content based on average reading speed
+  def reading_time(content)
+    return 0 if content.blank?
+
+    # Strip HTML tags and count words
+    word_count = strip_tags(content.to_s).split.length
+
+    # Average reading speed is 200 words per minute
+    reading_time = (word_count / 200.0).ceil
+
+    # Minimum 1 minute
+    [reading_time, 1].max
+  end
 end

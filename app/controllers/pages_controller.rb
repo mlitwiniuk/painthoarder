@@ -1,6 +1,7 @@
 class PagesController < ApplicationController
-  before_action :set_page, only: %i[edit update destroy]
+  before_action :set_page, only: %i[show edit update destroy]
   before_action :authenticate_user!, except: %i[welcome show]
+  before_action :authorize_admin!, only: %i[index new create edit update destroy]
 
   def index
     @pages = Page.all
@@ -18,7 +19,6 @@ class PagesController < ApplicationController
   end
 
   def show
-    @page = Page.find(params[:id])
     respond_with(@page)
   rescue ActiveRecord::RecordNotFound
     render static_page
@@ -51,7 +51,12 @@ class PagesController < ApplicationController
   private
 
   def set_page
-    @page = Page.find(params[:id])
+    @page = Page
+    @page = if user_signed_in? && current_user.admin?
+      @page.friendly.find(params[:id])
+    else
+      @page.issued.friendly.find(params[:id])
+    end
   end
 
   def page_params
