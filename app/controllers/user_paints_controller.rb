@@ -2,6 +2,7 @@
 class UserPaintsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_user_paint, only: [:show, :edit, :update, :destroy]
+  before_action :get_counters_for_stats_grid, only: [:index]
   include Filterable
 
   def index
@@ -29,12 +30,6 @@ class UserPaintsController < ApplicationController
       .order("brands.name, product_lines.name")
     @color_categories = ColorCategorization::COLOR_CATEGORIES
 
-    # For tab counts
-    @all_count = current_user.user_paints.count
-    @owned_count = current_user.user_paints.owned.count
-    @wishlist_count = current_user.user_paints.wishlist.count
-    @avoid_count = current_user.user_paints.avoid.count
-
     respond_to do |format|
       format.html
       format.turbo_stream
@@ -43,8 +38,8 @@ class UserPaintsController < ApplicationController
         if params[:search].present?
           search_term = params[:search].strip
           @user_paints = @user_paints.joins(paint: {product_line: :brand})
-                                    .where("paints.name LIKE ? OR brands.name LIKE ? OR product_lines.name LIKE ?",
-                                           "%#{search_term}%", "%#{search_term}%", "%#{search_term}%")
+            .where("paints.name LIKE ? OR brands.name LIKE ? OR product_lines.name LIKE ?",
+              "%#{search_term}%", "%#{search_term}%", "%#{search_term}%")
         end
 
         render json: {
@@ -89,8 +84,6 @@ class UserPaintsController < ApplicationController
         "owned"
       elsif params[:commit_wishlist]
         "wishlist"
-      else
-        nil
       end
 
     # Merge status into user_paint_params
@@ -102,6 +95,7 @@ class UserPaintsController < ApplicationController
 
     respond_to do |format|
       if @user_paint.save
+        get_counters_for_stats_grid
         format.html { redirect_to dashboard_path, notice: "Paint added to your collection!" }
         format.turbo_stream # Will render create.turbo_stream.erb that updates multiple parts of the UI
       else
@@ -241,5 +235,13 @@ class UserPaintsController < ApplicationController
   def apply_filters(query)
     # Use the shared filter logic from the Filterable concern
     super
+  end
+
+  def get_counters_for_stats_grid
+    # For tab counts
+    @all_count = current_user.user_paints.count
+    @owned_count = current_user.user_paints.owned.count
+    @wishlist_count = current_user.user_paints.wishlist.count
+    @avoid_count = current_user.user_paints.avoid.count
   end
 end

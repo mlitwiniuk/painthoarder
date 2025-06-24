@@ -27,6 +27,9 @@
   <%# Update the paint in search results if present %>
   <% paint_id = @user_paint.paint_id %>
 <% end %>
+<%= turbo_stream.prepend "collection-results-grid-all", partial: "modern_paint_card", locals: { user_paint: @user_paint } %>
+<%= turbo_stream.prepend "collection-results-grid-#{@user_paint.status}", partial: "modern_paint_card", locals: { user_paint: @user_paint } %>
+<%= turbo_stream.replace "stats-grid", partial: "stats_grid" %>
 
 <%# Update the collection options section on paint show page %>
 <%= turbo_stream.replace "collection-options-#{paint_id}" do %>
