@@ -33,25 +33,29 @@
             data: { action: "change->auto-submit#submit" } %>
     </div>
 
-    <div class="form-control">
-      <label class="label">
-        <span class="label-text">Color</span>
-      </label>
-      <%= select_tag :color,
-            options_for_select(color_categories, params[:color]),
-            include_blank: "All Colors",
-            class: "select select-bordered w-full",
-            data: { action: "change->auto-submit#submit" } %>
+    <div class="flex flex-row gap-4">
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Color</span>
+        </label>
+        <%= select_tag :color,
+              options_for_select(color_categories, params[:color]),
+              include_blank: "All Colors",
+              class: "select select-bordered w-full",
+              data: { action: "change->auto-submit#submit" } %>
+      </div>
+      <div class="flex justify-end mt-4">
+        <button type="button" class="btn btn-ghost ml-2 mt-2" data-action="click->auto-submit#clearFilters">
+          Clear Filters
+        </button>
+      </div>
+
     </div>
   </div>
 
-  <div class="flex justify-end mt-4">
-    <button type="button" class="btn btn-ghost ml-2" data-action="click->auto-submit#clearFilters">
-      Clear Filters
-    </button>
-  </div>
 
   <%# Hidden field to track if we're clearing filters %>
   <%= hidden_field_tag :clear_filters, "", data: { "auto-submit-target": "clearFiltersInput" } %>
   <%= hidden_field_tag :status, params[:status] %>
+  <%= f.hidden_field :s, value: params.dig(:q, :s).to_s %>
 <% end %>

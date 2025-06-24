@@ -85,7 +85,7 @@
   <!-- Collapsible Filter Section -->
   <%= turbo_frame_tag "collection-filters" do %>
     <div data-toggle-target="content" class="<%= "hidden" if params[:search].blank? && params[:q].blank? %> pb-4">
-      <div class="bg-base-200 rounded-2xl p-6 border border-base-300">
+      <div class="bg-base-200 rounded-2xl py-4 px-6 border border-base-300">
         <%= render "shared/filter_form",
             q: @q,
             url: user_paints_path,

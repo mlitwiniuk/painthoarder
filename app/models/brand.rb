@@ -34,6 +34,10 @@ class Brand < ApplicationRecord
     ["paints", "product_lines"]
   end
 
+  def self.ransortable_attributes(auth_object = nil)
+    ["name"]
+  end
+
   def to_s
     name
   end
