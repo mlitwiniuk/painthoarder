@@ -36,6 +36,14 @@ class ProductLine < ApplicationRecord
     ["brand", "paints"]
   end
 
+  def self.ransortable_attributes(auth_object = nil)
+    ["name"]
+  end
+
+  def self.ransortable_associations(auth_object = nil)
+    ["brand"]
+  end
+
   def to_s
     [brand.name, name].join(" - ")
   end

@@ -38,15 +38,15 @@
   <div class="flex items-center justify-between py-4">
     <!-- Sort Options -->
     <div class="flex items-center gap-1 bg-base-200 rounded-full p-1">
-      <%= link_to paints_path(q: request.params[:q]&.merge(s: "name asc") || {s: "name asc"}),
+      <%= link_to paints_path(search: params[:search], q: request.params[:q]&.merge(s: "name asc") || {s: "name asc"}),
               class: "px-4 py-2 rounded-full text-sm font-medium transition-all #{params.dig(:q, :s) == 'name asc' ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/60 hover:text-base-content'}" do %>
         Name A-Z
       <% end %>
-      <%= link_to paints_path(q: request.params[:q]&.merge(s: "product_line_brand_name asc") || {s: "product_line_brand_name asc"}),
+      <%= link_to paints_path(search: params[:search], q: request.params[:q]&.merge(s: "product_line_brand_name asc") || {s: "product_line_brand_name asc"}),
               class: "px-4 py-2 rounded-full text-sm font-medium transition-all #{params.dig(:q, :s) == 'product_line_brand_name asc' ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/60 hover:text-base-content'}" do %>
         Brand A-Z
       <% end %>
-      <%= link_to paints_path(q: request.params[:q]&.merge(s: "created_at desc") || {s: "created_at desc"}),
+      <%= link_to paints_path(search: params[:search], q: request.params[:q]&.merge(s: "created_at desc") || {s: "created_at desc"}),
               class: "px-4 py-2 rounded-full text-sm font-medium transition-all #{params.dig(:q, :s) == 'created_at desc' ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/60 hover:text-base-content'}" do %>
         Newest
       <% end %>
@@ -74,8 +74,8 @@
 
   <!-- Collapsible Filter Section -->
   <%= turbo_frame_tag "catalog-filters" do %>
-    <div data-toggle-target="content" class="hidden pb-4">
-      <div class="bg-base-50 rounded-2xl p-6 border border-base-200">
+    <div data-toggle-target="content" class="<%= "hidden" if params[:search].blank? && params[:q].blank? %> pb-4">
+      <div class="bg-base-50 rounded-2xl px-6 py-4 border border-base-200">
         <%= render "shared/filter_form",
             q: @q,
             url: paints_path,
