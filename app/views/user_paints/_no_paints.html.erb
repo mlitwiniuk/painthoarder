@@ -1,0 +1,68 @@
+<!-- Modern Empty State -->
+<div class="flex flex-col items-center justify-center py-20">
+  <div class="w-32 h-32 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl flex items-center justify-center mb-8 shadow-lg">
+    <% case params[:status] %>
+    <% when 'wishlist' %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+      </svg>
+    <% when 'avoid' %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+      </svg>
+    <% else %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+    <% end %>
+  </div>
+
+  <h2 class="text-3xl font-bold text-base-content mb-4">
+    <% if params[:q].present? || params[:color].present? %>
+      No matches found 🔍
+    <% else %>
+      <%= case params[:status]
+          when 'owned', nil
+            "Start your collection ✨"
+          when 'wishlist'
+            "Build your wishlist 💫"
+          when 'avoid'
+            "No paints to avoid"
+          else
+            "No paints found"
+          end %>
+    <% end %>
+  </h2>
+
+  <p class="text-base-content/60 text-center max-w-md mb-8 leading-relaxed text-lg">
+    <% if params[:q].present? || params[:color].present? %>
+      Try adjusting your filters or search terms to find what you're looking for.
+    <% else %>
+      <%= case params[:status]
+          when 'owned', nil
+            "Add your first paint to start building your collection. Track what you own, discover new colors, and organize your hobby like a pro."
+          when 'wishlist'
+            "Found a paint you want? Add it to your wishlist so you never forget what to buy next time you're at the store."
+          when 'avoid'
+            "Keep track of paints you want to avoid for any reason - maybe they don't work well with your style or you've had bad experiences."
+          else
+            "Start exploring and building your amazing paint collection."
+          end %>
+    <% end %>
+  </p>
+
+  <div class="flex flex-col sm:flex-row gap-4">
+    <% if params[:q].present? || params[:color].present? %>
+      <%= link_to "Clear Filters", user_paints_path(status: params[:status]),
+          class: "btn btn-outline" %>
+    <% end %>
+    <%= link_to new_user_paint_path,
+        class: "btn btn-primary shadow-lg hover:shadow-xl transition-all",
+        data: { turbo_frame: "modal" } do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Add Your First Paint
+    <% end %>
+  </div>
+</div>

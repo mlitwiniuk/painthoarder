@@ -8,8 +8,9 @@ module Filterable
   # Apply filters to query that cannot be handled by ransack
   def apply_filters(query)
     # Status filter - only applies to UserPaints
-    if respond_to?(:filter_by_status) && params[:status].present?
+    if respond_to?(:filter_by_status) && params[:status].present? && UserPaint.statuses.key?(params[:status])
       query = filter_by_status(query)
+      @status = params[:status].to_s
     end
 
     # Search filter - use Paint's full_search scope for better search results

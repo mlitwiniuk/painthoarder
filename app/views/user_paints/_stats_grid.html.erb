@@ -1,0 +1,26 @@
+<div id="stats-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <div class="stats shadow-lg bg-base-100 border border-base-300">
+    <div class="stat place-items-center">
+      <div class="stat-title text-base-content/60">Owned</div>
+      <div class="stat-value text-primary text-2xl"><%= @owned_count %></div>
+    </div>
+  </div>
+  <div class="stats shadow-lg bg-base-100 border border-base-300">
+    <div class="stat place-items-center">
+      <div class="stat-title text-base-content/60">Wishlist</div>
+      <div class="stat-value text-secondary text-2xl"><%= @wishlist_count %></div>
+    </div>
+  </div>
+  <div class="stats shadow-lg bg-base-100 border border-base-300">
+    <div class="stat place-items-center">
+      <div class="stat-title text-base-content/60">Brands</div>
+      <div class="stat-value text-accent text-2xl"><%= current_user.paints.distinct.joins(product_line: :brand).select('brands.id').distinct.count %></div>
+    </div>
+  </div>
+  <div class="stats shadow-lg bg-base-100 border border-base-300">
+    <div class="stat place-items-center">
+      <div class="stat-title text-base-content/60">Total</div>
+      <div class="stat-value text-info text-2xl"><%= @all_count %></div>
+    </div>
+  </div>
+</div>
