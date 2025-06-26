@@ -148,9 +148,13 @@ class UserPaintsController < ApplicationController
     if @user_paint.update(user_paint_params)
       respond_to do |format|
         format.html { redirect_to user_paint_path(@user_paint), notice: "Paint was successfully updated." }
-        format.turbo_stream {
-          flash.now[:notice] = "Paint was successfully updated."
-        }
+        format.turbo_stream do
+          if params[:quick_action]
+            redirect_to user_paint_path(@user_paint), notice: "Paint was successfully updated."
+          else
+            flash.now[:notice] = "Paint was successfully updated."
+          end
+        end
       end
     else
       @brands = Brand.order(:name)
@@ -159,7 +163,9 @@ class UserPaintsController < ApplicationController
 
       respond_to do |format|
         format.html { render :edit }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("modal", partial: "user_paints/form", locals: {user_paint: @user_paint}) }
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace("modal", partial: "user_paints/form", locals: {user_paint: @user_paint})
+        end
       end
     end
   end

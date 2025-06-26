@@ -1,17 +1,15 @@
 <!-- Mobile-First Status Actions -->
-<div class="flex items-center justify-end gap-1 sm:gap-2" data-controller="status-actions">
+<div class="flex items-center justify-end gap-1 sm:gap-2">
   <!-- Status Transitions -->
   <% status_transitions(user_paint.status).each do |transition| %>
     <%= button_to user_paint_path(user_paint),
         method: :patch,
-        params: { user_paint: { status: transition[:status] } },
+        params: { user_paint: { status: transition[:status] }, quick_action: true },
         class: "btn #{transition[:class]} btn-xs sm:btn-sm border-0 shadow-sm hover:shadow-md transition-all duration-200",
         form: { class: "inline-block" },
         title: transition[:tooltip],
         data: {
           turbo_method: :patch,
-          status_actions_target: "button",
-          action: "click->status-actions#updateStatus"
         } do %>
 
       <!-- Mobile: Icon only -->
