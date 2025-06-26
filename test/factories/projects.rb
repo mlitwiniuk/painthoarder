@@ -25,10 +25,27 @@
 #
 FactoryBot.define do
   factory :project do
-    title { "MyString" }
-    description { "MyText" }
-    visibility { 1 }
-    secret_token { "MyString" }
-    user { nil }
+    sequence(:title) { |n| "Project #{n}" }
+    description { "A test project description" }
+    visibility { :public }
+    association :user, factory: :user
+
+    trait :private do
+      visibility { :private }
+    end
+
+    trait :restricted do
+      visibility { :restricted }
+    end
+
+    trait :public do
+      visibility { :public }
+    end
+
+    trait :with_updates do
+      after(:create) do |project|
+        create_list(:project_update, 2, project: project)
+      end
+    end
   end
 end

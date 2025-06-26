@@ -97,7 +97,7 @@ class UserPaintsController < ApplicationController
     respond_to do |format|
       if @user_paint.save
         get_counters_for_stats_grid
-        format.html { redirect_to dashboard_path, notice: "Paint added to your collection!" }
+        format.html { redirect_to user_root_path, notice: "Paint added to your collection!" }
         format.turbo_stream do
           if params[:quick_add]
             redirect_to user_paint_path(@user_paint) and return
