@@ -43,8 +43,24 @@ class UserPaint < ApplicationRecord
 
   # Default status for virtual paints
   def status
-    return "similar" if virtual?
+    return "not_in_collection" if virtual?
     super
+  end
+
+  # Check if paint is in user's collection
+  def in_collection?
+    persisted?
+  end
+
+  # Get display status for UI
+  def display_status
+    return "not_in_collection" if virtual?
+    status
+  end
+
+  # Check if this paint can be added to collection
+  def can_add_to_collection?
+    virtual? || !persisted?
   end
 
   ## RANSACK CONFIG

@@ -9,6 +9,8 @@
 
 /* Import component styles */
 @import "./components/slider.css";
+@import "./components/user_paint_form.css";
+@import "./components/paint_details.css";
 
 @layer base {
   html {
@@ -354,5 +356,76 @@ input[type="radio"][value="avoid"]:checked + .radio-card {
 
   .btn-circle svg {
     @apply w-5 h-5;
+  }
+}
+
+/* Extra small breakpoint utilities (for screens < 475px) */
+@media (max-width: 475px) {
+  .xs\:hidden {
+    display: none !important;
+  }
+
+  .xs\:inline {
+    display: inline !important;
+  }
+
+  .xs\:inline-block {
+    display: inline-block !important;
+  }
+
+  .xs\:block {
+    display: block !important;
+  }
+
+  .xs\:flex {
+    display: flex !important;
+  }
+
+  .xs\:grid {
+    display: grid !important;
+  }
+
+  .xs\:text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
+  .xs\:text-2xs {
+    font-size: 0.625rem;
+    line-height: 0.75rem;
+  }
+
+  .xs\:gap-1 {
+    gap: 0.25rem;
+  }
+
+  .xs\:gap-0\.5 {
+    gap: 0.125rem;
+  }
+
+  .xs\:p-1 {
+    padding: 0.25rem;
+  }
+
+  .xs\:px-1 {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+  .xs\:py-1 {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .xs\:w-6 {
+    width: 1.5rem;
+  }
+
+  .xs\:h-6 {
+    height: 1.5rem;
+  }
+
+  .xs\:min-w-0 {
+    min-width: 0px;
   }
 }

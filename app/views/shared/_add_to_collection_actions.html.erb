@@ -1,0 +1,52 @@
+<!-- Add to Collection Actions for Virtual Paints -->
+<div class="flex items-center justify-end gap-1 sm:gap-2" controller="add-to-collection">
+  <!-- Quick Add Actions -->
+  <% status_transitions(user_paint.display_status).each do |transition| %>
+    <%= button_to user_paints_path,
+        method: :post,
+        params: { user_paint: { paint_id: user_paint.paint.id, status: transition[:status] }, quick_add: true },
+        class: "btn #{transition[:class]} btn-xs sm:btn-sm border-0 shadow-sm hover:shadow-md transition-all duration-200",
+        form: { class: "inline-block" },
+        title: transition[:tooltip],
+        data: {
+          turbo_method: :post,
+          add_to_collection_target: "button",
+          action: "click->add-to-collection#addToCollection"
+        } do %>
+
+      <!-- Mobile: Icon only -->
+      <span class="sm:hidden">
+        <%= status_icon(transition[:icon], "h-3 w-3") %>
+      </span>
+
+      <!-- Desktop: Icon + Text -->
+      <span class="hidden sm:flex items-center gap-1.5">
+        <%= status_icon(transition[:icon], "h-3.5 w-3.5") %>
+        <span class="text-xs font-medium"><%= transition[:short_label] %></span>
+      </span>
+    <% end %>
+  <% end %>
+
+  <!-- Advanced Add Button -->
+  <%= link_to new_user_paint_path(paint_id: user_paint.paint.id),
+      data: { turbo_frame: "modal" },
+      class: "btn btn-ghost btn-xs sm:btn-sm border border-base-300 hover:border-primary hover:bg-primary/10 transition-all duration-200",
+      title: "Add with details" do %>
+
+    <!-- Mobile: Icon only -->
+    <span class="sm:hidden">
+      <%= status_icon("plus", "h-3 w-3") %>
+    </span>
+
+    <!-- Desktop: Icon + Text -->
+    <span class="hidden sm:flex items-center gap-1.5">
+      <%= status_icon("plus", "h-3.5 w-3.5") %>
+      <span class="text-xs font-medium">More</span>
+    </span>
+  <% end %>
+</div>
+
+<!-- Loading state overlay -->
+<div class="hidden absolute inset-0 bg-base-100/50 backdrop-blur-sm rounded-lg flex items-center justify-center" data-add-to-collection-target="loading">
+  <div class="loading loading-spinner loading-sm text-primary"></div>
+</div>

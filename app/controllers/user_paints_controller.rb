@@ -98,7 +98,11 @@ class UserPaintsController < ApplicationController
       if @user_paint.save
         get_counters_for_stats_grid
         format.html { redirect_to dashboard_path, notice: "Paint added to your collection!" }
-        format.turbo_stream # Will render create.turbo_stream.erb that updates multiple parts of the UI
+        format.turbo_stream do
+          if params[:quick_add]
+            redirect_to user_paint_path(@user_paint) and return
+          end
+        end
       else
         @brands = Brand.order(:name)
 
@@ -121,8 +125,8 @@ class UserPaintsController < ApplicationController
   end
 
   def show
-    # No need to initialize similar paints arrays anymore
-    # Similar paints will be loaded lazily by turbo_frames making requests to PaintsController#similar
+    # UserPaint is already set by before_action
+    # Use unified view that works with both real and virtual UserPaints
     respond_to do |format|
       format.html
       format.turbo_stream

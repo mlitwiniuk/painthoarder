@@ -1,0 +1,55 @@
+<!-- Add to Collection Form for Virtual Paints -->
+<div class="space-y-4">
+  <!-- Quick Add Options -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <%= button_to user_paints_path,
+        method: :post,
+        params: { user_paint: { paint_id: user_paint.paint.id, status: 'owned' } },
+        class: "btn btn-success btn-sm justify-start gap-3 h-auto py-3",
+        form: { class: "w-full" },
+        data: { turbo_method: :post } do %>
+      <%= status_icon('check', 'h-4 w-4') %>
+      <div class="text-left">
+        <div class="font-medium">Mark as Owned</div>
+        <div class="text-xs opacity-70">Add to collection</div>
+      </div>
+    <% end %>
+
+    <%= button_to user_paints_path,
+        method: :post,
+        params: { user_paint: { paint_id: user_paint.paint.id, status: 'wishlist' } },
+        class: "btn btn-warning btn-sm justify-start gap-3 h-auto py-3",
+        form: { class: "w-full" },
+        data: { turbo_method: :post } do %>
+      <%= status_icon('heart', 'h-4 w-4') %>
+      <div class="text-left">
+        <div class="font-medium">Add to Wishlist</div>
+        <div class="text-xs opacity-70">Want to buy</div>
+      </div>
+    <% end %>
+
+    <%= button_to user_paints_path,
+        method: :post,
+        params: { user_paint: { paint_id: user_paint.paint.id, status: 'avoid' } },
+        class: "btn btn-error btn-sm justify-start gap-3 h-auto py-3",
+        form: { class: "w-full" },
+        data: { turbo_method: :post } do %>
+      <%= status_icon('ban', 'h-4 w-4') %>
+      <div class="text-left">
+        <div class="font-medium">Mark as Avoid</div>
+        <div class="text-xs opacity-70">Don't recommend</div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Divider -->
+  <div class="divider text-xs">or</div>
+
+  <!-- Advanced Add Button -->
+  <%= link_to new_user_paint_path(paint_id: user_paint.paint.id),
+      data: { turbo_frame: "modal" },
+      class: "btn btn-outline btn-sm w-full gap-2" do %>
+    <%= status_icon('edit', 'h-4 w-4') %>
+    Add with Details (notes, price, date)
+  <% end %>
+</div>

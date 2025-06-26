@@ -1,0 +1,16 @@
+<% status_config = status_display(status) %>
+
+<!-- Compact Status Badge -->
+<div class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border shadow-sm backdrop-blur-sm
+            <%= status_config[:class] %>
+            <%= status_config[:class]&.include?('success') ? 'bg-success/20 border-success/30 text-success-content' : '' %>
+            <%= status_config[:class]&.include?('warning') ? 'bg-warning/20 border-warning/30 text-warning-content' : '' %>
+            <%= status_config[:class]&.include?('error') ? 'bg-error/20 border-error/30 text-error-content' : '' %>
+            transition-all duration-200 hover:scale-105">
+
+  <!-- Status Icon -->
+  <%= status_icon(status_config[:icon], "h-3 w-3 shrink-0") %>
+
+  <!-- Status Label - Hidden on very small screens -->
+  <span class="hidden xs:inline whitespace-nowrap"><%= status_config[:label] %></span>
+</div>
