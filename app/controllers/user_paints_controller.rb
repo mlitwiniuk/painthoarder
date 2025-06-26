@@ -75,6 +75,7 @@ class UserPaintsController < ApplicationController
       @paint = Paint.find(params[:paint_id])
       @user_paint.paint = @paint
     end
+    @user_paint.status ||= "owned"
   end
 
   def create

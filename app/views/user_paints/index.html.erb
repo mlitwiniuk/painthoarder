@@ -12,7 +12,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="flex items-center gap-3">
+    <div class="flex justify-end md:justify-center items-center gap-3">
       <%= link_to bulk_import_user_paints_path, class: "btn btn-ghost btn-sm" do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
@@ -36,31 +36,39 @@
 <div class="sticky top-0 z-40 bg-base-100/90 backdrop-blur-xl border-b border-base-300 -mx-4 px-4 mb-8" data-controller="toggle">
   <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 py-4">
     <!-- Status Filter Tabs -->
-    <div class="flex items-center gap-1 bg-base-200 rounded-full p-1 overflow-x-auto">
+    <div class="grid grid-cols-2 sm:flex sm:items-center gap-1 sm:bg-base-200 sm:rounded-full sm:p-1">
       <%= link_to user_paints_path(color: params[:color], status: nil),
-              class: "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap #{params[:status] == 'all' || params[:status].blank? ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/70 hover:text-base-content hover:bg-base-300'}" do %>
-        All <span class="ml-1 opacity-60">(<%= @all_count %>)</span>
+              class: "flex items-center justify-center px-2 sm:px-4 py-2 rounded-lg sm:rounded-full text-xs sm:text-sm font-medium transition-all #{params[:status] == 'all' || params[:status].blank? ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/70 hover:text-base-content hover:bg-base-300 bg-base-200 sm:bg-transparent'}" do %>
+        <span class="sm:hidden">All</span>
+        <span class="hidden sm:inline">All</span>
+        <span class="ml-1 opacity-60 text-[11px] sm:text-xs">(<%= @all_count %>)</span>
       <% end %>
       <%= link_to user_paints_path(color: params[:color], status: :owned),
-              class: "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap #{params[:status] == 'owned' ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/70 hover:text-base-content hover:bg-base-300'}" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              class: "flex items-center justify-center px-2 sm:px-4 py-2 rounded-lg sm:rounded-full text-xs sm:text-sm font-medium transition-all #{params[:status] == 'owned' ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/70 hover:text-base-content hover:bg-base-300 bg-base-200 sm:bg-transparent'}" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
-        Owned <span class="ml-1 opacity-60">(<%= @owned_count %>)</span>
+        <span class="sm:hidden ml-1">Own</span>
+        <span class="hidden sm:inline">Owned</span>
+        <span class="ml-1 opacity-60 text-[11px] sm:text-xs">(<%= @owned_count %>)</span>
       <% end %>
       <%= link_to user_paints_path(color: params[:color], status: :wishlist),
-              class: "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap #{params[:status] == 'wishlist' ? 'bg-secondary text-secondary-content shadow-sm' : 'text-base-content/70 hover:text-base-content hover:bg-base-300'}" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              class: "flex items-center justify-center px-2 sm:px-4 py-2 rounded-lg sm:rounded-full text-xs sm:text-sm font-medium transition-all #{params[:status] == 'wishlist' ? 'bg-secondary text-secondary-content shadow-sm' : 'text-base-content/70 hover:text-base-content hover:bg-base-300 bg-base-200 sm:bg-transparent'}" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
         </svg>
-        Wishlist <span class="ml-1 opacity-60">(<%= @wishlist_count %>)</span>
+        <span class="sm:hidden ml-1">Want</span>
+        <span class="hidden sm:inline">Wishlist</span>
+        <span class="ml-1 opacity-60 text-[11px] sm:text-xs">(<%= @wishlist_count %>)</span>
       <% end %>
       <%= link_to user_paints_path(color: params[:color], status: :avoid),
-              class: "px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap #{params[:status] == 'avoid' ? 'bg-error text-error-content shadow-sm' : 'text-base-content/70 hover:text-base-content hover:bg-base-300'}" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              class: "flex items-center justify-center px-2 sm:px-4 py-2 rounded-lg sm:rounded-full text-xs sm:text-sm font-medium transition-all #{params[:status] == 'avoid' ? 'bg-error text-error-content shadow-sm' : 'text-base-content/70 hover:text-base-content hover:bg-base-300 bg-base-200 sm:bg-transparent'}" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
         </svg>
-        Avoid <span class="ml-1 opacity-60">(<%= @avoid_count %>)</span>
+        <span class="sm:hidden ml-1">No</span>
+        <span class="hidden sm:inline">Avoid</span>
+        <span class="ml-1 opacity-60 text-[11px] sm:text-xs">(<%= @avoid_count %>)</span>
       <% end %>
     </div>
 

@@ -226,15 +226,53 @@ html {
 /* Radio card styles for status selection */
 .radio-card {
   transition: all 0.2s ease;
-  border: 2px solid transparent;
 }
 
-.radio-card:has(input[type="radio"]:checked) {
-  @apply border-primary bg-primary text-primary-content;
+/* Status-specific radio card styling with theme support */
+:root {
+  --radio-owned-bg: #3b82f6;
+  --radio-owned-text: white;
+  --radio-wishlist-bg: #8b5cf6;
+  --radio-wishlist-text: white;
+  --radio-avoid-bg: #ef4444;
+  --radio-avoid-text: white;
 }
 
-.radio-card:hover {
-  @apply border-primary/30;
+/* Dark theme overrides */
+[data-theme="dark"],
+[data-theme="night"],
+[data-theme="coffee"],
+[data-theme="black"] {
+  --radio-owned-bg: #60a5fa;
+  --radio-owned-text: #1e293b;
+  --radio-wishlist-bg: #a78bfa;
+  --radio-wishlist-text: #1e293b;
+  --radio-avoid-bg: #f87171;
+  --radio-avoid-text: #1e293b;
+}
+
+input[type="radio"][value="owned"]:checked + .radio-card {
+  background-color: var(--radio-owned-bg) !important;
+  border-color: var(--radio-owned-bg) !important;
+  color: var(--radio-owned-text) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+}
+
+input[type="radio"][value="wishlist"]:checked + .radio-card {
+  background-color: var(--radio-wishlist-bg) !important;
+  border-color: var(--radio-wishlist-bg) !important;
+  color: var(--radio-wishlist-text) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3) !important;
+}
+
+input[type="radio"][value="avoid"]:checked + .radio-card {
+  background-color: var(--radio-avoid-bg) !important;
+  border-color: var(--radio-avoid-bg) !important;
+  color: var(--radio-avoid-text) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
 }
 
 /* Step content animations */

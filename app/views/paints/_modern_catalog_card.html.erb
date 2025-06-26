@@ -39,7 +39,7 @@
 
     <!-- Quick Add/Action Button -->
     <% if user_signed_in? %>
-      <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+      <div class="absolute top-3 right-3 z-10 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <% if user_paint.virtual %>
           <!-- Add to Collection Button -->
           <%= link_to new_user_paint_path(paint_id: user_paint.paint.id),
