@@ -206,3 +206,115 @@ html {
 .card::-webkit-scrollbar-thumb:hover {
   background-color: hsl(var(--bc) / 0.3);
 }
+
+/* Multi-step form animations */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Radio card styles for status selection */
+.radio-card {
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.radio-card:has(input[type="radio"]:checked) {
+  @apply border-primary bg-primary text-primary-content;
+}
+
+.radio-card:hover {
+  @apply border-primary/30;
+}
+
+/* Step content animations */
+.step-content {
+  min-height: 200px;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.step-content.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Mobile-first modal styles */
+@media (max-width: 640px) {
+  .modal-box {
+    margin: 0;
+    border-radius: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-box .overflow-y-auto {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
+
+/* Progress bar animation */
+.progress-bar {
+  transition: width 0.3s ease-in-out;
+}
+
+/* Enhanced form controls for mobile */
+@media (max-width: 640px) {
+  .select,
+  .input,
+  .textarea {
+    @apply h-12 text-base;
+  }
+
+  .btn {
+    @apply h-12 text-base;
+  }
+
+  .form-control .label {
+    @apply mb-2;
+  }
+
+  .form-control .label-text {
+    @apply text-sm font-medium;
+  }
+}
+
+/* Color swatch animations */
+.color-swatch {
+  transition: all 0.2s ease;
+}
+
+.color-swatch:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Collapse animation improvements */
+.collapse-content {
+  transition: max-height 0.3s ease-in-out;
+}
+
+/* Better touch targets for mobile */
+@media (max-width: 640px) {
+  .btn-circle {
+    @apply w-10 h-10;
+  }
+
+  .btn-circle svg {
+    @apply w-5 h-5;
+  }
+}
