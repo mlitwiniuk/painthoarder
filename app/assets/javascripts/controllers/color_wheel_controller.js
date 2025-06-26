@@ -212,14 +212,16 @@ export default class extends Controller {
 
       if (isMobile) {
         // On mobile, position relative to the dot
+        const containerRect = wheelContainer.getBoundingClientRect();
         const dotRect = event.target.getBoundingClientRect();
-        const dotCenterX = dotRect.left + dotRect.width / 2;
-        const dotCenterY = dotRect.top + dotRect.height / 2;
+        const dotCenterX =
+          dotRect.left - containerRect.left + dotRect.width / 2;
+        const dotCenterY = dotRect.top - containerRect.top + dotRect.height / 2;
 
         leftPos = Math.max(
           5,
           Math.min(
-            window.innerWidth - tooltipRect.width - 5,
+            containerRect.width - tooltipRect.width - 5,
             dotCenterX - tooltipRect.width / 2,
           ),
         );
@@ -230,15 +232,19 @@ export default class extends Controller {
           topPos = dotCenterY + 15;
         }
       } else {
-        // Desktop positioning - very close to mouse pointer
-        leftPos = event.pageX - tooltipRect.width / 2;
-        topPos = event.pageY - tooltipRect.height - 8;
+        // Desktop positioning - relative to container, not page
+        const containerRect = wheelContainer.getBoundingClientRect();
+        const mouseX = event.pageX - containerRect.left;
+        const mouseY = event.pageY - containerRect.top;
 
-        // Keep within screen bounds
+        leftPos = mouseX - tooltipRect.width / 2;
+        topPos = mouseY - tooltipRect.height - 8;
+
+        // Keep within container bounds
         if (leftPos < 5) leftPos = 5;
-        if (leftPos + tooltipRect.width > window.innerWidth - 5)
-          leftPos = window.innerWidth - tooltipRect.width - 5;
-        if (topPos < 5) topPos = event.pageY + 8;
+        if (leftPos + tooltipRect.width > containerRect.width - 5)
+          leftPos = containerRect.width - tooltipRect.width - 5;
+        if (topPos < 5) topPos = mouseY + 8;
       }
 
       tooltip.style.left = `${leftPos}px`;
