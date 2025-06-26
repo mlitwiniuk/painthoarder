@@ -17,36 +17,36 @@
 </div>
 
 <!-- Stats Grid -->
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-8">
   <div class="stats shadow-lg bg-base-100 border border-base-300">
-    <div class="stat place-items-center">
-      <div class="stat-title text-base-content/60">Total Paints</div>
-      <div class="stat-value text-primary"><%= current_user.user_paints.count %></div>
-      <div class="stat-desc text-base-content/50">In your collection</div>
+    <div class="stat place-items-center px-2 py-3 sm:px-4 sm:py-4">
+      <div class="stat-title text-xs sm:text-sm text-base-content/60">Total Paints</div>
+      <div class="stat-value text-lg sm:text-2xl lg:text-3xl text-primary"><%= current_user.user_paints.count %></div>
+      <div class="stat-desc text-xs text-base-content/50 hidden sm:block">In your collection</div>
     </div>
   </div>
 
   <div class="stats shadow-lg bg-base-100 border border-base-300">
-    <div class="stat place-items-center">
-      <div class="stat-title text-base-content/60">Wishlist</div>
-      <div class="stat-value text-secondary"><%= current_user.user_paints.wishlist.count %></div>
-      <div class="stat-desc text-base-content/50">Paints to buy</div>
+    <div class="stat place-items-center px-2 py-3 sm:px-4 sm:py-4">
+      <div class="stat-title text-xs sm:text-sm text-base-content/60">Wishlist</div>
+      <div class="stat-value text-lg sm:text-2xl lg:text-3xl text-secondary"><%= current_user.user_paints.wishlist.count %></div>
+      <div class="stat-desc text-xs text-base-content/50 hidden sm:block">Paints to buy</div>
     </div>
   </div>
 
   <div class="stats shadow-lg bg-base-100 border border-base-300">
-    <div class="stat place-items-center">
-      <div class="stat-title text-base-content/60">Brands</div>
-      <div class="stat-value text-accent"><%= current_user.user_paints.joins(paint: :brand).distinct.count('product_line.brand_id') %></div>
-      <div class="stat-desc text-base-content/50">Different brands</div>
+    <div class="stat place-items-center px-2 py-3 sm:px-4 sm:py-4">
+      <div class="stat-title text-xs sm:text-sm text-base-content/60">Brands</div>
+      <div class="stat-value text-lg sm:text-2xl lg:text-3xl text-accent"><%= current_user.user_paints.joins(paint: :brand).distinct.count('product_line.brand_id') %></div>
+      <div class="stat-desc text-xs text-base-content/50 hidden sm:block">Different brands</div>
     </div>
   </div>
 
   <div class="stats shadow-lg bg-base-100 border border-base-300">
-    <div class="stat place-items-center">
-      <div class="stat-title text-base-content/60">This Month</div>
-      <div class="stat-value text-info"><%= current_user.user_paints.where(created_at: 1.month.ago..Time.current).count %></div>
-      <div class="stat-desc text-base-content/50">New additions</div>
+    <div class="stat place-items-center px-2 py-3 sm:px-4 sm:py-4">
+      <div class="stat-title text-xs sm:text-sm text-base-content/60">This Month</div>
+      <div class="stat-value text-lg sm:text-2xl lg:text-3xl text-info"><%= current_user.user_paints.where(created_at: 1.month.ago..Time.current).count %></div>
+      <div class="stat-desc text-xs text-base-content/50 hidden sm:block">New additions</div>
     </div>
   </div>
 </div>
