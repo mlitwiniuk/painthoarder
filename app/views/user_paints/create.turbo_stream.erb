@@ -50,7 +50,7 @@
 <% ["rgb", "hsl", "user"].each do |type| %>
   <%= turbo_stream.replace "similar-paint-#{paint_id}" do %>
     <div id="similar-paint-<%= paint_id %>" class="similar-paint-item">
-      <%= render "paints/paint_card", user_paint: @user_paint %>
+      <%= render "paints/similar_paint_card", user_paint: @user_paint %>
     </div>
   <% end %>
 <% end %>
@@ -65,7 +65,7 @@
 <%# Update the paint in paints index if present %>
 <%= turbo_stream.replace "paint-card-#{paint_id}" do %>
   <div id="paint-card-<%= paint_id %>" class="paint-card">
-    <%= render "paints/paint_card", user_paint: @user_paint %>
+    <%= render "paints/modern_catalog_card", user_paint: @user_paint %>
   </div>
 <% end %>
 

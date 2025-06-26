@@ -1,0 +1,351 @@
+<% content_for :title, "#{@user_paint.paint.name} | PaintHoarder" %>
+
+<div class="min-h-screen bg-gradient-to-b from-base-200/30 to-base-100">
+  <!-- Mobile-optimized Header -->
+  <div class="sticky top-0 z-10 bg-base-100/95 backdrop-blur-md border-b border-base-300/50">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center gap-3">
+        <%= link_to back_url, class: "btn btn-circle btn-ghost hover:btn-primary btn-sm sm:btn-md shrink-0" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+        <% end %>
+
+        <div class="flex-1 min-w-0">
+          <h1 class="text-lg sm:text-2xl font-bold truncate"><%= @user_paint.paint.name %></h1>
+          <p class="text-xs sm:text-sm text-base-content/60 truncate">
+            <%= @user_paint.paint.product_line.brand.name %> • <%= @user_paint.paint.product_line.name %>
+          </p>
+        </div>
+
+        <!-- Collection Status Indicator -->
+        <% if @user_paint.in_collection? %>
+          <%= render 'shared/status_badge', status: @user_paint.display_status %>
+        <% end %>
+
+        <!-- Action Menu (for owned paints only) -->
+        <% if @user_paint.in_collection? %>
+          <div class="dropdown dropdown-end">
+            <label tabindex="0" class="btn btn-circle btn-ghost hover:btn-primary btn-sm sm:btn-md">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+              </svg>
+            </label>
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-xl bg-base-100 rounded-box w-52 border border-base-300/50 backdrop-blur-sm">
+              <li>
+                <%= link_to edit_user_paint_path(@user_paint), data: { turbo_frame: "modal" }, class: "gap-3" do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <span>Edit Details</span>
+                <% end %>
+              </li>
+              <div class="divider my-1"></div>
+              <li>
+                <%= button_to user_paint_path(@user_paint), method: :delete,
+                    data: { turbo_confirm: "Are you sure you want to remove this paint from your collection?", turbo_frame: "_top" },
+                    class: "text-error hover:bg-error hover:text-error-content gap-3" do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span>Remove from Collection</span>
+                <% end %>
+              </li>
+            </ul>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto p-4 pb-8">
+    <!-- Enhanced Color Hero Card -->
+    <div class="card bg-base-100 shadow-xl border border-base-300/50 mb-6 overflow-hidden">
+      <!-- Color Display Section -->
+      <div class="relative">
+        <!-- Main Color Background -->
+        <div class="h-32 sm:h-48 md:h-56 relative overflow-hidden"
+             style="background: linear-gradient(135deg, <%= @user_paint.paint.hex_color %> 0%, <%= @user_paint.paint.hex_color %>dd 60%, <%= @user_paint.paint.hex_color %>aa 100%);">
+
+          <!-- Decorative Pattern Overlay -->
+          <div class="absolute inset-0 opacity-10">
+            <div class="absolute inset-0" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,0.1) 35px, rgba(255,255,255,0.1) 70px);"></div>
+          </div>
+
+          <!-- Status Badge -->
+          <div class="absolute top-3 left-3 sm:top-4 sm:left-4">
+            <% if @user_paint.in_collection? %>
+              <%= render 'shared/status_badge', status: @user_paint.display_status %>
+            <% end %>
+          </div>
+
+          <!-- Quick Actions (Mobile) -->
+          <div class="absolute top-3 right-3 sm:hidden relative">
+            <% if @user_paint.in_collection? %>
+              <%= render 'user_paints/status_actions', user_paint: @user_paint %>
+            <% else %>
+              <%= render 'shared/add_to_collection_actions', user_paint: @user_paint %>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Color Information Panel -->
+        <div class="bg-base-100/95 backdrop-blur-sm border-t border-base-300/50 p-4">
+          <!-- Color Values Grid -->
+          <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
+            <div class="text-center">
+              <div class="text-[10px] sm:text-xs text-base-content/60 font-medium uppercase tracking-wide mb-1">HEX</div>
+              <div class="font-mono text-xs sm:text-sm font-bold bg-base-200 rounded px-2 py-1">
+                <%= @user_paint.paint.hex_color %>
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="text-[10px] sm:text-xs text-base-content/60 font-medium uppercase tracking-wide mb-1">RGB</div>
+              <div class="font-mono text-xs sm:text-sm font-bold bg-base-200 rounded px-2 py-1">
+                <%= @user_paint.paint.red %>,<%= @user_paint.paint.green %>,<%= @user_paint.paint.blue %>
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="text-[10px] sm:text-xs text-base-content/60 font-medium uppercase tracking-wide mb-1">HSL</div>
+              <% h, s, l = rgb_to_hsl(@user_paint.paint.red, @user_paint.paint.green, @user_paint.paint.blue) %>
+              <div class="font-mono text-xs sm:text-sm font-bold bg-base-200 rounded px-2 py-1">
+                <%= h %>°,<%= s %>%,<%= l %>%
+              </div>
+            </div>
+          </div>
+
+          <!-- Desktop Actions -->
+          <div class="hidden sm:block relative">
+            <% if @user_paint.in_collection? %>
+              <%= render 'user_paints/status_actions', user_paint: @user_paint %>
+            <% else %>
+              <%= render 'shared/add_to_collection_actions', user_paint: @user_paint %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Compact Paint Info -->
+    <div class="block sm:hidden mb-6">
+      <div class="bg-base-100/80 backdrop-blur-sm rounded-xl p-4 border border-base-300/50 shadow-lg">
+        <div class="text-center space-y-2">
+          <div class="text-xs text-base-content/60 font-medium uppercase tracking-wider">
+            <%= @user_paint.paint.product_line.brand.name %>
+          </div>
+          <div class="text-sm text-base-content/80">
+            <%= @user_paint.paint.product_line.name %>
+          </div>
+          <div class="text-lg font-bold text-base-content">
+            <%= @user_paint.paint.name %>
+          </div>
+          <% if @user_paint.paint.code.present? && @user_paint.paint.code != @user_paint.paint.name %>
+            <div class="text-xs text-base-content/70 font-mono bg-base-200/50 rounded px-2 py-1 inline-block">
+              <%= @user_paint.paint.code %>
+            </div>
+          <% end %>
+
+          <!-- Collection Stats -->
+          <% stats = @user_paint.paint.collection_stats %>
+          <div class="flex justify-center items-center gap-3 text-xs pt-2 border-t border-base-300/30 mt-3">
+            <div class="flex items-center gap-1">
+              <span class="text-success">●</span>
+              <span><%= stats[:owned] %></span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-warning">●</span>
+              <span><%= stats[:wishlist] %></span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-error">●</span>
+              <span><%= stats[:avoid] %></span>
+            </div>
+            <div class="flex items-center gap-1 font-medium">
+              <span class="text-primary">●</span>
+              <span><%= stats[:total] %> users</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop Paint Details & Collection Info -->
+    <div class="hidden sm:grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
+      <!-- Paint Information Card -->
+      <div class="card bg-base-100 shadow-lg border border-base-300/50">
+        <div class="card-body p-4 sm:p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-1 h-6 bg-gradient-to-b from-primary to-secondary rounded-full"></div>
+            <h3 class="text-lg font-semibold">Paint Details</h3>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex justify-between items-center p-3 bg-base-200/50 rounded-lg border border-base-300/30">
+              <span class="text-sm text-base-content/70">Brand</span>
+              <span class="font-medium text-sm sm:text-base"><%= @user_paint.paint.product_line.brand.name %></span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-base-200/50 rounded-lg border border-base-300/30">
+              <span class="text-sm text-base-content/70">Product Line</span>
+              <span class="font-medium text-sm sm:text-base"><%= @user_paint.paint.product_line.name %></span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-base-200/50 rounded-lg border border-base-300/30">
+              <span class="text-sm text-base-content/70">Color Name</span>
+              <span class="font-medium text-sm sm:text-base"><%= @user_paint.paint.name %></span>
+            </div>
+            <% if @user_paint.paint.code.present? %>
+              <div class="flex justify-between items-center p-3 bg-base-200/50 rounded-lg border border-base-300/30">
+                <span class="text-sm text-base-content/70">Code</span>
+                <span class="font-medium text-sm sm:text-base"><%= @user_paint.paint.code %></span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collection Information Card -->
+      <div class="card bg-base-100 shadow-lg border border-base-300/50">
+        <div class="card-body p-3 sm:p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-1 h-4 bg-gradient-to-b from-secondary to-accent rounded-full"></div>
+            <h3 class="text-base font-semibold">Collection Info</h3>
+          </div>
+
+          <% if @user_paint.in_collection? %>
+            <!-- Your Status (Compact) -->
+            <div class="mb-3 p-2 bg-base-200/50 rounded border border-base-300/30">
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-base-content/70">Your Status:</span>
+                <span class="font-medium text-sm">
+                  <% case @user_paint.status %>
+                  <% when 'owned' %>
+                    <span class="text-success">● Owned</span>
+                  <% when 'wishlist' %>
+                    <span class="text-warning">● Wishlist</span>
+                  <% when 'avoid' %>
+                    <span class="text-error">● Avoiding</span>
+                  <% end %>
+                </span>
+              </div>
+              <% if @user_paint.owned? && (@user_paint.purchase_date.present? || @user_paint.purchase_price.present?) %>
+                <div class="text-xs text-base-content/60 mt-1">
+                  <% if @user_paint.purchase_date.present? %>
+                    <%= @user_paint.purchase_date.strftime("%b %Y") %>
+                  <% end %>
+                  <% if @user_paint.purchase_price.present? %>
+                    <% if @user_paint.purchase_date.present? %> • <% end %>
+                    <%= number_to_currency(@user_paint.purchase_price) %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+
+          <!-- Community Stats (Compact Grid) -->
+          <% stats = @user_paint.paint.collection_stats %>
+          <div class="text-xs text-base-content/70 mb-2">Community:</div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="flex items-center justify-between p-2 bg-base-200/30 rounded">
+              <span class="flex items-center gap-1">
+                <span class="text-success">●</span>
+                <span>Owned</span>
+              </span>
+              <span class="font-medium"><%= stats[:owned] %></span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-base-200/30 rounded">
+              <span class="flex items-center gap-1">
+                <span class="text-warning">●</span>
+                <span>Wishlist</span>
+              </span>
+              <span class="font-medium"><%= stats[:wishlist] %></span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-base-200/30 rounded">
+              <span class="flex items-center gap-1">
+                <span class="text-error">●</span>
+                <span>Avoiding</span>
+              </span>
+              <span class="font-medium"><%= stats[:avoid] %></span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-primary/10 rounded border border-primary/20">
+              <span class="flex items-center gap-1 font-medium">
+                <span class="text-primary">●</span>
+                <span>Total</span>
+              </span>
+              <span class="font-bold text-primary"><%= stats[:total] %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes Section (for owned paints only) -->
+    <% if @user_paint.in_collection? && @user_paint.notes.present? %>
+      <div class="card bg-base-100 shadow-lg border border-base-300/50 mb-6">
+        <div class="card-body p-4 sm:p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-1 h-6 bg-gradient-to-b from-accent to-primary rounded-full"></div>
+            <h3 class="text-lg font-semibold">Your Notes</h3>
+          </div>
+          <div class="bg-base-200/50 rounded-lg p-4 border border-base-300/30">
+            <p class="text-sm sm:text-base whitespace-pre-line leading-relaxed"><%= @user_paint.notes %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Similar Paints Section -->
+    <div class="card bg-base-100 shadow-lg border border-base-300/50">
+      <div class="card-body p-4 sm:p-6" data-controller="similar-tabs">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-1 h-6 bg-gradient-to-b from-primary via-secondary to-accent rounded-full"></div>
+            <h2 class="text-xl sm:text-2xl font-bold">Similar Paints</h2>
+          </div>
+
+          <!-- Modern Tab Navigation -->
+          <div class="flex gap-1 bg-base-200/50 rounded-lg p-1 border border-base-300/30 w-fit">
+            <button class="px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all bg-base-100 text-base-content shadow-sm border border-base-300/30"
+                    data-similar-tabs-target="tab"
+                    data-tab="rgb"
+                    data-action="click->similar-tabs#switch">
+              RGB
+            </button>
+            <button class="px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all text-base-content/60 hover:text-base-content hover:bg-base-100/50"
+                    data-similar-tabs-target="tab"
+                    data-tab="hsl"
+                    data-action="click->similar-tabs#switch">
+              HSL
+            </button>
+          </div>
+        </div>
+
+        <!-- Decorative Separator -->
+        <div class="h-px bg-gradient-to-r from-transparent via-base-300 to-transparent mb-6"></div>
+
+        <!-- Tab Content -->
+        <div id="rgb-content" class="similar-tab-content" data-similar-tabs-target="content">
+          <%= turbo_frame_tag "similar-paints-frame-rgb",
+              src: similar_paint_path(@user_paint.paint, similar_type: "rgb", per_page: 12, format: :html),
+              loading: "lazy" do %>
+            <div class="flex flex-col items-center justify-center py-12">
+              <div class="loading loading-spinner loading-lg text-primary mb-4"></div>
+              <p class="text-sm text-base-content/60">Loading similar paints...</p>
+            </div>
+          <% end %>
+        </div>
+
+        <div id="hsl-content" class="similar-tab-content hidden" data-similar-tabs-target="content">
+          <%= turbo_frame_tag "similar-paints-frame-hsl",
+              src: similar_paint_path(@user_paint.paint, similar_type: "hsl", per_page: 12, format: :html),
+              loading: "lazy" do %>
+            <div class="flex flex-col items-center justify-center py-12">
+              <div class="loading loading-spinner loading-lg text-primary mb-4"></div>
+              <p class="text-sm text-base-content/60">Loading similar paints...</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= turbo_frame_tag "modal" %>

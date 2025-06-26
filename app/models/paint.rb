@@ -214,6 +214,32 @@ class Paint < ApplicationRecord
     ["brand", "product_line"]
   end
 
+  # Collection statistics methods
+  def owned_count
+    user_paints.where(status: "owned").count
+  end
+
+  def wishlist_count
+    user_paints.where(status: "wishlist").count
+  end
+
+  def avoid_count
+    user_paints.where(status: "avoid").count
+  end
+
+  def total_users_count
+    user_paints.count
+  end
+
+  def collection_stats
+    {
+      owned: owned_count,
+      wishlist: wishlist_count,
+      avoid: avoid_count,
+      total: total_users_count
+    }
+  end
+
   private
 
   ## Callbacks

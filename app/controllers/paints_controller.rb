@@ -32,11 +32,10 @@ class PaintsController < ApplicationController
   end
 
   def show
-    # Check if the user already has this paint in their collection
-    @user_paint = current_user.user_paints.find_by(paint_id: @paint.id)
+    # Create or find UserPaint object (virtual if not in collection)
+    existing_user_paint = current_user.user_paints.find_by(paint_id: @paint.id)
 
-    # For paint collection options
-    @new_user_paint = @user_paint || UserPaint.new(paint: @paint)
+    @user_paint = existing_user_paint || UserPaint.new(paint: @paint, user: current_user, virtual: true)
 
     respond_to do |format|
       format.html
@@ -126,7 +125,7 @@ class PaintsController < ApplicationController
     end
 
     # Apply special filters from concern (search and color)
-    super(query)
+    super
   end
 
   # Helper method to convert Paint objects to UserPaint objects

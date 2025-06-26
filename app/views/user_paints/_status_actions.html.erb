@@ -1,49 +1,79 @@
-<div class="flex flex-wrap gap-2">
-  <% # Define available status transitions %>
-  <% status_options = {
-    'owned' => [
-      { status: 'wishlist', label: 'Move to Wishlist', class: 'btn btn-outline btn-sm', icon: 'heart' },
-      { status: 'avoid', label: 'Mark as Avoid', class: 'btn btn-outline btn-error btn-sm', icon: 'ban' }
-    ],
-    'wishlist' => [
-      { status: 'owned', label: 'Mark as Owned', class: 'btn btn-primary btn-sm', icon: 'check' },
-      { status: 'avoid', label: 'Mark as Avoid', class: 'btn btn-outline btn-error btn-sm', icon: 'ban' }
-    ],
-    'avoid' => [
-      { status: 'owned', label: 'Mark as Owned', class: 'btn btn-primary btn-sm', icon: 'check' },
-      { status: 'wishlist', label: 'Add to Wishlist', class: 'btn btn-outline btn-sm', icon: 'heart' }
-    ]
-  } %>
-
-  <% # Define SVG icons %>
-  <% icons = {
-    'heart' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />',
-    'check' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />',
-    'ban' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 715.636 5.636m12.728 12.728L5.636 5.636" />'
-  } %>
-
-  <% # Render status change buttons %>
-  <% status_options[user_paint.status]&.each do |option| %>
+<!-- Mobile-First Status Actions -->
+<div class="flex items-center justify-end gap-1 sm:gap-2" data-controller="status-actions">
+  <!-- Status Transitions -->
+  <% status_transitions(user_paint.status).each do |transition| %>
     <%= button_to user_paint_path(user_paint),
         method: :patch,
-        params: { user_paint: { status: option[:status] } },
-        class: option[:class],
-        form: { class: "inline-block" } do %>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <%= icons[option[:icon]].html_safe %>
-      </svg>
-      <%= option[:label] %>
+        params: { user_paint: { status: transition[:status] } },
+        class: "btn #{transition[:class]} btn-xs sm:btn-sm border-0 shadow-sm hover:shadow-md transition-all duration-200",
+        form: { class: "inline-block" },
+        title: transition[:tooltip],
+        data: {
+          turbo_method: :patch,
+          status_actions_target: "button",
+          action: "click->status-actions#updateStatus"
+        } do %>
+
+      <!-- Mobile: Icon only -->
+      <span class="sm:hidden">
+        <%= status_icon(transition[:icon], "h-3 w-3") %>
+      </span>
+
+      <!-- Desktop: Icon + Text -->
+      <span class="hidden sm:flex items-center gap-1.5">
+        <%= status_icon(transition[:icon], "h-3.5 w-3.5") %>
+        <span class="text-xs font-medium"><%= transition[:short_label] %></span>
+      </span>
     <% end %>
   <% end %>
 
+  <!-- Edit Action -->
+  <%= link_to edit_user_paint_path(user_paint),
+      data: { turbo_frame: "modal" },
+      class: "btn btn-ghost btn-xs sm:btn-sm border border-base-300 hover:border-primary hover:bg-primary/10 transition-all duration-200",
+      title: "Edit paint details" do %>
+
+    <!-- Mobile: Icon only -->
+    <span class="sm:hidden">
+      <%= status_icon("edit", "h-3 w-3") %>
+    </span>
+
+    <!-- Desktop: Icon + Text -->
+    <span class="hidden sm:flex items-center gap-1.5">
+      <%= status_icon("edit", "h-3.5 w-3.5") %>
+      <span class="text-xs font-medium">Edit</span>
+    </span>
+  <% end %>
+
+  <!-- Separator -->
+  <div class="w-px h-4 bg-base-300 mx-1 hidden sm:block"></div>
+
+  <!-- Remove Action -->
   <%= button_to user_paint_path(user_paint),
       method: :delete,
-      data: { turbo_confirm: "Are you sure you want to remove this paint from your collection?", turbo_frame: "_top" },
-      class: "btn btn-outline btn-error btn-sm",
-      form: { class: "inline-block" } do %>
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-    </svg>
-    Remove from Collection
+      data: {
+        turbo_confirm: "Remove this paint from your collection?",
+        turbo_frame: "_top",
+        status_actions_target: "deleteButton"
+      },
+      class: "btn btn-ghost btn-xs sm:btn-sm text-error hover:bg-error/10 hover:border-error border border-transparent transition-all duration-200",
+      form: { class: "inline-block" },
+      title: "Remove from collection" do %>
+
+    <!-- Mobile: Icon only -->
+    <span class="sm:hidden">
+      <%= status_icon("trash", "h-3 w-3") %>
+    </span>
+
+    <!-- Desktop: Icon + Text -->
+    <span class="hidden sm:flex items-center gap-1.5">
+      <%= status_icon("trash", "h-3.5 w-3.5") %>
+      <span class="text-xs font-medium">Remove</span>
+    </span>
   <% end %>
+</div>
+
+<!-- Loading state overlay -->
+<div class="hidden absolute inset-0 bg-base-100/50 backdrop-blur-sm rounded-lg flex items-center justify-center" data-status-actions-target="loading">
+  <div class="loading loading-spinner loading-sm text-primary"></div>
 </div>
