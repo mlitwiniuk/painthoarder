@@ -55,6 +55,13 @@ export default class extends Controller {
                         this.tomSelectInstances.paint.setValue(
                           this.paintIdValue.toString(),
                         );
+                        // Trigger initial paint selection event for color preview
+                        this.element.dispatchEvent(
+                          new CustomEvent("paint-selected", {
+                            detail: { paintId: this.paintIdValue.toString() },
+                            bubbles: true,
+                          }),
+                        );
                       }
                     }, 100);
                   }
@@ -130,6 +137,13 @@ export default class extends Controller {
       onChange: (value) => {
         if (value) {
           this.brandChanged();
+          // Trigger validation for multi-step form
+          this.element.dispatchEvent(
+            new CustomEvent("cascading-select:changed", {
+              detail: { type: "brand", value: value },
+              bubbles: true,
+            }),
+          );
         } else {
           // If brand is cleared, disable and clear the dependent selects
           this.resetProductLineSelect();
@@ -180,6 +194,13 @@ export default class extends Controller {
         onChange: (value) => {
           if (value) {
             this.productLineChanged();
+            // Trigger validation for multi-step form
+            this.element.dispatchEvent(
+              new CustomEvent("cascading-select:changed", {
+                detail: { type: "productLine", value: value },
+                bubbles: true,
+              }),
+            );
           } else {
             this.resetPaintSelect();
           }
@@ -243,6 +264,13 @@ export default class extends Controller {
               bubbles: true,
             }),
           );
+          // Trigger validation for multi-step form
+          this.element.dispatchEvent(
+            new CustomEvent("cascading-select:changed", {
+              detail: { type: "paint", value: value },
+              bubbles: true,
+            }),
+          );
         }
       },
     });
@@ -256,7 +284,15 @@ export default class extends Controller {
 
     this.productLineSelectTarget.disabled = true;
     this.productLineSelectTarget.innerHTML =
-      '<option value="">Select a product line</option>';
+      '<option value="">Choose a product line...</option>';
+
+    // Trigger validation update
+    this.element.dispatchEvent(
+      new CustomEvent("cascading-select:changed", {
+        detail: { type: "productLine", value: "" },
+        bubbles: true,
+      }),
+    );
   }
 
   resetPaintSelect() {
@@ -267,6 +303,14 @@ export default class extends Controller {
 
     this.paintSelectTarget.disabled = true;
     this.paintSelectTarget.innerHTML =
-      '<option value="">Select a paint</option>';
+      '<option value="">Choose a paint...</option>';
+
+    // Trigger validation update and hide color preview
+    this.element.dispatchEvent(
+      new CustomEvent("cascading-select:changed", {
+        detail: { type: "paint", value: "" },
+        bubbles: true,
+      }),
+    );
   }
 }
