@@ -1,44 +1,69 @@
 <%# color_wheel.html.erb %>
-<div class="flex justify-between items-center mb-8">
-  <h1 class="text-3xl font-bold">My Paint Collection - Color Wheel</h1>
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+  <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold">My Paint Collection - Color Wheel</h1>
   <div class="flex">
     <div class="btn-group">
-      <%= link_to user_paints_path, class: "btn" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <%= link_to user_paints_path, class: "btn btn-sm sm:btn-md" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
         </svg>
-        List View
+        <span class="hidden sm:inline">List View</span>
+        <span class="sm:hidden">List</span>
       <% end %>
     </div>
   </div>
 </div>
 
-  
+
 
 <div class="block">
+  <!-- Mobile instructions -->
+  <div class="sm:hidden mb-4 p-3 bg-base-100 rounded-lg border text-sm">
+    <div class="flex items-center mb-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span class="font-medium">How to use:</span>
+    </div>
+    <ul class="text-xs space-y-1 text-gray-600">
+      <li>• Quick tap a paint dot for information</li>
+      <li>• Long press to view full details</li>
+      <li>• Colors closer to center are more muted</li>
+      <li>• Larger dots are brighter colors</li>
+    </ul>
+  </div>
+
   <!-- Color wheel container -->
-  <div class="bg-transparent rounded-lg p-6">
-    
+  <div class="bg-transparent rounded-lg p-2 sm:p-4 lg:p-6">
+
     <!-- Color wheel visualization area -->
     <div
-      class="relative w-full h-[600px] border rounded-lg"
+      class="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] border rounded-lg"
       data-controller="color-wheel"
       data-color-wheel-paints-value="<%= @user_paints.map do |up|
+        hsv = up.paint.hsv_values
         {
           id: up.id,
           name: up.paint.name,
           brand: up.paint.brand.name,
           product_line: up.paint.product_line.name,
-          color: up.paint.hex_color,
+          hex_color: up.paint.hex_color,
+          red: up.paint.red,
+          green: up.paint.green,
+          blue: up.paint.blue,
+          hue: hsv[:h],
+          saturation: hsv[:s],
+          value: hsv[:v],
           status: up.status,
           path: user_paint_path(up)
         }
       end.to_json %>"
     >
       <div class="absolute inset-0 flex items-center justify-center" data-color-wheel-target="wheel"></div>
-      <div 
-        class="hidden absolute bg-base-200 border rounded-lg shadow-lg p-3 w-64" 
+      <div
+        class="hidden absolute bg-white border border-gray-400 rounded shadow-lg p-1.5 w-40 sm:w-48 text-xs z-20 max-w-xs"
         data-color-wheel-target="tooltip"
+        style="backdrop-filter: blur(4px); background-color: rgba(255, 255, 255, 0.98);"
       ></div>
     </div>
   </div>

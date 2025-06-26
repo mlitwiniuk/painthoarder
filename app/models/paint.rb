@@ -54,6 +54,39 @@ class Paint < ApplicationRecord
     "#{name} #{code}".tr("^A-Za-z0-9\s", "")
   end
 
+  def hsv_values
+    # Convert RGB to HSV
+    r, g, b = red / 255.0, green / 255.0, blue / 255.0
+
+    max_val = [r, g, b].max
+    min_val = [r, g, b].min
+    delta = max_val - min_val
+
+    # Calculate hue
+    hue = if delta == 0
+      0
+    elsif max_val == r
+      60 * (((g - b) / delta) % 6)
+    elsif max_val == g
+      60 * (((b - r) / delta) + 2)
+    else
+      60 * (((r - g) / delta) + 4)
+    end
+
+    # Normalize hue to 0-360
+    hue = (hue < 0) ? hue + 360 : hue
+
+    # Calculate saturation and value
+    saturation = (max_val == 0) ? 0 : delta / max_val
+    value = max_val
+
+    {
+      h: hue.round(1),
+      s: (saturation * 100).round(1),
+      v: (value * 100).round(1)
+    }
+  end
+
   def color_category
     # Convert RGB to HSV for better color classification
     r, g, b = red / 255.0, green / 255.0, blue / 255.0
