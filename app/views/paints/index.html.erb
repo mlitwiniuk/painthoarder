@@ -74,8 +74,8 @@
 
   <!-- Collapsible Filter Section -->
   <%= turbo_frame_tag "catalog-filters" do %>
-    <div data-toggle-target="content" class="<%= "hidden" if params[:search].blank? && params[:q].blank? %> pb-4">
-      <div class="bg-base-50 rounded-2xl px-6 py-4 border border-base-200">
+    <div data-toggle-target="content" class="<%= "hidden" if params[:search].blank? && params[:q].blank? %> pb-3">
+      <div class="bg-base-50 rounded-xl px-3 py-3 lg:px-6 lg:py-4 border border-base-200">
         <%= render "shared/filter_form",
             q: @q,
             url: paints_path,
@@ -100,7 +100,7 @@
     </div>
 
     <!-- Paint Catalog Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mb-8">
+    <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-2 lg:gap-4 xl:gap-6 mb-8">
       <% @paints.each do |paint| %>
         <%
           # Create a virtual UserPaint object for each paint
