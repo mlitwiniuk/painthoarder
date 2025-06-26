@@ -82,7 +82,8 @@
                   <select id="brand_id"
                           class="select select-bordered w-full h-12 text-base"
                           data-cascading-select-target="brandSelect"
-                          data-action="change->cascading-select#brandChanged change->multi-step-form#validateCurrentStep">
+                          data-multi-step-form-target="brandSelect"
+                          data-action="change->cascading-select#brandChanged change->multi-step-form#brandChanged">
                     <option value="">Choose a brand...</option>
                     <% @brands.each do |brand| %>
                       <option value="<%= brand.id %>" <%= 'selected' if @user_paint.paint&.product_line&.brand_id == brand.id %>>
@@ -105,7 +106,8 @@
                 <select id="product_line_id"
                         class="select select-bordered w-full h-12 text-base"
                         data-cascading-select-target="productLineSelect"
-                        data-action="change->cascading-select#productLineChanged change->multi-step-form#validateCurrentStep"
+                        data-multi-step-form-target="productLineSelect"
+                        data-action="change->cascading-select#productLineChanged change->multi-step-form#productLineChanged"
                         disabled>
                   <option value="">Choose a product line...</option>
                   <% @product_lines.each do |product_line| %>
@@ -129,7 +131,8 @@
                         name="user_paint[paint_id]"
                         class="select select-bordered w-full h-12 text-base"
                         data-cascading-select-target="paintSelect"
-                        data-action="change->color-preview#updatePreview change->multi-step-form#validateCurrentStep"
+                        data-multi-step-form-target="paintSelect"
+                        data-action="change->color-preview#updatePreview change->multi-step-form#paintChanged"
                         disabled
                         required>
                   <option value="">Choose a paint...</option>
@@ -168,8 +171,9 @@
                   <label class="cursor-pointer">
                     <input type="radio" name="user_paint[status]" value="owned"
                            class="radio radio-primary hidden"
-                           <%= 'checked' if @user_paint.status == 'owned' || @user_paint.status.blank? %>
-                           data-action="change->multi-step-form#validateCurrentStep">
+                           <%= (@user_paint.status.to_s == 'owned' || @user_paint.status.blank? || @user_paint.new_record?) ? 'checked="checked"' : '' %>
+                           data-multi-step-form-target="statusRadio"
+                           data-action="change->multi-step-form#statusChanged">
                     <div class="btn btn-outline btn-sm h-auto py-3 px-2 flex flex-col items-center space-y-1 radio-card">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -180,8 +184,9 @@
                   <label class="cursor-pointer">
                     <input type="radio" name="user_paint[status]" value="wishlist"
                            class="radio radio-primary hidden"
-                           <%= 'checked' if @user_paint.status == 'wishlist' %>
-                           data-action="change->multi-step-form#validateCurrentStep">
+                           <%= @user_paint.status.to_s == 'wishlist' ? 'checked="checked"' : '' %>
+                           data-multi-step-form-target="statusRadio"
+                           data-action="change->multi-step-form#statusChanged">
                     <div class="btn btn-outline btn-sm h-auto py-3 px-2 flex flex-col items-center space-y-1 radio-card">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
@@ -192,8 +197,9 @@
                   <label class="cursor-pointer">
                     <input type="radio" name="user_paint[status]" value="avoid"
                            class="radio radio-primary hidden"
-                           <%= 'checked' if @user_paint.status == 'avoid' %>
-                           data-action="change->multi-step-form#validateCurrentStep">
+                           <%= @user_paint.status.to_s == 'avoid' ? 'checked="checked"' : '' %>
+                           data-multi-step-form-target="statusRadio"
+                           data-action="change->multi-step-form#statusChanged">
                     <div class="btn btn-outline btn-sm h-auto py-3 px-2 flex flex-col items-center space-y-1 radio-card">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636"></path>
@@ -280,28 +286,3 @@
     <div class="modal-backdrop"></div>
   </div>
 <% end %>
-
-<style>
-  .radio-card {
-    transition: all 0.2s ease;
-  }
-
-  .radio-card:has(input[type="radio"]:checked) {
-    @apply btn-primary;
-  }
-
-  .step-content {
-    min-height: 200px;
-  }
-
-  @media (max-width: 640px) {
-    .modal-box {
-      margin: 0;
-      border-radius: 0;
-      width: 100vw;
-      height: 100vh;
-      max-width: none;
-      max-height: none;
-    }
-  }
-</style>

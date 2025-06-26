@@ -11,6 +11,10 @@ export default class extends Controller {
     "currentStepNumber",
     "progressPercent",
     "progressBar",
+    "brandSelect",
+    "productLineSelect",
+    "paintSelect",
+    "statusRadio",
   ];
 
   static values = {
@@ -26,14 +30,13 @@ export default class extends Controller {
       "Add details",
     ];
 
-    // Listen for cascading select changes
-    this.element.addEventListener(
-      "cascading-select:changed",
-      this.handleCascadingChange.bind(this),
-    );
-
     this.updateUI();
     this.validateCurrentStep();
+
+    // Check for edit mode with longer delay to allow cascading selects to initialize
+    setTimeout(() => {
+      this.checkForEditMode();
+    }, 500);
   }
 
   nextStep() {
@@ -55,6 +58,40 @@ export default class extends Controller {
       this.validateCurrentStep();
       this.scrollToTop();
     }
+  }
+
+  // Action for brand selection change
+  brandChanged() {
+    this.validateCurrentStep();
+
+    // Auto-advance if valid
+    if (this.validateCurrentStep() && this.currentStepValue === 0) {
+      setTimeout(() => {
+        this.nextStep();
+      }, 300);
+    }
+  }
+
+  // Action for product line selection change
+  productLineChanged() {
+    this.validateCurrentStep();
+
+    // Auto-advance if valid
+    if (this.validateCurrentStep() && this.currentStepValue === 1) {
+      setTimeout(() => {
+        this.nextStep();
+      }, 300);
+    }
+  }
+
+  // Action for paint selection change
+  paintChanged() {
+    this.validateCurrentStep();
+  }
+
+  // Action for status radio change
+  statusChanged() {
+    this.validateCurrentStep();
   }
 
   updateUI() {
@@ -136,25 +173,27 @@ export default class extends Controller {
 
     switch (this.currentStepValue) {
       case 0: // Brand selection
-        const brandSelect = document.getElementById("brand_id");
-        isValid = brandSelect && brandSelect.value !== "";
+        if (this.hasBrandSelectTarget) {
+          isValid = this.brandSelectTarget.value !== "";
+        }
         break;
 
       case 1: // Product line selection
-        const productLineSelect = document.getElementById("product_line_id");
-        isValid = productLineSelect && productLineSelect.value !== "";
+        if (this.hasProductLineSelectTarget) {
+          isValid = this.productLineSelectTarget.value !== "";
+        }
         break;
 
       case 2: // Paint selection
-        const paintSelect = document.getElementById("user_paint_paint_id");
-        isValid = paintSelect && paintSelect.value !== "";
+        if (this.hasPaintSelectTarget) {
+          isValid = this.paintSelectTarget.value !== "";
+        }
         break;
 
       case 3: // Details (status is required)
-        const statusInputs = document.querySelectorAll(
-          'input[name="user_paint[status]"]',
-        );
-        isValid = Array.from(statusInputs).some((input) => input.checked);
+        if (this.hasStatusRadioTarget) {
+          isValid = this.statusRadioTargets.some((radio) => radio.checked);
+        }
         break;
     }
 
@@ -186,27 +225,6 @@ export default class extends Controller {
     return isValid;
   }
 
-  handleCascadingChange(event) {
-    // Validate current step when cascading selects change
-    this.validateCurrentStep();
-
-    // Auto-advance to next step if current step is valid
-    const { type, value } = event.detail;
-
-    if (value && this.validateCurrentStep()) {
-      // Small delay to allow UI to update
-      setTimeout(() => {
-        // Auto-advance for brand and product line selections
-        if (
-          (type === "brand" && this.currentStepValue === 0) ||
-          (type === "productLine" && this.currentStepValue === 1)
-        ) {
-          this.nextStep();
-        }
-      }, 300);
-    }
-  }
-
   handleSubmit(event) {
     // If form submission was successful, we can handle any cleanup here
     if (event.detail.success) {
@@ -220,6 +238,29 @@ export default class extends Controller {
     const modalBox = this.element.querySelector(".modal-box");
     if (modalBox) {
       modalBox.scrollTop = 0;
+    }
+  }
+
+  checkForEditMode() {
+    // Check if we're in edit mode with existing paint selection
+    if (this.hasPaintSelectTarget && this.paintSelectTarget.value) {
+      // We have a paint selected, go to paint selection step (step 2)
+      this.currentStepValue = 2;
+      this.updateUI();
+      this.validateCurrentStep();
+    } else if (
+      this.hasProductLineSelectTarget &&
+      this.productLineSelectTarget.value
+    ) {
+      // We have a product line selected, go to product line step (step 1)
+      this.currentStepValue = 1;
+      this.updateUI();
+      this.validateCurrentStep();
+    } else if (this.hasBrandSelectTarget && this.brandSelectTarget.value) {
+      // We have a brand selected, stay on brand step (step 0)
+      this.currentStepValue = 0;
+      this.updateUI();
+      this.validateCurrentStep();
     }
   }
 
