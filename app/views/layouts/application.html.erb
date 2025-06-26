@@ -7,7 +7,7 @@
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
 
     <!-- Modern Header -->
-    <header class="sticky top-0 z-40 backdrop-blur-xl border-b border-base-300">
+    <header class="sticky top-0 z-20 backdrop-blur-xl border-b border-base-300">
       <div class="max-w-7xl mx-auto px-4 py-3">
         <nav class="flex justify-between items-center">
           <!-- Logo -->
@@ -64,7 +64,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
                   </svg>
                 </label>
-                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-xl bg-base-100 rounded-xl w-52 border border-base-300">
+                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-40 p-2 shadow-xl bg-base-100 rounded-xl w-52 border border-base-300">
                   <li><%= link_to "My Collection", user_paints_path, class: "text-base-content hover:bg-base-200 font-semibold" %></li>
                   <li><%= link_to "Dashboard", user_root_path, class: "text-base-content/70 hover:bg-base-200" %></li>
                   <li><%= link_to "Explore", paints_path, class: "text-base-content/70 hover:bg-base-200" %></li>
@@ -80,7 +80,7 @@
                     <%= gravatar_for current_user %>
                   </div>
                 </label>
-                <ul tabindex="0" class="mt-3 p-2 shadow-xl menu menu-compact dropdown-content bg-base-100 rounded-xl w-52 border border-base-300">
+                <ul tabindex="0" class="mt-3 z-40 p-2 shadow-xl menu menu-compact dropdown-content bg-base-100 rounded-xl w-52 border border-base-300">
                   <li class="px-4 py-2 text-sm text-base-content/50 border-b border-base-300">
                     <%= current_user.email %>
                   </li>
