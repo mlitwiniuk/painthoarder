@@ -9,7 +9,6 @@
 
 /* Import component styles */
 @import "./components/slider.css";
-@import "./components/user_paint_form.css";
 @import "./components/paint_details.css";
 
 @layer base {
