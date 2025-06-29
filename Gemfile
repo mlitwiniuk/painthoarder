@@ -79,6 +79,7 @@ end
 group :development do
   gem "annotate", github: "mlitwiniuk/annotate_models"
   gem "better_errors"
+  gem "claude-on-rails"
   gem "binding_of_caller"
   gem "ruby-lsp-rails", require: false
   gem "web-console"
@@ -93,5 +94,6 @@ gem "responders"
 gem "show_for"
 gem "simple_form"
 gem "simple-navigation"
+gem "httparty"
 
 gem "appsignal", "~> 4.5"
