@@ -1,23 +1,239 @@
-<h1 class="text-3xl font-bold mb-6">Bulk Import Paints</h1>
-
-<div class="card bg-base-100 shadow-xl">
-  <div class="card-body">
-    <h2 class="card-title">Enter Paint Names</h2>
-    <p class="text-sm text-base-content/70 mb-4">Enter each paint name separately, using new lines, commas, or semicolons as separators.</p>
-
-    <%= form_with url: bulk_search_user_paints_path, method: :post, data: { turbo: true } do |f| %>
-      <div class="form-control mb-4">
-        <%= f.text_area :paint_names, rows: 7, class: "textarea textarea-bordered w-full", placeholder: "Abaddon Black\nMephiston Red\nUltramarine Blue\nCeramic White" %>
+<div class="max-w-7xl mx-auto">
+  <h1 class="text-3xl font-bold mb-2">Bulk Import Paints</h1>
+  <p class="text-base-content/70 mb-6">Quickly add multiple paints to your collection at once</p>
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <!-- Tab Navigation -->
+      <div role="tablist" class="tabs tabs-bordered tabs-lg">
+        <input type="radio" name="import_tabs" role="tab" class="tab" aria-label="📝 Text Import" checked />
+        <div role="tabpanel" class="tab-content pt-6">
+          <!-- Left column: Instructions -->
+          <div>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="space-y-4 mb-6">
+                <h3 class="text-xl font-semibold mb-3 flex items-center gap-2">
+                  <span class="text-2xl">📝</span>
+                  Text-Based Import
+                </h3>
+                <div class="alert alert-info">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <span>Perfect for importing from spreadsheets or paint lists</span>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-success mb-2">✅ Pros:</h4>
+                  <ul class="list-disc list-inside space-y-1 text-sm text-base-content/80">
+                    <li>Fast and accurate for exact paint names</li>
+                    <li>Great for copying from inventory lists</li>
+                    <li>Can handle any number of paints</li>
+                    <li>Works well with paint codes</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-warning mb-2">⚠️ Cons:</h4>
+                  <ul class="list-disc list-inside space-y-1 text-sm text-base-content/80">
+                    <li>Requires typing or copy-pasting</li>
+                    <li>Need to know exact paint names</li>
+                    <li>Manual process for large collections</li>
+                  </ul>
+                </div>
+              </div>
+              <div>
+                <div class="divider">Format Examples</div>
+                <div class="bg-base-200 rounded-lg p-3 text-sm font-mono">
+                  <div class="text-base-content/60 mb-1">Separated by new lines:</div>
+                  Abaddon Black<br>
+                  Mephiston Red<br>
+                  Macragge Blue
+                </div>
+                <div class="bg-base-200 rounded-lg p-3 text-sm font-mono">
+                  <div class="text-base-content/60 mb-1">Or by commas:</div>
+                  Nuln Oil, Agrax Earthshade, Seraphim Sepia
+                </div>
+              </div>
+            </div>
+            <!-- Right column: Form -->
+            <div>
+              <%= form_with url: bulk_search_user_paints_path, method: :post, data: { turbo: true } do |f| %>
+                <div class="form-control mb-4">
+                  <%= f.label :paint_names, "Enter paint names:", class: "label" %>
+                  <%= f.text_area :paint_names, 
+                                rows: 12, 
+                                class: "textarea textarea-bordered w-full font-mono text-sm", 
+                                placeholder: "Abaddon Black\nMephiston Red\nMacragge Blue\nRetributor Armour\nLeadbelcher\n\nOr use commas:\nNuln Oil, Agrax Earthshade, Seraphim Sepia\n\nOr include codes:\nVallejo 70.950 Black\nArmy Painter WP1101" %>
+                  <label class="label">
+                    <span class="label-text-alt">Tip: Include brand names or codes for better matches</span>
+                  </label>
+                </div>
+                <div class="flex justify-end">
+                  <%= f.submit "Find Matches", class: "btn btn-primary btn-lg" %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <input type="radio" name="import_tabs" role="tab" class="tab" aria-label="📸 Photo Import" />
+        <div role="tabpanel" class="tab-content pt-6">
+          <!-- Left column: Instructions -->
+          <div>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="space-y-4 mb-6">
+                <h3 class="text-xl font-semibold mb-3 flex items-center gap-2">
+                  <span class="text-2xl">📸</span>
+                  Photo-Based Import
+                </h3>
+                <div class="alert alert-info">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <span>AI-powered paint recognition from photos</span>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-success mb-2">✅ Pros:</h4>
+                  <ul class="list-disc list-inside space-y-1 text-sm text-base-content/80">
+                    <li>Quick for large collections</li>
+                    <li>No typing required</li>
+                    <li>Can identify paints you don't know</li>
+                    <li>Works with multiple paints at once</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-warning mb-2">⚠️ Cons:</h4>
+                  <ul class="list-disc list-inside space-y-1 text-sm text-base-content/80">
+                    <li>Requires clear, well-lit photos</li>
+                    <li>May miss some paints or brands</li>
+                    <li>Takes 10-30 seconds to process</li>
+                    <li>Best with labels facing camera</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="divider">Example Photos</div>
+                <div class="grid grid-cols-3 gap-2" data-controller="lightbox">
+                  <div>
+                    <a href="#" 
+                       data-action="click->lightbox#open"
+                      data-lightbox-target="thumbnail"
+                      data-full-url="<%= image_path('bulk_import_example1_full.jpg') %>"
+                      class="cursor-pointer block">
+                      <%= image_tag 'bulk_import_example1.jpg', 
+                                    class: "rounded-lg hover:opacity-80 transition-opacity w-full",
+                                    alt: "Good example: Clear labels" %>
+                    </a>
+                    <p class="text-xs text-center mt-1 text-success font-semibold">✅ Good</p>
+                    <p class="text-xs text-center text-base-content/60">Clear, well-lit labels</p>
+                  </div>
+                  <div>
+                    <a href="#" 
+                       data-action="click->lightbox#open"
+                      data-lightbox-target="thumbnail"
+                      data-full-url="<%= asset_path('bulk_import_example2_full.jpg') %>"
+                      class="cursor-pointer block">
+                      <%= image_tag 'bulk_import_example2.jpg', 
+                                    class: "rounded-lg hover:opacity-80 transition-opacity w-full",
+                                    alt: "OK example: Some labels hidden" %>
+                    </a>
+                    <p class="text-xs text-center mt-1 text-warning font-semibold">⚠️ OK</p>
+                    <p class="text-xs text-center text-base-content/60">Some labels obscured, low contrast</p>
+                  </div>
+                  <div>
+                    <a href="#" 
+                       data-action="click->lightbox#open"
+                      data-lightbox-target="thumbnail"
+                      data-full-url="<%= asset_path('bulk_import_example3_full.jpg') %>"
+                      class="cursor-pointer block">
+                      <%= image_tag 'bulk_import_example3.jpg', 
+                                    class: "rounded-lg hover:opacity-80 transition-opacity w-full",
+                                    alt: "Poor example: Blurry or dark" %>
+                    </a>
+                    <p class="text-xs text-center mt-1 text-error font-semibold">❌ Poor</p>
+                    <p class="text-xs text-center text-base-content/60">Too dark or blurry</p>
+                  </div>
+                </div>
+                <div class="divider">📷 Photo Tips</div>
+                <div class="bg-warning/10 border border-warning rounded-lg p-4">
+                  <h4 class="font-semibold text-warning mb-2">For Best Results:</h4>
+                  <ul class="list-disc list-inside space-y-1 text-sm">
+                    <li><strong>Labels visible:</strong> Face paint labels toward camera</li>
+                    <li><strong>Good lighting:</strong> Natural light or bright room</li>
+                    <li><strong>Clear focus:</strong> Avoid blurry photos</li>
+                    <li><strong>Group similar:</strong> Photo paints by brand if many</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <!-- Right column: Form -->
+            <div>
+              <div data-controller="photo-analyze">
+                <%= form_with url: bulk_search_from_photo_user_paints_path, method: :post, 
+                            data: { 
+                              turbo: true, 
+                              multipart: true,
+                              photo_analyze_target: "form"
+                            } do |f| %>
+                  <div class="card bg-base-200 border-2 border-dashed border-base-300 mb-4">
+                    <div class="card-body text-center">
+                      <div class="form-control">
+                        <%= f.label :photo, class: "cursor-pointer" do %>
+                          <div class="flex flex-col items-center gap-3 py-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-base-content/50">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                            </svg>
+                            <div>
+                              <p class="text-lg font-medium">Click to upload photo</p>
+                              <p class="text-sm text-base-content/60"></p>
+                            </div>
+                            <p class="text-xs text-base-content/50">Max file size: 4MB</p>
+                          </div>
+                        <% end %>
+                        <%= f.file_field :photo, 
+                                      accept: "image/*", 
+                                      class: "file-input file-input-bordered w-full hidden", 
+                                      required: true,
+                                      data: { action: "change->photo-analyze#fileSelected" } %>
+                      </div>
+                    </div>
+                  </div>
+                  <label class="label">
+                    <span class="label-text-alt">Supported formats: JPG, PNG, GIF, WebP • Max size: 4MB</span>
+                  </label>
+                  <div class="flex justify-end">
+                    <%= f.submit "🔍 Analyze Photo", 
+                               class: "btn btn-primary btn-lg",
+                               data: { photo_analyze_target: "submitButton" } %>
+                  </div>
+                  <!-- Progress indicator (hidden by default) -->
+                  <div class="hidden mt-6" data-photo-analyze-target="progressContainer">
+                    <div class="alert alert-info">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                      <div class="w-full">
+                        <div class="flex items-center justify-between mb-2">
+                          <span class="font-medium" data-photo-analyze-target="progressText">
+                            Uploading photo...
+                          </span>
+                          <span class="loading loading-spinner loading-sm"></span>
+                        </div>
+                        <div class="w-full bg-base-100 rounded-full h-3 overflow-hidden">
+                          <div class="bg-primary h-3 rounded-full transition-all duration-500 ease-out" 
+                             style="width: 0%" 
+                             data-photo-analyze-target="progressBar"></div>
+                        </div>
+                        <p class="text-sm mt-2">
+                          This may take 10-30 seconds depending on the number of paints in your photo.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="flex justify-end">
-        <%= f.submit "Find Matches", class: "btn btn-primary" %>
-      </div>
+    </div>
+  </div>
+  <!-- Results section -->
+  <div id="bulk-import-results" class="mt-8">
+    <% if @search_results.present? %>
+      <%= render "bulk_import_results", search_results: @search_results %>
     <% end %>
   </div>
-</div>
-
-<div id="bulk-import-results" class="mt-8">
-  <% if @search_results.present? %>
-    <%= render "bulk_import_results", search_results: @search_results %>
-  <% end %>
 </div>

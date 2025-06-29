@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus";
 // Lightbox controller: builds its own modal dynamically and uses
 // Stimulus targets/actions only – no manual addEventListener calls.
 export default class extends Controller {
-  static targets = ["thumbnail", "modal", "image"];
+  static targets = ["thumbnail", "modal", "image", "prevButton", "nextButton"];
 
   connect() {
     // Key handler bound once per controller instance
@@ -26,8 +26,8 @@ export default class extends Controller {
     wrapper.innerHTML = `
       <div class="modal-box p-0 relative max-w-7xl">
         <button class="btn btn-circle absolute top-2 right-2" data-action="click->lightbox#close">✕</button>
-        <button class="btn btn-circle absolute left-2 top-1/2 z-10" data-action="click->lightbox#prev">❮</button>
-        <button class="btn btn-circle absolute right-2 top-1/2 z-10" data-action="click->lightbox#next">❯</button>
+        <button class="btn btn-circle absolute left-2 top-1/2 z-10" data-action="click->lightbox#prev" data-lightbox-target="prevButton">❮</button>
+        <button class="btn btn-circle absolute right-2 top-1/2 z-10" data-action="click->lightbox#next" data-lightbox-target="nextButton">❯</button>
         <img data-lightbox-target="image" class="w-full h-auto object-contain" alt="Project image" />
       </div>`;
 
@@ -46,15 +46,17 @@ export default class extends Controller {
   }
 
   next() {
-    this.index = (this.index + 1) % this.thumbnailTargets.length;
-    this.showCurrent();
+    if (this.index < this.thumbnailTargets.length - 1) {
+      this.index++;
+      this.showCurrent();
+    }
   }
 
   prev() {
-    this.index =
-      (this.index - 1 + this.thumbnailTargets.length) %
-      this.thumbnailTargets.length;
-    this.showCurrent();
+    if (this.index > 0) {
+      this.index--;
+      this.showCurrent();
+    }
   }
 
   close() {
@@ -73,6 +75,29 @@ export default class extends Controller {
     const url = this.thumbnailTargets[this.index].dataset.fullUrl;
     this.imageTarget.src = url;
     this.modalTarget.classList.add("modal-open");
+    
+    // Update button visibility
+    this.updateNavigationButtons();
+  }
+  
+  updateNavigationButtons() {
+    // Hide/show prev button
+    if (this.hasPrevButtonTarget) {
+      if (this.index === 0) {
+        this.prevButtonTarget.classList.add("hidden");
+      } else {
+        this.prevButtonTarget.classList.remove("hidden");
+      }
+    }
+    
+    // Hide/show next button
+    if (this.hasNextButtonTarget) {
+      if (this.index === this.thumbnailTargets.length - 1) {
+        this.nextButtonTarget.classList.add("hidden");
+      } else {
+        this.nextButtonTarget.classList.remove("hidden");
+      }
+    }
   }
 
   // ------------------------------------------------------------------

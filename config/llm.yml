@@ -1,0 +1,33 @@
+default: &default
+  provider: <%= ENV.fetch("LLM_PROVIDER", "openai") %>
+  api_key: <%= ENV.fetch("LLM_API_KEY", ENV["OPENAI_API_KEY"]) %>
+  model: <%= ENV.fetch("LLM_MODEL", "gpt-4o") %>
+  max_tokens: 1000
+  temperature: 0.3
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+  provider: "mock"
+
+production:
+  <<: *default
+
+# Configuration examples for different providers:
+#
+# OpenAI:
+#   LLM_PROVIDER=openai
+#   LLM_API_KEY=your-openai-api-key
+#   LLM_MODEL=gpt-4o (or gpt-4-turbo, gpt-3.5-turbo)
+#
+# Anthropic:
+#   LLM_PROVIDER=anthropic
+#   LLM_API_KEY=your-anthropic-api-key
+#   LLM_MODEL=claude-3-5-sonnet-20241022
+#
+# Google:
+#   LLM_PROVIDER=google
+#   LLM_API_KEY=your-google-api-key
+#   LLM_MODEL=gemini-1.5-flash (or gemini-1.5-pro)

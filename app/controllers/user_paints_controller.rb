@@ -217,6 +217,90 @@ class UserPaintsController < ApplicationController
     end
   end
 
+  def bulk_search_from_photo
+    photo = params[:photo]
+
+    unless photo.present?
+      flash.now[:alert] = "Please select a photo to analyze"
+      return render :bulk_import
+    end
+
+    # Check file size (5MB limit)
+    if photo.size > 5.megabytes
+      flash.now[:alert] = "Photo size must be less than 5MB. Your photo is #{(photo.size.to_f / 1.megabyte).round(2)}MB."
+      return render :bulk_import
+    end
+
+    begin
+      # Store photo info for display
+      @photo_info = {
+        filename: photo.original_filename,
+        size: photo.size,
+        content_type: photo.content_type
+      }
+      # Analyze the photo using our LLM service - pass the uploaded file directly
+      analyzer = PaintPhotoAnalyzer.new(photo)
+      identified_paints = analyzer.analyze
+
+      # Process the identified paints similar to bulk_search
+      @paint_names = identified_paints.map { |p| p[:search_string] }
+      @search_results = {}
+      @user_paint_statuses = {}
+
+      # Get all user's paints to check ownership status
+      user_paints = current_user.user_paints.includes(:paint).index_by(&:paint_id)
+
+      identified_paints.each do |paint_data|
+        search_string = paint_data[:search_string]
+        next if search_string.blank?
+
+        ids = [-1]
+
+        # Find top 10 matches for each paint
+        scope = Paint.limit(10).includes(:brand, :product_line)
+        matches = scope.full_search(search_string).to_a
+        if paint_data[:brand].present? && paint_data[:name].present? && matches.count < 10
+          ids += matches.pluck(:id)
+          matches += scope.full_search([paint_data[:brand], paint_data[:name]].join(" ")).where.not(id: ids).to_a
+        end
+        if paint_data[:code].present? && matches.count < 10
+          ids += matches.pluck(:id)
+          matches += scope.full_search(paint_data[:code]).where.not(id: ids).to_a
+        end
+        if paint_data[:name].present? && matches.count < 10
+          ids += matches.pluck(:id)
+          matches += scope.full_search(paint_data[:name]).where.not(id: ids).to_a
+        end
+
+        if matches.any?
+          # Sort so owned paints come first
+          sorted_matches = matches.sort_by { |paint| user_paints[paint.id] ? 0 : 1 }
+          @search_results[search_string] = sorted_matches
+
+          # Check ownership status for each paint match
+          sorted_matches.each do |paint|
+            if (user_paint = user_paints[paint.id])
+              @user_paint_statuses[paint.id] = user_paint.status
+            end
+          end
+        end
+      end
+
+      respond_to do |format|
+        format.turbo_stream { render :bulk_search }
+        format.html { render :bulk_search }
+      end
+    rescue PaintPhotoAnalyzer::AnalysisError => e
+      flash.now[:alert] = "Failed to analyze photo: #{e.message}"
+      render :bulk_import
+    rescue => e
+      Rails.logger.error "Photo analysis error: #{e.class} - #{e.message}"
+      Rails.logger.error e.backtrace.join("\n")
+      flash.now[:alert] = "An error occurred while analyzing the photo. Please try again."
+      render :bulk_import
+    end
+  end
+
   def destroy
     @user_paint.destroy
     respond_to do |format|
