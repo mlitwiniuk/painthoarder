@@ -69,22 +69,36 @@ export default class extends Controller {
           // Clear the file input
           event.target.value = "";
         } else {
-          // File size OK
+          // File size OK - show image preview
           uploadCard.classList.remove("border-error", "bg-error/5");
           uploadCard.classList.add("border-primary", "bg-primary/5");
-          const labelDiv = uploadCard.querySelector(".flex-col");
-          if (labelDiv) {
-            labelDiv.innerHTML = `
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-primary">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div class="mt-2">
-                <p class="text-lg font-medium text-primary">Photo selected!</p>
-                <p class="text-sm text-base-content/60">${file.name}</p>
-                <p class="text-xs text-base-content/50">${fileSizeMB} MB</p>
-              </div>
-            `;
-          }
+          
+          // Create a FileReader to display the image
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const labelDiv = uploadCard.querySelector(".flex-col");
+            if (labelDiv) {
+              labelDiv.innerHTML = `
+                <div class="relative">
+                  <img src="${e.target.result}" 
+                       alt="Selected photo preview" 
+                       class="max-h-48 rounded-lg shadow-lg object-contain mx-auto" />
+                  <div class="absolute top-2 right-2 badge badge-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Ready
+                  </div>
+                </div>
+                <div class="mt-3 text-center">
+                  <p class="text-sm font-medium text-base-content">${file.name}</p>
+                  <p class="text-xs text-base-content/60">${fileSizeMB} MB</p>
+                </div>
+              `;
+            }
+          };
+          reader.readAsDataURL(file);
+          
           // Enable submit button
           if (this.hasSubmitButtonTarget) {
             this.submitButtonTarget.disabled = false;
