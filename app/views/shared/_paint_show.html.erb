@@ -81,10 +81,12 @@
 
           <!-- Quick Actions (Mobile) -->
           <div class="absolute top-3 right-3 sm:hidden relative">
-            <% if @user_paint.in_collection? %>
-              <%= render 'user_paints/status_actions', user_paint: @user_paint %>
-            <% else %>
-              <%= render 'shared/add_to_collection_actions', user_paint: @user_paint %>
+            <% if user_signed_in? %>
+              <% if @user_paint.in_collection? %>
+                <%= render 'user_paints/status_actions', user_paint: @user_paint %>
+              <% else %>
+                <%= render 'shared/add_to_collection_actions', user_paint: @user_paint %>
+              <% end %>
             <% end %>
           </div>
         </div>
@@ -116,10 +118,18 @@
 
           <!-- Desktop Actions -->
           <div class="hidden sm:block relative">
-            <% if @user_paint.in_collection? %>
-              <%= render 'user_paints/status_actions', user_paint: @user_paint %>
+            <% if user_signed_in? %>
+              <% if @user_paint.in_collection? %>
+                <%= render 'user_paints/status_actions', user_paint: @user_paint %>
+              <% else %>
+                <%= render 'shared/add_to_collection_actions', user_paint: @user_paint %>
+              <% end %>
             <% else %>
-              <%= render 'shared/add_to_collection_actions', user_paint: @user_paint %>
+              <div class="flex items-center justify-center gap-3 p-3 bg-base-200/50 rounded-lg border border-base-300/30">
+                <span class="text-sm text-base-content/60">Want to track this paint?</span>
+                <%= link_to "Sign in", new_user_session_path, class: "btn btn-primary btn-sm" %>
+                <%= link_to "Sign up", new_user_registration_path, class: "btn btn-ghost btn-sm" %>
+              </div>
             <% end %>
           </div>
         </div>

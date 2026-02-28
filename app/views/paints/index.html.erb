@@ -105,10 +105,12 @@
         <%
           # Create a virtual UserPaint object for each paint
           # If the user already has this paint in their collection, use that
-          user_paint = if @user_paint_ids&.include?(paint.id)
+          user_paint = if user_signed_in? && @user_paint_ids&.include?(paint.id)
                         current_user.user_paints.find_by(paint_id: paint.id)
-                      else
+                      elsif user_signed_in?
                         UserPaint.new(paint: paint, user: current_user, virtual: true)
+                      else
+                        UserPaint.new(paint: paint, virtual: true)
                       end
         %>
         <%= render "paints/modern_catalog_card", user_paint: user_paint %>
