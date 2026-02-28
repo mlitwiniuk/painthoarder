@@ -147,6 +147,9 @@
     <!-- Modal Container -->
     <turbo-frame id="modal"></turbo-frame>
 
+    <!-- Shared Lightbox Modal (single instance for all lightbox controllers) -->
+    <%= render "shared/lightbox_modal" %>
+
     <!-- Modern Footer for Guests -->
     <% unless user_signed_in? %>
       <footer class="bg-base-100 border-t border-base-300">
