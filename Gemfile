@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.0.0"
+gem "rails", "~> 8.1.0"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use sqlite3 as the database for Active Record
@@ -72,12 +72,12 @@ group :test do
   gem "capybara"
   gem "minitest-spec-rails"
   gem "selenium-webdriver"
+  gem "mocha"
   gem "shoulda-context"
   gem "shoulda-matchers"
 end
 
 group :development do
-  gem "annotate", github: "mlitwiniuk/annotate_models"
   gem "better_errors"
   gem "claude-on-rails"
   gem "binding_of_caller"
@@ -94,6 +94,6 @@ gem "responders"
 gem "show_for"
 gem "simple_form"
 gem "simple-navigation"
-gem "httparty"
+gem "ruby_llm"
 
 gem "appsignal", "~> 4.5"

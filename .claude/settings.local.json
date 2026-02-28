@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "mcp__context7__resolve-library-id",
+      "WebFetch(domain:github.com)",
+      "mcp__context7__query-docs",
+      "WebFetch(domain:rubyllm.com)",
+      "WebFetch(domain:rubygems.org)",
+      "WebFetch(domain:guides.rubyonrails.org)",
+      "Bash(ruby:*)",
+      "Bash(bundle update:*)",
+      "Bash(bin/rails db:schema:dump:*)",
+      "Bash(bin/rails test:*)",
+      "Bash(gem list:*)",
+      "Bash(bundle exec:*)",
+      "Bash(gem search:*)",
+      "Bash(yarn info:*)",
+      "Bash(yarn npm:*)",
+      "Bash(yarn outdated:*)",
+      "Bash(yarn upgrade-interactive:*)"
+    ]
+  }
+}
