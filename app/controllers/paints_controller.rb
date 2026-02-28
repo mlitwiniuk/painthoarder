@@ -1,6 +1,6 @@
 # app/controllers/paints_controller.rb
 class PaintsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_user!, except: %i[index show similar]
   before_action :set_paint, only: [:show]
   include Filterable
 
@@ -23,7 +23,7 @@ class PaintsController < ApplicationController
     @color_categories = ColorCategorization::COLOR_CATEGORIES
 
     # Get IDs of paints the user already has a relationship with
-    @user_paint_ids = current_user.user_paints.pluck(:paint_id)
+    @user_paint_ids = user_signed_in? ? current_user.user_paints.pluck(:paint_id) : []
 
     respond_to do |format|
       format.html
@@ -33,9 +33,12 @@ class PaintsController < ApplicationController
 
   def show
     # Create or find UserPaint object (virtual if not in collection)
-    existing_user_paint = current_user.user_paints.find_by(paint_id: @paint.id)
-
-    @user_paint = existing_user_paint || UserPaint.new(paint: @paint, user: current_user, virtual: true)
+    if user_signed_in?
+      existing_user_paint = current_user.user_paints.find_by(paint_id: @paint.id)
+      @user_paint = existing_user_paint || UserPaint.new(paint: @paint, user: current_user, virtual: true)
+    else
+      @user_paint = UserPaint.new(paint: @paint, virtual: true)
+    end
 
     respond_to do |format|
       format.html
@@ -132,10 +135,14 @@ class PaintsController < ApplicationController
   # If the user already has the paint in their collection, use that
   # Otherwise, create a virtual UserPaint object for display purposes
   def map_paints_to_user_paints(paints)
-    user_paint_map = current_user.user_paints.where(paint_id: paints.map(&:id)).index_by(&:paint_id)
+    if user_signed_in?
+      user_paint_map = current_user.user_paints.where(paint_id: paints.map(&:id)).index_by(&:paint_id)
 
-    paints.map do |paint|
-      user_paint_map[paint.id] || UserPaint.new(paint: paint, user: current_user, virtual: true)
+      paints.map do |paint|
+        user_paint_map[paint.id] || UserPaint.new(paint: paint, user: current_user, virtual: true)
+      end
+    else
+      paints.map { |paint| UserPaint.new(paint: paint, virtual: true) }
     end
   end
 

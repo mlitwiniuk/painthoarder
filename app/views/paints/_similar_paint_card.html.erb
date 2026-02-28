@@ -38,25 +38,27 @@
     <% end %>
 
     <!-- Quick Action Button -->
-    <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-      <% if user_paint.virtual? %>
-        <%= link_to new_user_paint_path(paint_id: user_paint.paint.id),
-            data: { turbo_frame: "modal" },
-            class: "btn btn-circle btn-sm bg-base-100/90 hover:bg-base-100 text-base-content shadow-lg backdrop-blur-sm border-0" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
+    <% if user_signed_in? %>
+      <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <% if user_paint.virtual? %>
+          <%= link_to new_user_paint_path(paint_id: user_paint.paint.id),
+              data: { turbo_frame: "modal" },
+              class: "btn btn-circle btn-sm bg-base-100/90 hover:bg-base-100 text-base-content shadow-lg backdrop-blur-sm border-0" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+          <% end %>
+        <% else %>
+          <%= link_to user_paint_path(user_paint),
+              class: "btn btn-circle btn-sm bg-base-100/90 hover:bg-base-100 text-base-content shadow-lg backdrop-blur-sm border-0" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          <% end %>
         <% end %>
-      <% else %>
-        <%= link_to user_paint_path(user_paint),
-            class: "btn btn-circle btn-sm bg-base-100/90 hover:bg-base-100 text-base-content shadow-lg backdrop-blur-sm border-0" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-          </svg>
-        <% end %>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
 
     <!-- Brand Badge -->
     <div class="absolute bottom-3 left-3">
@@ -95,21 +97,23 @@
         View
       <% end %>
 
-      <% if user_paint.virtual? %>
-        <%= link_to new_user_paint_path(paint_id: user_paint.paint.id),
-            class: "btn btn-primary btn-sm flex-1",
-            data: { turbo_frame: "modal" } do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          Add
-        <% end %>
-      <% else %>
-        <%= link_to user_paint_path(user_paint), class: "btn btn-secondary btn-sm flex-1" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
-          Collection
+      <% if user_signed_in? %>
+        <% if user_paint.virtual? %>
+          <%= link_to new_user_paint_path(paint_id: user_paint.paint.id),
+              class: "btn btn-primary btn-sm flex-1",
+              data: { turbo_frame: "modal" } do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add
+          <% end %>
+        <% else %>
+          <%= link_to user_paint_path(user_paint), class: "btn btn-secondary btn-sm flex-1" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            Collection
+          <% end %>
         <% end %>
       <% end %>
     </div>
