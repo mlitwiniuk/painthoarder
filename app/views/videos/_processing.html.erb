@@ -1,0 +1,22 @@
+<div class="card bg-base-200 shadow-xl">
+  <div class="card-body text-center py-12">
+    <div class="flex flex-col items-center gap-4">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+      <div>
+        <h3 class="text-lg font-semibold mb-1">
+          <%= video.processing? ? "Analyzing Video..." : "Queued for Analysis" %>
+        </h3>
+        <p class="text-base-content/60 text-sm">
+          <% if video.processing? %>
+            Our AI is watching the video and identifying all the paints used. This may take a few minutes for longer videos.
+          <% else %>
+            Your video is in the queue and will be analyzed shortly.
+          <% end %>
+        </p>
+        <p class="text-base-content/40 text-xs mt-2">
+          Results will appear here automatically &mdash; no need to refresh.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

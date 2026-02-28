@@ -1,0 +1,53 @@
+<% content_for :title, "Analyze YouTube Video" %>
+
+<div class="min-h-screen bg-base-100">
+  <div class="max-w-2xl mx-auto p-4">
+    <div class="mb-6">
+      <%= link_to videos_path, class: "btn btn-ghost btn-sm gap-2" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back
+      <% end %>
+    </div>
+
+    <div class="card bg-base-200 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-2">Analyze YouTube Video</h2>
+        <p class="text-base-content/70 mb-6">
+          Paste a YouTube painting tutorial URL and our AI will extract the list of paints used in the video.
+        </p>
+
+        <div data-controller="video-form">
+          <%= form_with url: videos_path, method: :post, class: "space-y-6" do |f| %>
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">YouTube URL</span>
+              </label>
+              <input type="url" name="url" placeholder="https://www.youtube.com/watch?v=..." required
+                     class="input input-bordered w-full"
+                     data-video-form-target="urlInput"
+                     data-action="input->video-form#parseUrl" />
+              <label class="label">
+                <span class="label-text-alt text-base-content/50">Supports youtube.com and youtu.be links</span>
+              </label>
+            </div>
+
+            <!-- Thumbnail Preview -->
+            <div data-video-form-target="preview" class="hidden">
+              <div class="rounded-lg overflow-hidden border border-base-300">
+                <img data-video-form-target="thumbnail" src="" alt="Video thumbnail"
+                     class="w-full aspect-video object-cover" />
+              </div>
+            </div>
+
+            <div class="card-actions justify-end">
+              <%= f.submit "Analyze Video", class: "btn btn-primary",
+                  data: { video_form_target: "submitBtn" } %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

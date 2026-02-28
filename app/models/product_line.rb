@@ -21,6 +21,8 @@ class ProductLine < ApplicationRecord
   ## ASSOCIATIONS
   belongs_to :brand
   has_many :paints, dependent: :destroy
+  has_many :product_line_similarities, dependent: :destroy
+  has_many :similar_product_lines, through: :product_line_similarities
 
   ## VALIDATIONS
   validates :name, presence: true

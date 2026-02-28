@@ -13,6 +13,10 @@
 #  index_brands_on_name  (name) UNIQUE
 #
 class Brand < ApplicationRecord
+  ## FRIENDLY ID
+  extend FriendlyId
+  friendly_id :name, use: [:slugged, :history]
+
   ## ATTRIBUTES
   has_one_attached :logo
 
