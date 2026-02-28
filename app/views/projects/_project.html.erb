@@ -1,7 +1,7 @@
 <article id="<%= dom_id project %>" class="break-inside-avoid card bg-base-100 shadow hover:shadow-lg transition relative">
   <figure class="aspect-video overflow-hidden">
     <% if project.cover_photo.attached? %>
-      <%= image_tag project.cover_photo.variant(resize_to_limit: [600, 400]), class: "w-full h-full object-cover" %>
+      <%= image_tag optimized_variant(project.cover_photo, :card), class: "w-full h-full object-cover" %>
     <% else %>
       <div class="w-full h-full flex items-center justify-center bg-base-200 text-base-content/50">No cover</div>
     <% end %>

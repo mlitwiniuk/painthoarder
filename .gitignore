@@ -52,3 +52,6 @@ claude-swarm.log
 CLAUDE.md
 claude-swarm.yml
 .kamal
+/.yarn
+/.yarnrc
+/.yarnrc.yml
