@@ -96,7 +96,7 @@ GEM
       activesupport (>= 6.1)
     addressable (2.8.9)
       public_suffix (>= 2.0.2, < 8.0)
-    appsignal (4.5.8)
+    appsignal (4.8.3)
       logger
       rack (>= 2.0.0)
     ast (2.4.3)
@@ -662,7 +662,7 @@ PLATFORMS
 DEPENDENCIES
   active_storage_validations
   acts_as_list
-  appsignal (~> 4.5)
+  appsignal (~> 4.8)
   aws-sdk-s3
   better_errors
   binding_of_caller

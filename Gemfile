@@ -98,4 +98,4 @@ gem "ruby_llm"
 gem "ruby_llm-schema"
 gem "youtube-transcript-rb"
 
-gem "appsignal", "~> 4.5"
+gem "appsignal", "~> 4.8"
