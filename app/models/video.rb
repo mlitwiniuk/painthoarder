@@ -18,11 +18,7 @@ class Video < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
 
   def slug_candidates
-    [[:user_username, :title]]
-  end
-
-  def user_username
-    user&.username
+    [[:author_name, :title]]
   end
 
   def should_generate_new_friendly_id?
