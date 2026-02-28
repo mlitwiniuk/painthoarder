@@ -7,12 +7,12 @@
         <% if photos.count == 1 %>
           <!-- Single photo -->
           <figure class="relative group cursor-pointer">
-            <%= image_tag photos.first.variant(resize_to_fill: [600,400]),
+            <%= image_tag optimized_variant(photos.first, :card),
                 class: "w-full h-48 md:h-56 object-cover",
                 data: {
                   lightbox_target: "thumbnail",
                   action: "click->lightbox#open",
-                  full_url: url_for(photos.first)
+                  full_url: url_for(optimized_variant(photos.first, :large))
                 } %>
             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
             <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -26,12 +26,12 @@
           <div class="grid grid-cols-2 gap-0.5">
             <% photos.each do |photo| %>
               <figure class="relative group cursor-pointer">
-                <%= image_tag photo.variant(resize_to_fill: [300,300]),
+                <%= image_tag optimized_variant(photo, :thumb),
                     class: "w-full h-32 md:h-40 object-cover",
                     data: {
                       lightbox_target: "thumbnail",
                       action: "click->lightbox#open",
-                      full_url: url_for(photo)
+                      full_url: url_for(optimized_variant(photo, :large))
                     } %>
                 <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
               </figure>
@@ -41,24 +41,24 @@
           <!-- Three photos: one large, two small -->
           <div class="grid grid-cols-2 gap-0.5 h-48 md:h-56">
             <figure class="relative group cursor-pointer">
-              <%= image_tag photos.first.variant(resize_to_fill: [400,400]),
+              <%= image_tag optimized_variant(photos.first, :card),
                   class: "w-full h-full object-cover",
                   data: {
                     lightbox_target: "thumbnail",
                     action: "click->lightbox#open",
-                    full_url: url_for(photos.first)
+                    full_url: url_for(optimized_variant(photos.first, :large))
                   } %>
               <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
             </figure>
             <div class="grid grid-rows-2 gap-0.5">
               <% photos[1..2].each do |photo| %>
                 <figure class="relative group cursor-pointer">
-                  <%= image_tag photo.variant(resize_to_fill: [200,200]),
+                  <%= image_tag optimized_variant(photo, :thumb),
                       class: "w-full h-full object-cover",
                       data: {
                         lightbox_target: "thumbnail",
                         action: "click->lightbox#open",
-                        full_url: url_for(photo)
+                        full_url: url_for(optimized_variant(photo, :large))
                       } %>
                   <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                 </figure>
@@ -69,33 +69,33 @@
           <!-- Four or more photos: show first 3 + overlay -->
           <div class="grid grid-cols-2 gap-0.5 h-48 md:h-56">
             <figure class="relative group cursor-pointer">
-              <%= image_tag photos.first.variant(resize_to_fill: [400,400]),
+              <%= image_tag optimized_variant(photos.first, :card),
                   class: "w-full h-full object-cover",
                   data: {
                     lightbox_target: "thumbnail",
                     action: "click->lightbox#open",
-                    full_url: url_for(photos.first)
+                    full_url: url_for(optimized_variant(photos.first, :large))
                   } %>
               <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
             </figure>
             <div class="grid grid-rows-2 gap-0.5">
               <figure class="relative group cursor-pointer">
-                <%= image_tag photos[1].variant(resize_to_fill: [200,200]),
+                <%= image_tag optimized_variant(photos[1], :thumb),
                     class: "w-full h-full object-cover",
                     data: {
                       lightbox_target: "thumbnail",
                       action: "click->lightbox#open",
-                      full_url: url_for(photos[1])
+                      full_url: url_for(optimized_variant(photos[1], :large))
                     } %>
                 <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
               </figure>
               <figure class="relative group cursor-pointer">
-                <%= image_tag photos[2].variant(resize_to_fill: [200,200]),
+                <%= image_tag optimized_variant(photos[2], :thumb),
                     class: "w-full h-full object-cover",
                     data: {
                       lightbox_target: "thumbnail",
                       action: "click->lightbox#open",
-                      full_url: url_for(photos[2])
+                      full_url: url_for(optimized_variant(photos[2], :large))
                     } %>
                 <div class="absolute inset-0 bg-black/50 group-hover:bg-black/60 transition-colors duration-300 flex items-center justify-center">
                   <span class="text-white font-bold text-lg">

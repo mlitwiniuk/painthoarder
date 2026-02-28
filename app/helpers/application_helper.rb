@@ -92,10 +92,10 @@ module ApplicationHelper
     end
 
     image_url = if project.cover_photo.attached?
-      project.cover_photo.variant(resize_to_fill: [1200, 630]).processed.url
+      optimized_variant(project.cover_photo, :og).processed.url
     elsif project.project_updates.joins(:photos_attachments).any?
       recent_photo = project.project_updates.joins(:photos_attachments).first&.photos&.first
-      recent_photo ? recent_photo.variant(resize_to_fill: [1200, 630]).processed.url : asset_url("og-default.png")
+      recent_photo ? optimized_variant(recent_photo, :og).processed.url : asset_url("og-default.png")
     else
       asset_url("og-project.png")
     end
@@ -201,10 +201,10 @@ module ApplicationHelper
     author_name = project.user.username.present? ? project.user.username : project.user.email.split("@").first
 
     image_url = if project.cover_photo.attached?
-      project.cover_photo.variant(resize_to_limit: [1200, 630]).processed.url
+      optimized_variant(project.cover_photo, :og).processed.url
     elsif project.project_updates.joins(:photos_attachments).any?
       recent_photo = project.project_updates.joins(:photos_attachments).first&.photos&.first
-      recent_photo ? recent_photo.variant(resize_to_limit: [1200, 630]).processed.url : asset_url("og-project.png")
+      recent_photo ? optimized_variant(recent_photo, :og).processed.url : asset_url("og-project.png")
     else
       asset_url("og-project.png")
     end

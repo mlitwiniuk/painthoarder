@@ -124,7 +124,7 @@
             <% if project.cover_photo.attached? %>
               <div class="mt-3 cursor-pointer" onclick="window.location='<%= project.visibility == 'private' ? project_url(project) : restricted_project_url(project.secret_token) %>'">
                 <div class="aspect-[4/3] w-full overflow-hidden">
-                  <%= image_tag project.cover_photo.variant(resize_to_limit: [800,600]),
+                  <%= image_tag optimized_variant(project.cover_photo, :card),
                       class: "w-full h-full object-cover hover:brightness-95 transition-all" %>
                 </div>
               </div>
@@ -135,25 +135,25 @@
                 <div class="mt-3 cursor-pointer" onclick="window.location='<%= project.visibility == 'private' ? project_url(project) : restricted_project_url(project.secret_token) %>'">
                   <% if recent_photos.count == 1 %>
                     <div class="aspect-[4/3] w-full overflow-hidden">
-                      <%= image_tag recent_photos.first.variant(resize_to_limit: [800,600]),
+                      <%= image_tag optimized_variant(recent_photos.first, :card),
                           class: "w-full h-full object-cover hover:brightness-95 transition-all" %>
                     </div>
                   <% elsif recent_photos.count == 2 %>
                     <div class="grid grid-cols-2 gap-1 aspect-[4/3] overflow-hidden">
                       <% recent_photos.take(2).each do |photo| %>
-                        <%= image_tag photo.variant(resize_to_fill: [400,300]),
+                        <%= image_tag optimized_variant(photo, :card),
                             class: "w-full h-full object-cover hover:brightness-95 transition-all" %>
                       <% end %>
                     </div>
                   <% else %>
                     <div class="grid grid-cols-2 gap-1 aspect-[4/3] overflow-hidden">
-                      <%= image_tag recent_photos.first.variant(resize_to_fill: [400,300]),
+                      <%= image_tag optimized_variant(recent_photos.first, :card),
                           class: "w-full h-full object-cover hover:brightness-95 transition-all" %>
                       <div class="grid grid-rows-2 gap-1">
-                        <%= image_tag recent_photos.second.variant(resize_to_fill: [400,150]),
+                        <%= image_tag optimized_variant(recent_photos.second, :card),
                             class: "w-full h-full object-cover hover:brightness-95 transition-all" %>
                         <div class="relative">
-                          <%= image_tag recent_photos.third.variant(resize_to_fill: [400,150]),
+                          <%= image_tag optimized_variant(recent_photos.third, :card),
                               class: "w-full h-full object-cover" %>
                           <% if recent_photos.count > 3 %>
                             <div class="absolute inset-0 bg-black/60 flex items-center justify-center hover:bg-black/70 transition-colors">

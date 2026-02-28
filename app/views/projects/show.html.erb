@@ -57,7 +57,7 @@
       <!-- Cover Photo -->
       <% if @project.cover_photo.attached? %>
         <div class="aspect-[4/3] w-full overflow-hidden">
-          <%= image_tag @project.cover_photo.variant(resize_to_limit: [1600,1200]),
+          <%= image_tag optimized_variant(@project.cover_photo, :cover),
               class: "w-full h-full object-cover" %>
         </div>
       <% end %>
@@ -216,12 +216,12 @@
                 <% if photos.count == 1 %>
                   <!-- Single photo -->
                   <div class="rounded-lg overflow-hidden cursor-pointer group max-w-md">
-                    <%= image_tag photos.first.variant(resize_to_limit: [600,600]),
+                    <%= image_tag optimized_variant(photos.first, :medium),
                         class: "w-full object-cover group-hover:brightness-95 transition-all",
                         data: {
                           lightbox_target: "thumbnail",
                           action: "click->lightbox#open",
-                          full_url: url_for(photos.first)
+                          full_url: url_for(optimized_variant(photos.first, :large))
                         } %>
                   </div>
                 <% elsif photos.count == 2 %>
@@ -229,12 +229,12 @@
                   <div class="grid grid-cols-2 gap-1 rounded-lg overflow-hidden max-w-md">
                     <% photos.each do |photo| %>
                       <div class="cursor-pointer group aspect-square">
-                        <%= image_tag photo.variant(resize_to_fill: [300,300]),
+                        <%= image_tag optimized_variant(photo, :thumb),
                             class: "w-full h-full object-cover group-hover:brightness-95 transition-all",
                             data: {
                               lightbox_target: "thumbnail",
                               action: "click->lightbox#open",
-                              full_url: url_for(photo)
+                              full_url: url_for(optimized_variant(photo, :large))
                             } %>
                       </div>
                     <% end %>
@@ -243,23 +243,23 @@
                   <!-- Three photos: one large, two small -->
                   <div class="grid grid-cols-2 gap-1 rounded-lg overflow-hidden max-w-md aspect-[4/3]">
                     <div class="cursor-pointer group">
-                      <%= image_tag photos.first.variant(resize_to_fill: [300,400]),
+                      <%= image_tag optimized_variant(photos.first, :thumb),
                           class: "w-full h-full object-cover group-hover:brightness-95 transition-all",
                           data: {
                             lightbox_target: "thumbnail",
                             action: "click->lightbox#open",
-                            full_url: url_for(photos.first)
+                            full_url: url_for(optimized_variant(photos.first, :large))
                           } %>
                     </div>
                     <div class="grid grid-rows-2 gap-1">
                       <% photos[1..2].each do |photo| %>
                         <div class="cursor-pointer group">
-                          <%= image_tag photo.variant(resize_to_fill: [200,200]),
+                          <%= image_tag optimized_variant(photo, :thumb),
                               class: "w-full h-full object-cover group-hover:brightness-95 transition-all",
                               data: {
                                 lightbox_target: "thumbnail",
                                 action: "click->lightbox#open",
-                                full_url: url_for(photo)
+                                full_url: url_for(optimized_variant(photo, :large))
                               } %>
                         </div>
                       <% end %>
@@ -269,31 +269,31 @@
                   <!-- Four or more photos: show first 3 + overlay -->
                   <div class="grid grid-cols-2 gap-1 rounded-lg overflow-hidden max-w-md aspect-[4/3]">
                     <div class="cursor-pointer group">
-                      <%= image_tag photos[0].variant(resize_to_fill: [300,300]),
+                      <%= image_tag optimized_variant(photos[0], :thumb),
                           class: "w-full h-full object-cover group-hover:brightness-95 transition-all",
                           data: {
                             lightbox_target: "thumbnail",
                             action: "click->lightbox#open",
-                            full_url: url_for(photos.first)
+                            full_url: url_for(optimized_variant(photos.first, :large))
                           } %>
                     </div>
                     <div class="grid grid-rows-2 gap-1">
                       <div class="cursor-pointer group">
-                        <%= image_tag photos[1].variant(resize_to_fill: [300,150]),
+                        <%= image_tag optimized_variant(photos[1], :thumb),
                             class: "w-full h-full object-cover group-hover:brightness-95 transition-all",
                             data: {
                               lightbox_target: "thumbnail",
                               action: "click->lightbox#open",
-                              full_url: url_for(photos[1])
+                              full_url: url_for(optimized_variant(photos[1], :large))
                             } %>
                       </div>
                       <div class="relative cursor-pointer group">
-                        <%= image_tag photos[2].variant(resize_to_fill: [300,150]),
+                        <%= image_tag optimized_variant(photos[2], :thumb),
                             class: "w-full h-full object-cover",
                             data: {
                               lightbox_target: "thumbnail",
                               action: "click->lightbox#open",
-                              full_url: url_for(photos[2])
+                              full_url: url_for(optimized_variant(photos[2], :large))
                             } %>
                         <div class="absolute inset-0 bg-black/60 flex items-center justify-center group-hover:bg-black/70 transition-colors">
                           <span class="text-white font-bold text-lg">
@@ -301,12 +301,12 @@
                           </span>
                             <% if photos.size > 4 %>
                               <% photos[3..-1].each do |photo| %>
-                                <%= image_tag photo.variant(resize_to_fill: [10,10]),
+                                <%= image_tag optimized_variant(photo, :thumb),
                                     class: "hidden",
                                     data: {
                                       lightbox_target: "thumbnail",
                                       action: "click->lightbox#open",
-                                      full_url: url_for(photo)
+                                      full_url: url_for(optimized_variant(photo, :large))
                                     } %>
                               <% end %>
                             <% end %>
