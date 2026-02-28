@@ -72,4 +72,9 @@ Rails.application.configure do
 
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = {database: {writing: :queue}}
+
+  # Log Solid Queue and Active Job activity to STDOUT so it shows in bin/dev output
+  config.solid_queue.logger = ActiveSupport::Logger.new(STDOUT, level: :info)
+  config.solid_queue.on_thread_error = ->(error) { Rails.logger.error("SolidQueue error: #{error.message}\n#{error.backtrace&.first(5)&.join("\n")}") }
+
 end

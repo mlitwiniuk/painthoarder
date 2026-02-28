@@ -1,6 +1,14 @@
 #!/usr/bin/env ruby
 
 require_relative "../config/environment"
+
+# Broadcast Rails.logger to STDOUT so Active Job logs are visible in bin/dev
+if Rails.env.development?
+  stdout_logger = ActiveSupport::Logger.new(STDOUT)
+  stdout_logger.formatter = Rails.logger.formatter || Logger::Formatter.new
+  Rails.logger.broadcast_to(stdout_logger)
+end
+
 require "solid_queue/cli"
 
 SolidQueue::Cli.start(ARGV)

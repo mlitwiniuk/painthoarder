@@ -1,0 +1,47 @@
+<% show_status = local_assigns.fetch(:show_status, false) %>
+
+<div class="card bg-base-200 shadow-md hover:shadow-lg transition-shadow">
+  <%= link_to video_path(video), class: "block" do %>
+    <!-- Thumbnail -->
+    <div class="aspect-video w-full overflow-hidden rounded-t-2xl bg-base-300 relative">
+      <img src="<%= video.thumbnail_url || video.default_thumbnail_url %>"
+           alt="<%= video.title %>"
+           class="w-full h-full object-cover"
+           loading="lazy"
+           onerror="this.src='https://img.youtube.com/vi/<%= video.youtube_video_id %>/hqdefault.jpg'" />
+
+      <% if show_status && !video.completed? %>
+        <div class="absolute top-2 right-2">
+          <span class="badge badge-<%= video.pending? ? 'warning' : video.processing? ? 'info' : 'error' %> badge-sm">
+            <%= video.status %>
+          </span>
+        </div>
+      <% end %>
+
+      <!-- Paint count badge -->
+      <% if video.completed? && video.video_paints.any? %>
+        <div class="absolute bottom-2 right-2">
+          <span class="badge badge-primary badge-sm gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+            </svg>
+            <%= video.video_paints.count %> paints
+          </span>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Card Body -->
+    <div class="p-4">
+      <h3 class="font-semibold text-sm text-base-content line-clamp-2 mb-1">
+        <%= video.title || "Untitled Video" %>
+      </h3>
+      <% if video.author_name.present? %>
+        <p class="text-xs text-base-content/50"><%= video.author_name %></p>
+      <% end %>
+      <p class="text-xs text-base-content/40 mt-1">
+        <%= time_ago_in_words(video.created_at) %> ago
+      </p>
+    </div>
+  <% end %>
+</div>

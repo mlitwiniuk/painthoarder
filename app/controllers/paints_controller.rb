@@ -169,16 +169,27 @@ class PaintsController < ApplicationController
     return [] unless paint
     paint_id = paint.id
 
-    # Use PostgreSQL's distance calculation between RGB values
     red = paint.red
     green = paint.green
     blue = paint.blue
 
-    # Calculate Euclidean distance in RGB space
-    paints = Paint.where.not(id: paint_id)
-      .select("paints.*, SQRT(POWER(paints.red - #{red.to_i}, 2) +
+    # Get similar product line IDs for boosting
+    similar_pl_ids = paint.product_line.similar_product_line_ids
+
+    # Calculate Euclidean distance in RGB space, with boost for similar product lines
+    distance_sql = "SQRT(POWER(paints.red - #{red.to_i}, 2) +
               POWER(paints.green - #{green.to_i}, 2) +
-              POWER(paints.blue - #{blue.to_i}, 2)) AS color_distance")
+              POWER(paints.blue - #{blue.to_i}, 2))"
+
+    if similar_pl_ids.any?
+      boosted_sql = "CASE WHEN paints.product_line_id IN (#{similar_pl_ids.join(",")}) " \
+                    "THEN #{distance_sql} * 0.7 ELSE #{distance_sql} END"
+    else
+      boosted_sql = distance_sql
+    end
+
+    paints = Paint.where.not(id: paint_id)
+      .select("paints.*, #{distance_sql} AS color_distance, #{boosted_sql} AS boosted_distance")
       .includes(product_line: :brand)
 
     # Apply brand filter if provided
@@ -187,7 +198,7 @@ class PaintsController < ApplicationController
         .where(product_lines: {brand_id: brand_ids})
     end
 
-    paints = paints.order("color_distance ASC")
+    paints = paints.order("boosted_distance ASC")
       .limit(per_page)
       .offset((page - 1) * per_page)
     map_paints_to_user_paints(paints)
@@ -197,19 +208,27 @@ class PaintsController < ApplicationController
     return [] unless paint
     paint_id = paint.id
 
-    # Use RGB for now as a placeholder, since we don't have HSL values directly
-    # In a real implementation, we'd convert RGB to HSL and compare in HSL space
     red = paint.red
     green = paint.green
     blue = paint.blue
 
-    # Calculate weighted distance that emphasizes color similarities that would be
-    # perceptually similar in HSL space
-    paints = Paint.where.not(id: paint_id)
-      .select("paints.*, (
-              ABS(paints.red - #{red.to_i}) +
+    # Get similar product line IDs for boosting
+    similar_pl_ids = paint.product_line.similar_product_line_ids
+
+    # Calculate weighted distance that emphasizes perceptual similarity
+    distance_sql = "(ABS(paints.red - #{red.to_i}) +
               ABS(paints.green - #{green.to_i}) +
-              ABS(paints.blue - #{blue.to_i})) AS color_distance")
+              ABS(paints.blue - #{blue.to_i}))"
+
+    if similar_pl_ids.any?
+      boosted_sql = "CASE WHEN paints.product_line_id IN (#{similar_pl_ids.join(",")}) " \
+                    "THEN #{distance_sql} * 0.7 ELSE #{distance_sql} END"
+    else
+      boosted_sql = distance_sql
+    end
+
+    paints = Paint.where.not(id: paint_id)
+      .select("paints.*, #{distance_sql} AS color_distance, #{boosted_sql} AS boosted_distance")
       .includes(product_line: :brand)
 
     # Apply brand filter if provided
@@ -218,7 +237,7 @@ class PaintsController < ApplicationController
         .where(product_lines: {brand_id: brand_ids})
     end
 
-    paints = paints.order("color_distance ASC")
+    paints = paints.order("boosted_distance ASC")
       .limit(per_page)
       .offset((page - 1) * per_page)
     map_paints_to_user_paints(paints)

@@ -44,6 +44,14 @@ Rails.application.routes.draw do
   end
   get "/p/:token", to: "projects#restricted", as: :restricted_project
 
+  # Videos
+  resources :videos, only: [:index, :new, :create, :show, :destroy] do
+    collection do
+      get :public, to: "videos#public_index"
+    end
+    get "alternatives/:brand_slug", action: :alternatives, on: :member, as: :alternatives
+  end
+
   resources :pages
 
   root "pages#welcome"

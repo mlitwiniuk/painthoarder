@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_06_22_183459) do
+ActiveRecord::Schema[8.1].define(version: 2025_06_28_000005) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -52,9 +52,11 @@ ActiveRecord::Schema[8.1].define(version: 2025_06_22_183459) do
   create_table "brands", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
+    t.string "slug"
     t.datetime "updated_at", null: false
     t.string "url"
     t.index ["name"], name: "index_brands_on_name", unique: true
+    t.index ["slug"], name: "index_brands_on_slug", unique: true
   end
 
   create_table "friendly_id_slugs", force: :cascade do |t|
@@ -100,6 +102,16 @@ ActiveRecord::Schema[8.1].define(version: 2025_06_22_183459) do
     t.integer "red"
     t.datetime "updated_at", null: false
     t.index ["product_line_id"], name: "index_paints_on_product_line_id"
+  end
+
+  create_table "product_line_similarities", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "product_line_id", null: false
+    t.integer "similar_product_line_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_line_id", "similar_product_line_id"], name: "idx_product_line_similarities_unique", unique: true
+    t.index ["product_line_id"], name: "index_product_line_similarities_on_product_line_id"
+    t.index ["similar_product_line_id"], name: "index_product_line_similarities_on_similar_product_line_id"
   end
 
   create_table "product_lines", force: :cascade do |t|
@@ -180,11 +192,49 @@ ActiveRecord::Schema[8.1].define(version: 2025_06_22_183459) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  create_table "video_paints", force: :cascade do |t|
+    t.string "brand_name"
+    t.string "context"
+    t.datetime "created_at", null: false
+    t.string "hex_color"
+    t.string "paint_code"
+    t.integer "paint_id"
+    t.string "paint_name"
+    t.string "paint_type"
+    t.string "product_line_name"
+    t.string "timestamp"
+    t.datetime "updated_at", null: false
+    t.integer "video_id", null: false
+    t.index ["paint_id"], name: "index_video_paints_on_paint_id"
+    t.index ["video_id"], name: "index_video_paints_on_video_id"
+  end
+
+  create_table "videos", force: :cascade do |t|
+    t.string "author_name"
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.datetime "processed_at"
+    t.text "raw_response"
+    t.string "slug"
+    t.integer "status", default: 0, null: false
+    t.string "thumbnail_url"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.string "youtube_video_id", null: false
+    t.index ["slug"], name: "index_videos_on_slug", unique: true
+    t.index ["status", "created_at"], name: "index_videos_on_status_and_created_at"
+    t.index ["user_id"], name: "index_videos_on_user_id"
+    t.index ["youtube_video_id"], name: "index_videos_on_youtube_video_id", unique: true
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "paint_usages", "project_updates", on_delete: :cascade
   add_foreign_key "paint_usages", "user_paints", on_delete: :cascade
   add_foreign_key "paints", "product_lines"
+  add_foreign_key "product_line_similarities", "product_lines"
+  add_foreign_key "product_line_similarities", "product_lines", column: "similar_product_line_id"
   add_foreign_key "product_lines", "brands"
   add_foreign_key "project_updates", "active_storage_attachments", column: "primary_photo_id", on_delete: :nullify
   add_foreign_key "project_updates", "projects", on_delete: :cascade
@@ -192,6 +242,9 @@ ActiveRecord::Schema[8.1].define(version: 2025_06_22_183459) do
   add_foreign_key "projects", "users", on_delete: :cascade
   add_foreign_key "user_paints", "paints"
   add_foreign_key "user_paints", "users"
+  add_foreign_key "video_paints", "paints"
+  add_foreign_key "video_paints", "videos", on_delete: :cascade
+  add_foreign_key "videos", "users", on_delete: :cascade
 
   # Virtual tables defined in this database.
   # Note that virtual tables may not work with other database engines. Be careful if changing database.

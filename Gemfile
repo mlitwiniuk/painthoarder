@@ -95,5 +95,7 @@ gem "show_for"
 gem "simple_form"
 gem "simple-navigation"
 gem "ruby_llm"
+gem "ruby_llm-schema"
+gem "youtube-transcript-rb"
 
 gem "appsignal", "~> 4.5"
