@@ -49,7 +49,7 @@
       <% if video.video_paints.any? %>
         <div class="divide-y divide-base-300">
           <% video.video_paints.includes(paint: { product_line: :brand }).order(:created_at).each do |video_paint| %>
-            <%= render "videos/video_paint", video_paint: video_paint, alternatives: alternatives[video_paint.id] %>
+            <%= render "videos/video_paint", video_paint: video_paint, video: video, alternatives: alternatives[video_paint.id] %>
           <% end %>
         </div>
       <% else %>

@@ -1,0 +1,50 @@
+<%= turbo_frame_tag dom_id(@video_paint) do %>
+  <div class="py-3 flex items-start gap-3">
+    <!-- Color Swatch -->
+    <% swatch_color = @video_paint.hex_color %>
+    <% if swatch_color.present? %>
+      <div class="w-10 h-10 rounded-lg border border-base-300 shadow-inner flex-shrink-0"
+           style="background-color: <%= swatch_color %>;"></div>
+    <% else %>
+      <div class="w-10 h-10 rounded-lg border border-base-300 bg-base-300 flex-shrink-0 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+    <% end %>
+
+    <!-- Edit Form -->
+    <div class="flex-1 min-w-0" data-controller="video-paint-search">
+      <div class="text-xs text-base-content/50 mb-1">
+        Editing: <strong><%= @video_paint.brand_name %> &mdash; <%= @video_paint.paint_name %></strong>
+      </div>
+
+      <%= form_with(url: video_video_paint_path(@video, @video_paint), method: :patch, data: { video_paint_search_target: "form" }) do |f| %>
+        <input type="hidden" name="video_paint[paint_id]" value="<%= @video_paint.paint_id %>" data-video-paint-search-target="paintId">
+
+        <div class="relative">
+          <input type="text"
+                 placeholder="Search catalog paints..."
+                 class="input input-bordered input-sm w-full"
+                 data-video-paint-search-target="input"
+                 data-action="input->video-paint-search#search"
+                 autocomplete="off">
+
+          <!-- Results dropdown -->
+          <div class="absolute z-50 top-full left-0 right-0 mt-1 bg-base-100 border border-base-300 rounded-lg shadow-xl max-h-60 overflow-y-auto hidden"
+               data-video-paint-search-target="results">
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 mt-2">
+          <% if @video_paint.matched? %>
+            <button type="button" class="btn btn-warning btn-xs" data-action="click->video-paint-search#clear">
+              Clear match
+            </button>
+          <% end %>
+          <%= link_to "Cancel", video_path(@video), class: "btn btn-ghost btn-xs", data: { turbo_frame: dom_id(@video_paint) } %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

@@ -1,9 +1,9 @@
 module Api
   class PaintsController < ApplicationController
-    before_action :authenticate_user!
+    before_action :authenticate_user!, except: [:index]
 
     def index
-      @paints = Paint.includes(:product_line).order(:name)
+      @paints = Paint.includes(product_line: :brand).order(:name)
 
       if params[:product_line_id].present?
         @paints = @paints.where(product_line_id: params[:product_line_id])
@@ -13,12 +13,14 @@ module Api
         @paints = @paints.where("paints.name LIKE ? OR paints.code LIKE ?", "%#{params[:query]}%", "%#{params[:query]}%")
       end
 
-      render json: @paints.map { |paint|
+      render json: @paints.limit(50).map { |paint|
         {
           id: paint.id,
           text: "#{paint.name} (#{paint.code})",
           color: paint.hex_color,
-          product_line_id: paint.product_line_id
+          product_line_id: paint.product_line_id,
+          brand_name: paint.brand&.name,
+          product_line_name: paint.product_line&.name
         }
       }
     end

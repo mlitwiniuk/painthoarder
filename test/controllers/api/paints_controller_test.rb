@@ -22,9 +22,9 @@ class Api::PaintsControllerTest < ActionDispatch::IntegrationTest
       hex_color: "#CC0000")
   end
 
-  test "should require authentication for index" do
+  test "index is publicly accessible without authentication" do
     get api_paints_url, as: :json
-    assert_response :unauthorized
+    assert_response :success
   end
 
   test "should require authentication for show" do
@@ -45,7 +45,9 @@ class Api::PaintsControllerTest < ActionDispatch::IntegrationTest
       "id" => @paint1.id,
       "text" => "Abaddon Black (AB01)",
       "color" => "#808080",
-      "product_line_id" => @paint1.product_line_id
+      "product_line_id" => @paint1.product_line_id,
+      "brand_name" => @paint1.brand&.name,
+      "product_line_name" => @paint1.product_line&.name
     }, response_data.find { |p| p["id"] == @paint1.id })
   end
 

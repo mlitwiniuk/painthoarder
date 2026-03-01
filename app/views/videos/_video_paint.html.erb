@@ -1,117 +1,128 @@
 <% signed_in = respond_to?(:user_signed_in?) && (request&.env&.key?("warden") ? user_signed_in? : false) %>
+<% is_owner = signed_in && local_assigns[:video] && current_user == video.user %>
 
-<div class="py-3 flex items-start gap-3">
-  <!-- Color Swatch -->
-  <% swatch_color = video_paint.hex_color %>
-  <% if swatch_color.present? %>
-    <div class="w-10 h-10 rounded-lg border border-base-300 shadow-inner flex-shrink-0"
-         style="background-color: <%= swatch_color %>;"
-         title="<%= swatch_color %><%= ' (estimated)' unless video_paint.matched? %>"></div>
-  <% else %>
-    <div class="w-10 h-10 rounded-lg border border-base-300 bg-base-300 flex-shrink-0 flex items-center justify-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    </div>
-  <% end %>
+<%= turbo_frame_tag dom_id(video_paint) do %>
+  <div class="py-3 flex items-start gap-3">
+    <!-- Color Swatch -->
+    <% swatch_color = video_paint.hex_color %>
+    <% if swatch_color.present? %>
+      <div class="w-10 h-10 rounded-lg border border-base-300 shadow-inner flex-shrink-0"
+           style="background-color: <%= swatch_color %>;"
+           title="<%= swatch_color %><%= ' (estimated)' unless video_paint.matched? %>"></div>
+    <% else %>
+      <div class="w-10 h-10 rounded-lg border border-base-300 bg-base-300 flex-shrink-0 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+    <% end %>
 
-  <!-- Paint Info -->
-  <div class="flex-1 min-w-0">
-    <div class="flex items-start justify-between gap-2">
-      <div>
-        <% if video_paint.matched? %>
-          <%= link_to paint_path(video_paint.paint), class: "font-semibold text-base-content hover:text-primary transition-colors" do %>
-            <%= video_paint.paint.brand_name %> &mdash; <%= video_paint.paint.name %>
-          <% end %>
-        <% else %>
-          <span class="font-semibold text-base-content">
-            <%= video_paint.brand_name %>
-            <% if video_paint.paint_name.present? %>
-              &mdash; <%= video_paint.paint_name %>
+    <!-- Paint Info -->
+    <div class="flex-1 min-w-0">
+      <div class="flex items-start justify-between gap-2">
+        <div>
+          <% if video_paint.matched? %>
+            <%= link_to paint_path(video_paint.paint), class: "font-semibold text-base-content hover:text-primary transition-colors" do %>
+              <%= video_paint.paint.brand_name %> &mdash; <%= video_paint.paint.name %>
             <% end %>
-          </span>
-          <span class="badge badge-warning badge-xs ml-2">unmatched</span>
-        <% end %>
+          <% else %>
+            <span class="font-semibold text-base-content">
+              <%= video_paint.brand_name %>
+              <% if video_paint.paint_name.present? %>
+                &mdash; <%= video_paint.paint_name %>
+              <% end %>
+            </span>
+            <span class="badge badge-warning badge-xs ml-2">unmatched</span>
+          <% end %>
 
-        <% if video_paint.paint_code.present? %>
-          <span class="text-base-content/50 text-sm ml-1">(<%= video_paint.paint_code %>)</span>
+          <% if video_paint.paint_code.present? %>
+            <span class="text-base-content/50 text-sm ml-1">(<%= video_paint.paint_code %>)</span>
+          <% end %>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-1 flex-shrink-0">
+          <% if is_owner %>
+            <%= link_to edit_video_video_paint_path(video, video_paint), class: "btn btn-ghost btn-xs", title: "Edit paint match", data: { turbo_frame: dom_id(video_paint) } do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            <% end %>
+          <% end %>
+
+          <% if video_paint.matched? %>
+            <%= link_to similar_paint_path(video_paint.paint), class: "btn btn-ghost btn-xs", title: "View similar paints" do %>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            <% end %>
+
+            <% if signed_in %>
+              <% user_paint = defined?(@current_user_paints) && @current_user_paints&.dig(video_paint.paint_id) %>
+              <% unless user_paint %>
+                <%= button_to user_paints_path, params: { user_paint: { paint_id: video_paint.paint_id, status: "owned" } }, method: :post, class: "btn btn-success btn-xs", title: "Add to collection" do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                <% end %>
+                <%= button_to user_paints_path, params: { user_paint: { paint_id: video_paint.paint_id, status: "wishlist" } }, method: :post, class: "btn btn-info btn-xs", title: "Add to wishlist" do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                <% end %>
+              <% else %>
+                <span class="badge badge-<%= user_paint.status == 'owned' ? 'success' : 'info' %> badge-xs">
+                  <%= user_paint.status %>
+                </span>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Secondary info -->
+      <div class="flex flex-wrap gap-2 mt-1 text-xs text-base-content/50">
+        <% if video_paint.product_line_name.present? %>
+          <span class="badge badge-ghost badge-xs"><%= video_paint.product_line_name %></span>
+        <% end %>
+        <% if video_paint.paint_type.present? %>
+          <span class="badge badge-ghost badge-xs"><%= video_paint.paint_type %></span>
+        <% end %>
+        <% if video_paint.timestamp.present? %>
+          <span>@ <%= video_paint.timestamp %></span>
+        <% end %>
+        <% if video_paint.context.present? %>
+          <span>&mdash; <%= video_paint.context %></span>
         <% end %>
       </div>
 
-      <!-- Actions -->
-      <div class="flex items-center gap-1 flex-shrink-0">
-        <% if video_paint.matched? %>
-          <%= link_to similar_paint_path(video_paint.paint), class: "btn btn-ghost btn-xs", title: "View similar paints" do %>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-          <% end %>
-
-          <% if signed_in %>
-            <% user_paint = defined?(@current_user_paints) && @current_user_paints&.dig(video_paint.paint_id) %>
-            <% unless user_paint %>
-              <%= button_to user_paints_path, params: { user_paint: { paint_id: video_paint.paint_id, status: "owned" } }, method: :post, class: "btn btn-success btn-xs", title: "Add to collection" do %>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
+      <% if local_assigns[:alternatives] && alternatives.present? %>
+        <div class="flex flex-wrap gap-1.5 mt-2">
+          <span class="text-xs text-base-content/40">Alternatives:</span>
+          <% alternatives.each do |alt| %>
+            <div class="dropdown dropdown-hover dropdown-top dropdown-end">
+              <%= link_to paint_path(alt), class: "inline-flex items-center gap-1 badge badge-sm badge-outline hover:badge-primary transition-colors" do %>
+                <span class="w-2.5 h-2.5 rounded-full border border-base-300 flex-shrink-0" style="background-color: <%= alt.hex_color %>;"></span>
+                <span class="truncate max-w-24"><%= alt.name %></span>
               <% end %>
-              <%= button_to user_paints_path, params: { user_paint: { paint_id: video_paint.paint_id, status: "wishlist" } }, method: :post, class: "btn btn-info btn-xs", title: "Add to wishlist" do %>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              <% end %>
-            <% else %>
-              <span class="badge badge-<%= user_paint.status == 'owned' ? 'success' : 'info' %> badge-xs">
-                <%= user_paint.status %>
-              </span>
-            <% end %>
-          <% end %>
-        <% end %>
-      </div>
-    </div>
-
-    <!-- Secondary info -->
-    <div class="flex flex-wrap gap-2 mt-1 text-xs text-base-content/50">
-      <% if video_paint.product_line_name.present? %>
-        <span class="badge badge-ghost badge-xs"><%= video_paint.product_line_name %></span>
-      <% end %>
-      <% if video_paint.paint_type.present? %>
-        <span class="badge badge-ghost badge-xs"><%= video_paint.paint_type %></span>
-      <% end %>
-      <% if video_paint.timestamp.present? %>
-        <span>@ <%= video_paint.timestamp %></span>
-      <% end %>
-      <% if video_paint.context.present? %>
-        <span>&mdash; <%= video_paint.context %></span>
-      <% end %>
-    </div>
-
-    <% if local_assigns[:alternatives] && alternatives.present? %>
-      <div class="flex flex-wrap gap-1.5 mt-2">
-        <span class="text-xs text-base-content/40">Alternatives:</span>
-        <% alternatives.each do |alt| %>
-          <div class="dropdown dropdown-hover dropdown-top dropdown-end">
-            <%= link_to paint_path(alt), class: "inline-flex items-center gap-1 badge badge-sm badge-outline hover:badge-primary transition-colors" do %>
-              <span class="w-2.5 h-2.5 rounded-full border border-base-300 flex-shrink-0" style="background-color: <%= alt.hex_color %>;"></span>
-              <span class="truncate max-w-24"><%= alt.name %></span>
-            <% end %>
-            <div class="dropdown-content z-50 mb-2">
-              <div class="card card-compact bg-base-100 shadow-xl border border-base-300 w-56">
-                <div class="h-8 rounded-t-lg" style="background-color: <%= alt.hex_color %>;"></div>
-                <div class="card-body gap-1 !pt-2">
-                  <h3 class="font-semibold text-sm leading-tight"><%= alt.name %></h3>
-                  <p class="text-xs text-base-content/60"><%= alt.brand_name %></p>
-                  <p class="text-xs text-base-content/50"><%= alt.product_line_name %></p>
-                  <div class="flex items-center justify-between mt-1">
-                    <span class="text-xs font-mono text-base-content/40"><%= alt.code %></span>
-                    <span class="text-xs font-mono text-base-content/40"><%= alt.hex_color %></span>
+              <div class="dropdown-content z-50 mb-2">
+                <div class="card card-compact bg-base-100 shadow-xl border border-base-300 w-56">
+                  <div class="h-8 rounded-t-lg" style="background-color: <%= alt.hex_color %>;"></div>
+                  <div class="card-body gap-1 !pt-2">
+                    <h3 class="font-semibold text-sm leading-tight"><%= alt.name %></h3>
+                    <p class="text-xs text-base-content/60"><%= alt.brand_name %></p>
+                    <p class="text-xs text-base-content/50"><%= alt.product_line_name %></p>
+                    <div class="flex items-center justify-between mt-1">
+                      <span class="text-xs font-mono text-base-content/40"><%= alt.code %></span>
+                      <span class="text-xs font-mono text-base-content/40"><%= alt.hex_color %></span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
   </div>
-</div>
+<% end %>

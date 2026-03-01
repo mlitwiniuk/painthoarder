@@ -2,7 +2,7 @@ require "test_helper"
 
 class VideosControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = create(:user, :confirmed)
+    @user = create(:user, :confirmed, video_limit: 0)
     @other_user = create(:user, :confirmed)
     @completed_video = create(:video, :completed, user: @user, title: "My Tutorial")
     @other_video = create(:video, :completed, user: @other_user, title: "Other Tutorial")
@@ -128,6 +128,45 @@ class VideosControllerTest < ActionDispatch::IntegrationTest
     assert_enqueued_with(job: VideoAnalysisJob) do
       post videos_url, params: {url: "https://www.youtube.com/watch?v=jobtest1"}
     end
+  end
+
+  # Create — video limit
+  test "create blocked when user at video limit" do
+    @user.update!(video_limit: 1)
+    # @completed_video already counts as 1 for this user in current period
+
+    stub_oembed_request("blocked1")
+
+    assert_no_difference("Video.count") do
+      post videos_url, params: {url: "https://www.youtube.com/watch?v=blocked1"}
+    end
+
+    assert_redirected_to new_video_url
+    assert_match /reached your video analysis limit/, flash[:alert]
+  end
+
+  test "create allowed when user under video limit" do
+    @user.update!(video_limit: 5)
+
+    stub_oembed_request("allowed1")
+
+    assert_difference("Video.count") do
+      post videos_url, params: {url: "https://www.youtube.com/watch?v=allowed1"}
+    end
+
+    assert_redirected_to video_url(Video.last)
+  end
+
+  test "create allowed when user has unlimited videos" do
+    @user.update!(video_limit: 0)
+
+    stub_oembed_request("unlimited1")
+
+    assert_difference("Video.count") do
+      post videos_url, params: {url: "https://www.youtube.com/watch?v=unlimited1"}
+    end
+
+    assert_redirected_to video_url(Video.last)
   end
 
   # Destroy
