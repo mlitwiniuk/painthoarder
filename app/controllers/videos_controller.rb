@@ -43,6 +43,12 @@ class VideosController < ApplicationController
 
   # POST /videos
   def create
+    unless current_user.can_create_video?
+      period = User.video_limit_period
+      redirect_to new_video_path, alert: "You've reached your video analysis limit (#{current_user.video_limit} per #{period}). Contact an admin to increase it."
+      return
+    end
+
     url = params[:url]&.strip
     youtube_video_id = Video.extract_video_id(url)
 

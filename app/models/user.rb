@@ -70,6 +70,25 @@ class User < ApplicationRecord
     is_admin?
   end
 
+  def can_create_video?
+    video_limit == 0 || videos_in_current_period < video_limit
+  end
+
+  def videos_in_current_period
+    videos.where("created_at >= ?", video_limit_period_start).count
+  end
+
+  def video_limit_period_start
+    case self.class.video_limit_period
+    when "week" then Time.current.beginning_of_week
+    else Time.current.beginning_of_day
+    end
+  end
+
+  def self.video_limit_period
+    ENV.fetch("VIDEO_LIMIT_PERIOD", "day")
+  end
+
   def after_confirmation
     UserMailer.with(user: self).welcome.deliver_later
   end

@@ -18,6 +18,24 @@
           Paste a YouTube painting tutorial URL and our AI will extract the list of paints used in the video.
         </p>
 
+        <% if current_user.video_limit > 0 %>
+          <% used = current_user.videos_in_current_period %>
+          <% limit = current_user.video_limit %>
+          <% period = User.video_limit_period %>
+          <% at_limit = used >= limit %>
+
+          <% if at_limit %>
+            <div role="alert" class="alert alert-warning mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span>You've reached your limit of <%= limit %> <%= "video".pluralize(limit) %> per <%= period %>. Try again later or contact an admin.</span>
+            </div>
+          <% else %>
+            <p class="text-sm text-base-content/50 mb-4"><%= used %> of <%= limit %> <%= "video".pluralize(limit) %> used this <%= period %></p>
+          <% end %>
+        <% end %>
+
         <div data-controller="video-form">
           <%= form_with url: videos_path, method: :post, class: "space-y-6" do |f| %>
             <div class="form-control">
@@ -27,7 +45,8 @@
               <input type="url" name="url" placeholder="https://www.youtube.com/watch?v=..." required
                      class="input input-bordered w-full"
                      data-video-form-target="urlInput"
-                     data-action="input->video-form#parseUrl" />
+                     data-action="input->video-form#parseUrl"
+                     <%= "disabled" if defined?(at_limit) && at_limit %> />
               <label class="label">
                 <span class="label-text-alt text-base-content/50">Supports youtube.com and youtu.be links</span>
               </label>
@@ -43,6 +62,7 @@
 
             <div class="card-actions justify-end">
               <%= f.submit "Analyze Video", class: "btn btn-primary",
+                  disabled: (defined?(at_limit) && at_limit),
                   data: { video_form_target: "submitBtn" } %>
             </div>
           <% end %>

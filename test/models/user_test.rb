@@ -89,6 +89,44 @@ class UserTest < ActiveSupport::TestCase
     assert user.access_locked?
   end
 
+  test "can_create_video? returns true when no videos created" do
+    user = create(:confirmed_user)
+    assert user.can_create_video?
+  end
+
+  test "can_create_video? returns false when at limit" do
+    user = create(:confirmed_user, video_limit: 1)
+    create(:video, user: user)
+    refute user.can_create_video?
+  end
+
+  test "can_create_video? returns true when limit is 0 (unlimited)" do
+    user = create(:confirmed_user, video_limit: 0)
+    3.times { create(:video, user: user) }
+    assert user.can_create_video?
+  end
+
+  test "can_create_video? returns true when limit not yet reached" do
+    user = create(:confirmed_user, video_limit: 3)
+    2.times { create(:video, user: user) }
+    assert user.can_create_video?
+  end
+
+  test "can_create_video? only counts videos in current period" do
+    user = create(:confirmed_user, video_limit: 1)
+    create(:video, user: user, created_at: 2.days.ago)
+    assert user.can_create_video?
+  end
+
+  test "can_create_video? respects week period" do
+    ENV["VIDEO_LIMIT_PERIOD"] = "week"
+    user = create(:confirmed_user, video_limit: 1)
+    create(:video, user: user, created_at: 2.days.ago)
+    refute user.can_create_video?
+  ensure
+    ENV.delete("VIDEO_LIMIT_PERIOD")
+  end
+
   test "factory traits work correctly" do
     # For confirmed user, check that the factory sets confirmed_at properly
     confirmed_user = create(:user, :confirmed)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_06_28_000005) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_01_181040) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -185,6 +185,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_06_28_000005) do
     t.string "unlock_token"
     t.datetime "updated_at", null: false
     t.string "username", default: "", null: false
+    t.integer "video_limit", default: 1, null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
