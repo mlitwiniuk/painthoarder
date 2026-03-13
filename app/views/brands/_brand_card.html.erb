@@ -1,0 +1,28 @@
+<%= link_to brand_path(brand), class: "card bg-base-100 shadow-md hover:shadow-xl border border-base-300/50 transition-all duration-300 group" do %>
+  <div class="card-body p-5">
+    <div class="flex items-center gap-4">
+      <% if brand.logo.attached? %>
+        <div class="w-14 h-14 rounded-xl overflow-hidden bg-base-200 flex-shrink-0 border border-base-300/30">
+          <%= image_tag brand.logo, class: "w-full h-full object-contain p-1", alt: brand.name %>
+        </div>
+      <% else %>
+        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center flex-shrink-0 border border-base-300/30">
+          <span class="text-xl font-bold text-primary/60"><%= brand.name.first(2).upcase %></span>
+        </div>
+      <% end %>
+      <div class="flex-1 min-w-0">
+        <h3 class="text-lg font-bold text-base-content group-hover:text-primary transition-colors truncate">
+          <%= brand.name %>
+        </h3>
+        <div class="flex items-center gap-3 text-sm text-base-content/60 mt-1">
+          <span><%= brand.product_lines_count %> lines</span>
+          <span class="text-base-content/30">|</span>
+          <span><%= brand.paints_count %> paints</span>
+        </div>
+      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-base-content/30 group-hover:text-primary/60 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </div>
+  </div>
+<% end %>

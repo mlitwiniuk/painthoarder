@@ -1,0 +1,26 @@
+<% content_for :title, "Paint Brands Directory | PaintHoarder" %>
+<% content_for :description, "Browse all miniature paint brands. Find paints from Citadel, Vallejo, Army Painter, Scale75 and more." %>
+<%= render_og_tags(brand_index_og_tags) %>
+<%= render_structured_data(brand_index_structured_data(@brands)) %>
+
+<%= render "shared/breadcrumbs", crumbs: [
+  { label: "Home", path: root_path },
+  { label: "Brands" }
+] %>
+
+<!-- Hero Section -->
+<div class="text-center mb-8">
+  <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-3">
+    Paint Brands
+  </h1>
+  <p class="text-base-content/60 text-lg">
+    Browse <span class="font-semibold text-base-content"><%= @brands.length %></span> brands in our directory
+  </p>
+</div>
+
+<!-- Brand Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  <% @brands.each do |brand| %>
+    <%= render "brands/brand_card", brand: brand %>
+  <% end %>
+</div>

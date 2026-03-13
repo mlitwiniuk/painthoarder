@@ -18,6 +18,13 @@ Rails.application.routes.draw do
     resources :paints, only: [ :index, :show ]
   end
 
+  # Public brand directory (SEO-friendly)
+  resources :brands, only: [:index, :show] do
+    resources :product_lines, only: [:show], path: "lines" do
+      resources :paints, only: [:show], controller: "directory_paints"
+    end
+  end
+
   resources :paints do
     get :search, on: :collection
     get :similar, on: :member

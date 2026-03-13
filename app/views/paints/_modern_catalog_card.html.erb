@@ -99,7 +99,7 @@
   <!-- Paint Information -->
   <div class="p-4">
     <!-- Paint Name & Product Line -->
-    <%= link_to paint_path(user_paint.paint), data: { turbo_frame: "_top" }, class: "block group/link" do %>
+    <%= link_to directory_paint_path_for(user_paint.paint), data: { turbo_frame: "_top" }, class: "block group/link" do %>
       <h3 class="font-bold text-gray-900 text-lg mb-1 group-hover/link:text-primary transition-colors line-clamp-1">
         <%= user_paint.paint.name %>
       </h3>

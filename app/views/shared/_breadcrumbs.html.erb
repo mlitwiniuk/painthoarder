@@ -1,0 +1,13 @@
+<div class="breadcrumbs text-sm mb-4">
+  <ul>
+    <% crumbs.each do |crumb| %>
+      <li>
+        <% if crumb[:path] %>
+          <%= link_to crumb[:label], crumb[:path], class: "text-base-content/60 hover:text-primary transition-colors" %>
+        <% else %>
+          <span class="text-base-content font-medium"><%= crumb[:label] %></span>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>

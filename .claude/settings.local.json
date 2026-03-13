@@ -18,7 +18,8 @@
       "Bash(yarn info:*)",
       "Bash(yarn npm:*)",
       "Bash(yarn outdated:*)",
-      "Bash(yarn upgrade-interactive:*)"
+      "Bash(yarn upgrade-interactive:*)",
+      "Bash(grep:*)"
     ]
   }
 }
