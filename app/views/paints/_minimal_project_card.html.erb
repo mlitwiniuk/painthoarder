@@ -23,7 +23,7 @@
 
   <!-- Paint Info -->
   <div class="flex-1 min-w-0">
-    <%= link_to paint_path(user_paint.paint), data: { turbo_frame: "_top" }, class: "block group/link" do %>
+    <%= link_to directory_paint_path_for(user_paint.paint), data: { turbo_frame: "_top" }, class: "block group/link" do %>
       <h4 class="font-semibold text-sm text-base-content group-hover/link:text-primary transition-colors truncate">
         <%= user_paint.paint.name %>
       </h4>

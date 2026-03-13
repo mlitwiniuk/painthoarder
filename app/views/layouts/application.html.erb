@@ -40,7 +40,11 @@
               <% end %>
               <%= link_to paints_path,
                   class: "px-4 py-2 rounded-full text-sm font-medium transition-all #{current_page?(paints_path) ? 'bg-base-100 text-base-content shadow-sm' : 'text-base-content/60 hover:text-base-content'}" do %>
-                Explore
+                Paints
+              <% end %>
+              <%= link_to brands_path,
+                  class: "px-4 py-2 rounded-full text-sm font-medium transition-all #{request.path.start_with?('/brands') ? 'bg-base-100 text-base-content shadow-sm' : 'text-base-content/60 hover:text-base-content'}" do %>
+                Brands
               <% end %>
               <%= link_to public_projects_path,
                   class: "px-4 py-2 rounded-full text-sm font-medium transition-all #{current_page?(public_projects_path) ? 'bg-base-100 text-base-content shadow-sm' : 'text-base-content/60 hover:text-base-content'}" do %>
@@ -71,7 +75,8 @@
                 <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow-xl bg-base-100 rounded-xl w-52 border border-base-300">
                   <li><%= link_to "My Collection", user_paints_path, class: "text-base-content hover:bg-base-200 font-semibold" %></li>
                   <li><%= link_to "Dashboard", user_root_path, class: "text-base-content/70 hover:bg-base-200" %></li>
-                  <li><%= link_to "Explore", paints_path, class: "text-base-content/70 hover:bg-base-200" %></li>
+                  <li><%= link_to "Paints", paints_path, class: "text-base-content/70 hover:bg-base-200" %></li>
+                  <li><%= link_to "Brands", brands_path, class: "text-base-content/70 hover:bg-base-200" %></li>
                   <li><%= link_to "Gallery", public_projects_path, class: "text-base-content/70 hover:bg-base-200" %></li>
                   <li><%= link_to "Videos", public_videos_path, class: "text-base-content/70 hover:bg-base-200" %></li>
                   <li><%= link_to "Bulk Import", bulk_import_user_paints_path, class: "text-base-content/70 hover:bg-base-200" %></li>
@@ -101,7 +106,8 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </label>
-              <%= link_to "Explore", paints_path, class: "btn btn-ghost btn-sm text-base-content/60 hover:text-base-content" %>
+              <%= link_to "Paints", paints_path, class: "btn btn-ghost btn-sm text-base-content/60 hover:text-base-content" %>
+              <%= link_to "Brands", brands_path, class: "btn btn-ghost btn-sm text-base-content/60 hover:text-base-content" %>
               <%= link_to "Gallery", public_projects_path, class: "btn btn-ghost btn-sm text-base-content/60 hover:text-base-content" %>
               <%= link_to "Videos", public_videos_path, class: "btn btn-ghost btn-sm text-base-content/60 hover:text-base-content" %>
               <%= link_to "Sign In", new_user_session_path, class: "btn btn-ghost btn-sm text-base-content/60 hover:text-base-content" %>

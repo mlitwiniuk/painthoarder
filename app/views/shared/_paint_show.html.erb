@@ -14,7 +14,7 @@
         <div class="flex-1 min-w-0">
           <h1 class="text-lg sm:text-2xl font-bold truncate"><%= @user_paint.paint.name %></h1>
           <p class="text-xs sm:text-sm text-base-content/60 truncate">
-            <%= @user_paint.paint.product_line.brand.name %> • <%= @user_paint.paint.product_line.name %>
+            <%= link_to @user_paint.paint.product_line.brand.name, brand_path(@user_paint.paint.product_line.brand), class: "hover:text-primary transition-colors" %> • <%= link_to @user_paint.paint.product_line.name, brand_product_line_path(@user_paint.paint.product_line.brand, @user_paint.paint.product_line), class: "hover:text-primary transition-colors" %>
           </p>
         </div>
 
@@ -141,10 +141,10 @@
       <div class="bg-base-100/80 backdrop-blur-sm rounded-xl p-4 border border-base-300/50 shadow-lg">
         <div class="text-center space-y-2">
           <div class="text-xs text-base-content/60 font-medium uppercase tracking-wider">
-            <%= @user_paint.paint.product_line.brand.name %>
+            <%= link_to @user_paint.paint.product_line.brand.name, brand_path(@user_paint.paint.product_line.brand), class: "hover:text-primary transition-colors" %>
           </div>
           <div class="text-sm text-base-content/80">
-            <%= @user_paint.paint.product_line.name %>
+            <%= link_to @user_paint.paint.product_line.name, brand_product_line_path(@user_paint.paint.product_line.brand, @user_paint.paint.product_line), class: "hover:text-primary transition-colors" %>
           </div>
           <div class="text-lg font-bold text-base-content">
             <%= @user_paint.paint.name %>
@@ -192,11 +192,11 @@
           <div class="space-y-3">
             <div class="flex justify-between items-center p-3 bg-base-200/50 rounded-lg border border-base-300/30">
               <span class="text-sm text-base-content/70">Brand</span>
-              <span class="font-medium text-sm sm:text-base"><%= @user_paint.paint.product_line.brand.name %></span>
+              <%= link_to @user_paint.paint.product_line.brand.name, brand_path(@user_paint.paint.product_line.brand), class: "font-medium text-sm sm:text-base hover:text-primary transition-colors" %>
             </div>
             <div class="flex justify-between items-center p-3 bg-base-200/50 rounded-lg border border-base-300/30">
               <span class="text-sm text-base-content/70">Product Line</span>
-              <span class="font-medium text-sm sm:text-base"><%= @user_paint.paint.product_line.name %></span>
+              <%= link_to @user_paint.paint.product_line.name, brand_product_line_path(@user_paint.paint.product_line.brand, @user_paint.paint.product_line), class: "font-medium text-sm sm:text-base hover:text-primary transition-colors" %>
             </div>
             <div class="flex justify-between items-center p-3 bg-base-200/50 rounded-lg border border-base-300/30">
               <span class="text-sm text-base-content/70">Color Name</span>

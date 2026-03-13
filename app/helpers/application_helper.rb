@@ -40,6 +40,11 @@ module ApplicationHelper
     [h, s, l]
   end
 
+  # Build the full directory URL for a paint: /brands/:brand/lines/:product_line/paints/:paint
+  def directory_paint_path_for(paint)
+    brand_product_line_paint_path(paint.product_line.brand, paint.product_line, paint.slug)
+  end
+
   include Pagy::Frontend
 
   def container_class
@@ -166,6 +171,55 @@ module ApplicationHelper
     end
   end
 
+  # Brand directory OG tag helpers
+  def brand_index_og_tags
+    {
+      site_name: "PaintHoarder",
+      type: "website",
+      url: request.original_url,
+      title: "Paint Brands Directory | PaintHoarder",
+      description: "Browse all miniature paint brands. Find paints from Citadel, Vallejo, Army Painter, Scale75 and more.",
+      image: asset_url("og-default.png"),
+      image_alt: "PaintHoarder Paint Brands Directory"
+    }
+  end
+
+  def brand_show_og_tags(brand)
+    {
+      site_name: "PaintHoarder",
+      type: "website",
+      url: request.original_url,
+      title: "#{brand.name} Paints | PaintHoarder",
+      description: "Browse all #{brand.name} paint product lines and colors for your miniature painting projects.",
+      image: brand.logo.attached? ? url_for(brand.logo) : asset_url("og-default.png"),
+      image_alt: "#{brand.name} - Miniature Paints"
+    }
+  end
+
+  def product_line_og_tags(brand, product_line)
+    {
+      site_name: "PaintHoarder",
+      type: "website",
+      url: request.original_url,
+      title: "#{product_line.name} by #{brand.name} | PaintHoarder",
+      description: product_line.description.presence || "Browse all #{product_line.name} paints by #{brand.name}.",
+      image: asset_url("og-default.png"),
+      image_alt: "#{product_line.name} by #{brand.name}"
+    }
+  end
+
+  def directory_paint_og_tags(brand, product_line, paint)
+    {
+      site_name: "PaintHoarder",
+      type: "website",
+      url: request.original_url,
+      title: "#{paint.name} - #{product_line.name} by #{brand.name} | PaintHoarder",
+      description: "#{paint.name} (#{paint.code}) from #{product_line.name} by #{brand.name}. Color: #{paint.hex_color}.",
+      image: asset_url("og-default.png"),
+      image_alt: "#{paint.name} - #{brand.name}"
+    }
+  end
+
   # Structured Data (JSON-LD) helpers for SEO
   def default_structured_data
     {
@@ -265,6 +319,61 @@ module ApplicationHelper
       "url" => request.original_url,
       "numberOfItems" => projects.count,
       "itemListElement" => list_items
+    }
+  end
+
+  def brand_index_structured_data(brands)
+    list_items = brands.map.with_index do |brand, index|
+      {
+        "@type" => "ListItem",
+        "position" => index + 1,
+        "item" => {
+          "@type" => "Brand",
+          "@id" => brand_url(brand),
+          "name" => brand.name,
+          "url" => brand_url(brand)
+        }
+      }
+    end
+
+    {
+      "@context" => "https://schema.org",
+      "@type" => "ItemList",
+      "name" => "Miniature Paint Brands",
+      "description" => "Directory of miniature paint brands",
+      "url" => request.original_url,
+      "numberOfItems" => brands.length,
+      "itemListElement" => list_items
+    }
+  end
+
+  def brand_structured_data(brand, product_lines)
+    {
+      "@context" => "https://schema.org",
+      "@type" => "Brand",
+      "name" => brand.name,
+      "url" => brand_url(brand),
+      "description" => "#{brand.name} miniature paints",
+      "mainEntityOfPage" => {
+        "@type" => "WebPage",
+        "@id" => brand_url(brand)
+      }
+    }
+  end
+
+  def product_line_structured_data(brand, product_line, paints)
+    {
+      "@context" => "https://schema.org",
+      "@type" => "ProductGroup",
+      "name" => "#{product_line.name} by #{brand.name}",
+      "description" => product_line.description.presence || "#{product_line.name} paint range by #{brand.name}",
+      "brand" => {
+        "@type" => "Brand",
+        "name" => brand.name,
+        "url" => brand_url(brand)
+      },
+      "url" => brand_product_line_url(brand, product_line),
+      "numberOfItems" => paints.count
     }
   end
 

@@ -22,6 +22,16 @@
 #  product_line_id  (product_line_id => product_lines.id)
 #
 class Paint < ApplicationRecord
+  ## FRIENDLY ID
+  extend FriendlyId
+  friendly_id :name, use: [:slugged, :scoped], scope: :product_line
+
+  # Slug is scoped to product_line, so standalone routes must use numeric ID.
+  # Directory routes pass slug explicitly via the helper.
+  def to_param
+    id.to_s
+  end
+
   ## CONCERNS
   include SqliteSearch
   search_scope(:name, :code, :brand_name, :product_line_name, :name_code_normalized, includes: [:brand, :product_line])

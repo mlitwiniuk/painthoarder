@@ -18,6 +18,10 @@
 #  brand_id  (brand_id => brands.id)
 #
 class ProductLine < ApplicationRecord
+  ## FRIENDLY ID
+  extend FriendlyId
+  friendly_id :name, use: [:slugged, :scoped], scope: :brand
+
   ## ASSOCIATIONS
   belongs_to :brand
   has_many :paints, dependent: :destroy

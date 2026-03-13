@@ -32,18 +32,11 @@ class PaintsController < ApplicationController
   end
 
   def show
-    # Create or find UserPaint object (virtual if not in collection)
-    if user_signed_in?
-      existing_user_paint = current_user.user_paints.find_by(paint_id: @paint.id)
-      @user_paint = existing_user_paint || UserPaint.new(paint: @paint, user: current_user, virtual: true)
-    else
-      @user_paint = UserPaint.new(paint: @paint, virtual: true)
-    end
-
-    respond_to do |format|
-      format.html
-      format.turbo_stream
-    end
+    redirect_to brand_product_line_paint_path(
+      @paint.product_line.brand,
+      @paint.product_line,
+      @paint.slug
+    ), status: :moved_permanently, allow_other_host: false
   end
 
   def search
