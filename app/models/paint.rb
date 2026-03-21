@@ -24,7 +24,7 @@
 class Paint < ApplicationRecord
   ## FRIENDLY ID
   extend FriendlyId
-  friendly_id :name, use: [:slugged, :scoped], scope: :product_line
+  friendly_id :name, use: [:slugged, :scoped, :history], scope: :product_line
 
   # Slug is scoped to product_line, so standalone routes must use numeric ID.
   # Directory routes pass slug explicitly via the helper.

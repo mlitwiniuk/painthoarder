@@ -91,7 +91,7 @@ module ColorCategorization
                   ABS(#{color_table}.green - #{color_table}.blue) < 30 AND 
                   ABS(#{color_table}.red - #{color_table}.blue) < 30")
     when "metallic"
-      metallic_conditions = METALLIC_KEYWORDS.map { |keyword| "#{color_table}.name ILIKE '%#{keyword}%'" }.join(" OR ")
+      metallic_conditions = METALLIC_KEYWORDS.map { |keyword| "LOWER(#{color_table}.name) LIKE '%#{keyword}%'" }.join(" OR ")
       query.where(metallic_conditions)
     else
       query

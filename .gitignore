@@ -55,3 +55,4 @@ claude-swarm.yml
 /.yarn
 /.yarnrc
 /.yarnrc.yml
+.*
