@@ -20,7 +20,7 @@
 class ProductLine < ApplicationRecord
   ## FRIENDLY ID
   extend FriendlyId
-  friendly_id :name, use: [:slugged, :scoped], scope: :brand
+  friendly_id :name, use: [:slugged, :scoped, :history], scope: :brand
 
   ## ASSOCIATIONS
   belongs_to :brand

@@ -10,7 +10,26 @@ class ApplicationController < ActionController::Base
   layout :set_layout
   before_action :configure_permitted_parameters, if: :devise_controller?
 
+  rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
+  rescue_from ActionController::UnknownFormat, with: :unknown_format
+  rescue_from Pagy::OverflowError, with: :pagy_overflow
+
   private
+
+  def record_not_found
+    respond_to do |format|
+      format.html { render file: Rails.public_path.join("404.html"), layout: false, status: :not_found }
+      format.all { head :not_found }
+    end
+  end
+
+  def unknown_format
+    head :not_acceptable
+  end
+
+  def pagy_overflow(exception)
+    redirect_to url_for(request.query_parameters.merge(page: exception.pagy.last)), status: :moved_permanently
+  end
 
   def set_layout
     if devise_controller?

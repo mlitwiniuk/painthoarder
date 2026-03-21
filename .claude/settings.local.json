@@ -19,7 +19,11 @@
       "Bash(yarn npm:*)",
       "Bash(yarn outdated:*)",
       "Bash(yarn upgrade-interactive:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "mcp__appsignal-painthoarder-production__get_exception_incidents",
+      "mcp__appsignal-painthoarder-production__get_applications",
+      "mcp__appsignal-painthoarder-production__get_incident",
+      "Bash(bin/rubocop:*)"
     ]
   }
 }

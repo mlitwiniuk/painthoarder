@@ -5,8 +5,8 @@ class PaintsController < ApplicationController
   include Filterable
 
   def index
-    # Initialize ransack search
-    @q = Paint.includes(product_line: :brand).ransack(params[:q])
+    # Initialize ransack search (sanitize params to reject non-scalar values)
+    @q = Paint.includes(product_line: :brand).ransack(sanitize_ransack_params(params[:q]))
 
     # Apply filters
     @query = apply_filters(@q.result)
@@ -109,19 +109,26 @@ class PaintsController < ApplicationController
 
   # Apply Ransack filters plus special filters from Filterable concern
   def apply_filters(query)
+    q = sanitize_ransack_params(params[:q])
+
     # Brand filter
-    if params[:q] && params[:q][:product_line_brand_id_eq].present?
+    if q && q[:product_line_brand_id_eq].present?
       query = query.joins(product_line: :brand)
-        .where(product_lines: {brand_id: params[:q][:product_line_brand_id_eq]})
+        .where(product_lines: {brand_id: q[:product_line_brand_id_eq]})
     end
 
     # Product line filter
-    if params[:q] && params[:q][:product_line_id_eq].present?
-      query = query.where(product_line_id: params[:q][:product_line_id_eq])
+    if q && q[:product_line_id_eq].present?
+      query = query.where(product_line_id: q[:product_line_id_eq])
     end
 
     # Apply special filters from concern (search and color)
     super
+  end
+
+  def sanitize_ransack_params(q_params)
+    return nil unless q_params.is_a?(ActionController::Parameters) || q_params.is_a?(Hash)
+    q_params.to_unsafe_h.select { |_, v| v.is_a?(String) || v.is_a?(Numeric) }
   end
 
   # Helper method to convert Paint objects to UserPaint objects
