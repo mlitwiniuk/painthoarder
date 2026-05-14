@@ -33,10 +33,19 @@ export default class extends Controller {
     this.updateUI();
     this.validateCurrentStep();
 
-    // Check for edit mode with longer delay to allow cascading selects to initialize
-    setTimeout(() => {
-      this.checkForEditMode();
-    }, 500);
+    // Check for edit mode once the cascading selects finish initializing.
+    // The timeout is a fallback; paint-selected fires when the edit chain
+    // (which now lazy-fetches paints) has populated the paint select.
+    this.checkForEditModeHandler = () => this.checkForEditMode();
+    this.element.addEventListener("paint-selected", this.checkForEditModeHandler);
+    setTimeout(this.checkForEditModeHandler, 500);
+  }
+
+  disconnect() {
+    this.element.removeEventListener(
+      "paint-selected",
+      this.checkForEditModeHandler,
+    );
   }
 
   nextStep() {

@@ -29,41 +29,44 @@ export default class extends Controller {
     this.loadAllData().then(() => {
       this.initializeBrandSelect();
 
-      // If we have initial values (editing mode), initialize the dropdowns
+      // If we have initial values (editing mode), initialize the dropdowns.
+      // setValue is silent (2nd arg) so it doesn't re-trigger the cascade via
+      // onChange — this edit chain initializes each dependent select explicitly.
       if (this.hasBrandIdValue && this.brandIdValue) {
         // For edit mode, initialize the selects with the pre-selected values
         setTimeout(() => {
           if (this.tomSelectInstances.brand) {
             this.tomSelectInstances.brand.setValue(
               this.brandIdValue.toString(),
+              true,
             );
 
             if (this.hasProductLineIdValue && this.productLineIdValue) {
               // Initialize product line select with the saved value
               this.initializeProductLineSelect(this.brandIdValue);
-              setTimeout(() => {
+              setTimeout(async () => {
                 if (this.tomSelectInstances.productLine) {
                   this.tomSelectInstances.productLine.setValue(
                     this.productLineIdValue.toString(),
+                    true,
                   );
 
                   if (this.hasPaintIdValue && this.paintIdValue) {
                     // Initialize paint select with the saved value
-                    this.initializePaintSelect(this.productLineIdValue);
-                    setTimeout(() => {
-                      if (this.tomSelectInstances.paint) {
-                        this.tomSelectInstances.paint.setValue(
-                          this.paintIdValue.toString(),
-                        );
-                        // Trigger initial paint selection event for color preview
-                        this.element.dispatchEvent(
-                          new CustomEvent("paint-selected", {
-                            detail: { paintId: this.paintIdValue.toString() },
-                            bubbles: true,
-                          }),
-                        );
-                      }
-                    }, 100);
+                    await this.initializePaintSelect(this.productLineIdValue);
+                    if (this.tomSelectInstances.paint) {
+                      this.tomSelectInstances.paint.setValue(
+                        this.paintIdValue.toString(),
+                        true,
+                      );
+                      // Trigger initial paint selection event for color preview
+                      this.element.dispatchEvent(
+                        new CustomEvent("paint-selected", {
+                          detail: { paintId: this.paintIdValue.toString() },
+                          bubbles: true,
+                        }),
+                      );
+                    }
                   }
                 }
               }, 100);
@@ -104,17 +107,7 @@ export default class extends Controller {
         this.paintsData.productLines[productLine.brand_id].push(productLine);
       });
 
-      // Load all paints
-      const paintsResponse = await fetch("/api/paints");
-      const allPaints = await paintsResponse.json();
-
-      // Group paints by product_line_id
-      allPaints.forEach((paint) => {
-        if (!this.paintsData.paints[paint.product_line_id]) {
-          this.paintsData.paints[paint.product_line_id] = [];
-        }
-        this.paintsData.paints[paint.product_line_id].push(paint);
-      });
+      // Paints are lazy-loaded per product line in initializePaintSelect.
     } catch (error) {
       console.error("Error loading data:", error);
     }
@@ -207,7 +200,7 @@ export default class extends Controller {
     this.initializePaintSelect(productLineId);
   }
 
-  initializePaintSelect(productLineId) {
+  async initializePaintSelect(productLineId) {
     // Destroy existing instance if it exists
     if (this.tomSelectInstances.paint) {
       this.tomSelectInstances.paint.destroy();
@@ -216,8 +209,20 @@ export default class extends Controller {
     // Enable the select
     this.paintSelectTarget.disabled = false;
 
-    // Get paints for the selected product line
-    const paintsForProductLine = this.paintsData.paints[productLineId] || [];
+    // Lazy-load paints for the selected product line (cached after first fetch)
+    let paintsForProductLine = this.paintsData.paints[productLineId];
+    if (!paintsForProductLine) {
+      try {
+        const response = await fetch(
+          `/api/paints?product_line_id=${productLineId}`,
+        );
+        paintsForProductLine = await response.json();
+        this.paintsData.paints[productLineId] = paintsForProductLine;
+      } catch (error) {
+        console.error("Error loading paints:", error);
+        paintsForProductLine = [];
+      }
+    }
 
     // Create new Tom-Select instance for paints
     this.tomSelectInstances.paint = new TomSelect(this.paintSelectTarget, {
