@@ -118,12 +118,12 @@ class VideosController < ApplicationController
       # Partition: similar-line paints vs rest
       similar_line, rest = brand_paints.partition { |bp| similar_pls.include?(bp.product_line_id) }
 
-      rgb_distance = ->(bp) { (source.red - bp.red)**2 + (source.green - bp.green)**2 + (source.blue - bp.blue)**2 }
+      delta_e = ->(bp) { ColorMath.ciede2000(source.lab, bp.lab) }
 
-      # Fill top 3: similar-line first (by RGB distance), then remainder
-      candidates = similar_line.sort_by(&rgb_distance)
+      # Fill top 3: similar-line first (by perceptual colour distance), then remainder
+      candidates = similar_line.sort_by(&delta_e)
       if candidates.size < 3
-        candidates += rest.sort_by(&rgb_distance).first(3 - candidates.size)
+        candidates += rest.sort_by(&delta_e).first(3 - candidates.size)
       end
 
       @alternatives[vp.id] = candidates.first(3)

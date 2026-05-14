@@ -5,7 +5,7 @@ export default class extends Controller {
 
   connect() {
     // Set initial state - first tab active
-    this.showTab("rgb");
+    this.showTab("color");
   }
 
   switch(event) {

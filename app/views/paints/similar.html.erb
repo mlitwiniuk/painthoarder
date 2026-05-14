@@ -1,8 +1,8 @@
-<%= turbo_frame_tag "similar-paints-frame-#{@similar_type}" do %>
+<%= turbo_frame_tag "similar-paints-frame-#{@strategy}" do %>
   <div data-controller="brand-filter"
        data-brand-filter-url-value="<%= similar_paint_path %>"
        data-brand-filter-source-id-value="<%= @source_paint.id %>"
-       data-brand-filter-similar-type-value="<%= @similar_type %>"
+       data-brand-filter-similar-type-value="<%= @strategy %>"
        data-brand-filter-per-page-value="<%= @per_page %>"
        data-brand-filter-selected-brands-value="<%= @brand_ids.present? ? @brand_ids.to_json : '[]' %>">
 
@@ -26,20 +26,30 @@
     </div>
 
     <% if @similar_paints.any? %>
+      <p class="text-sm text-base-content/60 mb-4">
+        <% if @strategy == "color" %>
+          Closest matches by perceptual colour distance (CIEDE2000 ΔE) &mdash;
+        <% else %>
+          Paints in the same hue family &mdash;
+        <% end %>
+        <%= pluralize(@total_count, "match") %> within range.
+      </p>
+
       <!-- Similar Paints Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
         <% @similar_paints.each do |user_paint| %>
           <div id="similar-paint-<%= user_paint.paint_id %>" class="similar-paint-item">
-            <%= render "similar_paint_card", user_paint: user_paint %>
+            <%= render "similar_paint_card",
+                  user_paint: user_paint,
+                  score_label: similarity_score_label(@strategy, @scores[user_paint.paint_id]) %>
           </div>
         <% end %>
       </div>
 
       <!-- Load More Section -->
-      <% if @similar_paints.any? && @similar_paints.size == @per_page %>
-        <div id="load-more-<%= @similar_type %>" class="text-center py-8">
-          <% # Include brand_ids in the load more link if present %>
-          <% load_more_params = { page: @page + 1, similar_type: @similar_type, per_page: @per_page, format: :turbo_stream } %>
+      <% if @has_more %>
+        <div id="load-more-<%= @strategy %>" class="text-center py-8">
+          <% load_more_params = { page: @page + 1, similar_type: @strategy, per_page: @per_page, format: :turbo_stream } %>
           <% load_more_params[:brand_ids] = @brand_ids.join(',') if @brand_ids.present? %>
           <%= link_to similar_paint_path(@source_paint, load_more_params),
                     class: "btn btn-outline btn-wide gap-2 hover:btn-primary" do %>
@@ -59,18 +69,19 @@
           </svg>
         </div>
 
-        <h3 class="text-xl font-bold mb-2">No Similar Paints Found</h3>
+        <h3 class="text-xl font-bold mb-2">No Close Matches Found</h3>
         <p class="text-base-content/60 text-center max-w-md">
           <% if @brand_ids&.any? %>
-            Try adjusting your brand filters to discover more similar paints.
+            No paints close enough to <%= @source_paint.name %> in the selected brands. Try widening your brand filter.
           <% else %>
-            We couldn't find any paints with similar <%= @similar_type.upcase %> color values.
+            No paints in the catalogue are close enough to <%= @source_paint.name %>
+            <%= @strategy == "color" ? "by colour distance" : "in this hue family" %>. Try the other tab.
           <% end %>
         </p>
 
         <% if @brand_ids&.any? %>
           <div class="mt-4">
-            <%= link_to similar_paint_path(@source_paint, similar_type: @similar_type, per_page: @per_page, format: :html),
+            <%= link_to similar_paint_path(@source_paint, similar_type: @strategy, per_page: @per_page, format: :html),
                       class: "btn btn-outline btn-sm" do %>
               Clear Filters
             <% end %>
