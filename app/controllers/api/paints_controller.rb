@@ -13,7 +13,10 @@ module Api
         @paints = @paints.where("paints.name LIKE ? OR paints.code LIKE ?", "%#{params[:query]}%", "%#{params[:query]}%")
       end
 
-      render json: @paints.limit(50).map { |paint|
+      # Return the full product line when filtering by it; cap search/unfiltered results.
+      @paints = @paints.limit(50) if params[:product_line_id].blank?
+
+      render json: @paints.map { |paint|
         {
           id: paint.id,
           text: "#{paint.name} (#{paint.code})",
