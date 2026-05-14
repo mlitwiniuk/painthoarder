@@ -408,4 +408,23 @@ class PaintTest < ActiveSupport::TestCase
     assert_not paint.valid?
     assert paint.errors[:blue].present?
   end
+
+  test "lab colour is populated before save" do
+    paint = create(:paint, red: 255, green: 255, blue: 255)
+
+    assert_in_delta 100.0, paint.lab_l, 0.01
+    assert_in_delta 0.0, paint.lab_a, 0.05
+    assert_in_delta 0.0, paint.lab_b, 0.05
+    assert_equal [paint.lab_l, paint.lab_a, paint.lab_b], paint.lab
+  end
+
+  test "updating RGB values recomputes lab colour" do
+    paint = create(:paint, red: 255, green: 255, blue: 255)
+    white_lab = paint.lab
+
+    paint.update(red: 0, green: 0, blue: 0)
+
+    assert_not_equal white_lab, paint.lab
+    assert_equal [0.0, 0.0, 0.0], paint.lab
+  end
 end

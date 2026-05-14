@@ -51,49 +51,21 @@ class PaintsController < ApplicationController
   end
 
   def similar
-    @page = (params[:page] || 1).to_i
-    @per_page = params[:per_page] || 4
-    @per_page = @per_page.to_i
-    @similar_type = params[:similar_type] || "rgb"
     @source_paint = Paint.find(params[:id])
+    @page = (params[:page] || 1).to_i.clamp(1, 100)
+    @per_page = (params[:per_page] || 4).to_i.clamp(1, PaintSimilarityQuery::MAX_RESULTS)
+    @strategy = params[:similar_type].presence_in(PaintSimilarityQuery::STRATEGIES) ||
+      PaintSimilarityQuery::DEFAULT_STRATEGY
 
-    # Parse brand_ids if provided in params
-    if params[:brand_ids].present?
-      @brand_ids = params[:brand_ids].split(",")
-      # Save to user preferences if user is logged in
-      current_user.similar_paint_brand_ids = @brand_ids if user_signed_in?
-    elsif user_signed_in?
-      # Use user's stored preferences
-      @brand_ids = current_user.similar_paint_brand_ids
-    else
-      @brand_ids = nil
-    end
-
-    # Get all brands for the filter
+    @brand_ids = resolve_similar_brand_ids
     @brands = Brand.order(:name)
 
-    # For user_provided similarity (paints from same brand)
-    if @similar_type == "user"
-      # Get the brand information
-      brand_id = @source_paint.product_line.brand_id
-
-      # Find paints from the same brand
-      paints = Paint.joins(product_line: :brand)
-        .where(product_lines: {brand_id: brand_id})
-        .where.not(id: @source_paint.id)
-        .includes(product_line: :brand)
-        .order(name: :asc)
-        .limit(@per_page)
-        .offset((@page - 1) * @per_page)
-
-      @similar_paints = map_paints_to_user_paints(paints)
-    # For RGB similarity
-    elsif @similar_type == "rgb"
-      @similar_paints = find_rgb_similar_paints_for(@source_paint, @page, @per_page, @brand_ids)
-    # For HSL similarity
-    else # "hsl"
-      @similar_paints = find_hsl_similar_paints_for(@source_paint, @page, @per_page, @brand_ids)
-    end
+    query = PaintSimilarityQuery.new(@source_paint, strategy: @strategy, brand_ids: @brand_ids)
+    results = query.page(@page, @per_page)
+    @scores = results.to_h { |result| [result[:paint].id, result[:score]] }
+    @similar_paints = map_paints_to_user_paints(results.map { |result| result[:paint] })
+    @has_more = query.more_after?(@page, @per_page)
+    @total_count = query.total_count
 
     respond_to do |format|
       format.html
@@ -146,100 +118,15 @@ class PaintsController < ApplicationController
     end
   end
 
-  # These methods can be called from other controllers
-  public
-
-  def find_user_similar_paints_for(paint, page, per_page)
-    return [] unless paint
-
-    # Get the brand information
-    brand_id = paint.product_line.brand_id
-
-    # Find paints from the same brand
-    Paint.joins(product_line: :brand)
-      .where(product_lines: {brand_id: brand_id})
-      .where.not(id: paint.id)
-      .includes(product_line: :brand)
-      .order(name: :asc)
-      .limit(per_page)
-      .offset((page - 1) * per_page)
-  end
-
-  def find_rgb_similar_paints_for(paint, page, per_page, brand_ids = nil)
-    return [] unless paint
-    paint_id = paint.id
-
-    red = paint.red
-    green = paint.green
-    blue = paint.blue
-
-    # Get similar product line IDs for boosting
-    similar_pl_ids = paint.product_line.similar_product_line_ids
-
-    # Calculate Euclidean distance in RGB space, with boost for similar product lines
-    distance_sql = "SQRT(POWER(paints.red - #{red.to_i}, 2) +
-              POWER(paints.green - #{green.to_i}, 2) +
-              POWER(paints.blue - #{blue.to_i}, 2))"
-
-    if similar_pl_ids.any?
-      boosted_sql = "CASE WHEN paints.product_line_id IN (#{similar_pl_ids.join(",")}) " \
-                    "THEN #{distance_sql} * 0.7 ELSE #{distance_sql} END"
-    else
-      boosted_sql = distance_sql
+  # Brand filter for similar paints: explicit params win and are persisted,
+  # otherwise fall back to the signed-in user's stored preference.
+  def resolve_similar_brand_ids
+    if params[:brand_ids].present?
+      ids = params[:brand_ids].split(",")
+      current_user.similar_paint_brand_ids = ids if user_signed_in?
+      ids
+    elsif user_signed_in?
+      current_user.similar_paint_brand_ids
     end
-
-    paints = Paint.where.not(id: paint_id)
-      .select("paints.*, #{distance_sql} AS color_distance, #{boosted_sql} AS boosted_distance")
-      .includes(product_line: :brand)
-
-    # Apply brand filter if provided
-    if brand_ids.present?
-      paints = paints.joins(product_line: :brand)
-        .where(product_lines: {brand_id: brand_ids})
-    end
-
-    paints = paints.order("boosted_distance ASC")
-      .limit(per_page)
-      .offset((page - 1) * per_page)
-    map_paints_to_user_paints(paints)
-  end
-
-  def find_hsl_similar_paints_for(paint, page, per_page, brand_ids = nil)
-    return [] unless paint
-    paint_id = paint.id
-
-    red = paint.red
-    green = paint.green
-    blue = paint.blue
-
-    # Get similar product line IDs for boosting
-    similar_pl_ids = paint.product_line.similar_product_line_ids
-
-    # Calculate weighted distance that emphasizes perceptual similarity
-    distance_sql = "(ABS(paints.red - #{red.to_i}) +
-              ABS(paints.green - #{green.to_i}) +
-              ABS(paints.blue - #{blue.to_i}))"
-
-    if similar_pl_ids.any?
-      boosted_sql = "CASE WHEN paints.product_line_id IN (#{similar_pl_ids.join(",")}) " \
-                    "THEN #{distance_sql} * 0.7 ELSE #{distance_sql} END"
-    else
-      boosted_sql = distance_sql
-    end
-
-    paints = Paint.where.not(id: paint_id)
-      .select("paints.*, #{distance_sql} AS color_distance, #{boosted_sql} AS boosted_distance")
-      .includes(product_line: :brand)
-
-    # Apply brand filter if provided
-    if brand_ids.present?
-      paints = paints.joins(product_line: :brand)
-        .where(product_lines: {brand_id: brand_ids})
-    end
-
-    paints = paints.order("boosted_distance ASC")
-      .limit(per_page)
-      .offset((page - 1) * per_page)
-    map_paints_to_user_paints(paints)
   end
 end

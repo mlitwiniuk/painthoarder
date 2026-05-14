@@ -45,6 +45,18 @@ module ApplicationHelper
     brand_product_line_paint_path(paint.product_line.brand, paint.product_line, paint.slug)
   end
 
+  # Human-readable badge for a paint similarity score.
+  # color strategy -> CIEDE2000 ΔE; hue strategy -> degrees off the hue family.
+  def similarity_score_label(strategy, score)
+    return if score.nil?
+
+    if strategy == "color"
+      "ΔE #{score.round(1)}"
+    else
+      "#{score.round}° off"
+    end
+  end
+
   include Pagy::Frontend
 
   def container_class

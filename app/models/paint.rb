@@ -7,6 +7,9 @@
 #  code            :string
 #  green           :integer
 #  hex_color       :string
+#  lab_a           :float
+#  lab_b           :float
+#  lab_l           :float
 #  name            :string
 #  red             :integer
 #  created_at      :datetime         not null
@@ -15,6 +18,7 @@
 #
 # Indexes
 #
+#  index_paints_on_lab              (lab_l,lab_a,lab_b)
 #  index_paints_on_product_line_id  (product_line_id)
 #
 # Foreign Keys
@@ -51,9 +55,15 @@ class Paint < ApplicationRecord
 
   ## BEFORE & AFTER
   before_save :set_hex_color
+  before_save :set_lab_color
 
   def brand_name
     brand.name
+  end
+
+  # CIELAB triple, used for perceptual colour comparison.
+  def lab
+    [lab_l, lab_a, lab_b]
   end
 
   def product_line_name
@@ -255,5 +265,12 @@ class Paint < ApplicationRecord
   ## Callbacks
   def set_hex_color
     self.hex_color = "##{red.to_s(16).rjust(2, "0")}#{green.to_s(16).rjust(2, "0")}#{blue.to_s(16).rjust(2, "0")}"
+  end
+
+  def set_lab_color
+    return unless red && green && blue
+    return unless red_changed? || green_changed? || blue_changed? || lab_l.nil?
+
+    self.lab_l, self.lab_a, self.lab_b = ColorMath.rgb_to_lab(red, green, blue)
   end
 end

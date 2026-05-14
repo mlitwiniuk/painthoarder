@@ -82,9 +82,17 @@
       <h3 class="font-bold text-base-content text-base mb-1 group-hover/link:text-primary transition-colors line-clamp-1">
         <%= user_paint.paint.name %>
       </h3>
-      <div class="text-sm text-base-content/60 mb-3 line-clamp-1">
+      <div class="text-sm text-base-content/60 mb-1 line-clamp-1">
         <%= user_paint.paint.product_line.name %>
       </div>
+    <% end %>
+
+    <% if local_assigns[:score_label].present? %>
+      <div class="badge badge-ghost badge-sm font-mono mb-3" title="Lower is a closer match">
+        <%= score_label %>
+      </div>
+    <% else %>
+      <div class="mb-3"></div>
     <% end %>
 
     <!-- Action Buttons -->

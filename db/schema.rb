@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_12_222110) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_14_093000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -97,11 +97,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_222110) do
     t.datetime "created_at", null: false
     t.integer "green"
     t.string "hex_color"
+    t.float "lab_a"
+    t.float "lab_b"
+    t.float "lab_l"
     t.string "name"
     t.integer "product_line_id", null: false
     t.integer "red"
     t.string "slug"
     t.datetime "updated_at", null: false
+    t.index ["lab_l", "lab_a", "lab_b"], name: "index_paints_on_lab"
     t.index ["product_line_id", "slug"], name: "index_paints_on_product_line_id_and_slug", unique: true
     t.index ["product_line_id"], name: "index_paints_on_product_line_id"
   end

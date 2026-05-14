@@ -315,15 +315,15 @@
           <div class="flex gap-1 bg-base-200/50 rounded-lg p-1 border border-base-300/30 w-fit">
             <button class="px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all bg-base-100 text-base-content shadow-sm border border-base-300/30"
                     data-similar-tabs-target="tab"
-                    data-tab="rgb"
+                    data-tab="color"
                     data-action="click->similar-tabs#switch">
-              RGB
+              Closest match
             </button>
             <button class="px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all text-base-content/60 hover:text-base-content hover:bg-base-100/50"
                     data-similar-tabs-target="tab"
-                    data-tab="hsl"
+                    data-tab="hue"
                     data-action="click->similar-tabs#switch">
-              HSL
+              Same hue family
             </button>
           </div>
         </div>
@@ -332,9 +332,9 @@
         <div class="h-px bg-gradient-to-r from-transparent via-base-300 to-transparent mb-6"></div>
 
         <!-- Tab Content -->
-        <div id="rgb-content" class="similar-tab-content" data-similar-tabs-target="content">
-          <%= turbo_frame_tag "similar-paints-frame-rgb",
-              src: similar_paint_path(@user_paint.paint, similar_type: "rgb", per_page: 12, format: :html),
+        <div id="color-content" class="similar-tab-content" data-similar-tabs-target="content">
+          <%= turbo_frame_tag "similar-paints-frame-color",
+              src: similar_paint_path(@user_paint.paint, similar_type: "color", per_page: 12, format: :html),
               loading: "lazy" do %>
             <div class="flex flex-col items-center justify-center py-12">
               <div class="loading loading-spinner loading-lg text-primary mb-4"></div>
@@ -343,9 +343,9 @@
           <% end %>
         </div>
 
-        <div id="hsl-content" class="similar-tab-content hidden" data-similar-tabs-target="content">
-          <%= turbo_frame_tag "similar-paints-frame-hsl",
-              src: similar_paint_path(@user_paint.paint, similar_type: "hsl", per_page: 12, format: :html),
+        <div id="hue-content" class="similar-tab-content hidden" data-similar-tabs-target="content">
+          <%= turbo_frame_tag "similar-paints-frame-hue",
+              src: similar_paint_path(@user_paint.paint, similar_type: "hue", per_page: 12, format: :html),
               loading: "lazy" do %>
             <div class="flex flex-col items-center justify-center py-12">
               <div class="loading loading-spinner loading-lg text-primary mb-4"></div>

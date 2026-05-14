@@ -1,18 +1,18 @@
-
 <% if @similar_paints.any? %>
-  <%= turbo_stream.remove "load-more-#{@similar_type}"  %>
-  <%= turbo_stream.append "similar-paints-frame-#{@similar_type}" do %>
+  <%= turbo_stream.remove "load-more-#{@strategy}" %>
+  <%= turbo_stream.append "similar-paints-frame-#{@strategy}" do %>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-2">
       <% @similar_paints.each do |user_paint| %>
         <div class="similar-paint-item">
-          <%= render "similar_paint_card", user_paint: user_paint %>
+          <%= render "similar_paint_card",
+                user_paint: user_paint,
+                score_label: similarity_score_label(@strategy, @scores[user_paint.paint_id]) %>
         </div>
       <% end %>
     </div>
-    <% if @similar_paints.any? && @similar_paints.size == @per_page %>
-      <div id="load-more-<%= @similar_type %>" class="text-center py-6">
-        <% # Include brand_ids in the load more link if present %>
-        <% load_more_params = { page: @page + 1, similar_type: @similar_type, per_page: @per_page, format: :turbo_stream } %>
+    <% if @has_more %>
+      <div id="load-more-<%= @strategy %>" class="text-center py-6">
+        <% load_more_params = { page: @page + 1, similar_type: @strategy, per_page: @per_page, format: :turbo_stream } %>
         <% load_more_params[:brand_ids] = @brand_ids.join(',') if @brand_ids.present? %>
         <%= link_to similar_paint_path(@source_paint, load_more_params),
                   class: "btn btn-outline" do %>
@@ -23,10 +23,7 @@
         <% end %>
       </div>
     <% else %>
-      <div id="load-more-<%= @similar_type %>"></div>
+      <div id="load-more-<%= @strategy %>"></div>
     <% end %>
   <% end %>
 <% end %>
-
-
-  
