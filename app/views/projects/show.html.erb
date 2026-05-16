@@ -266,53 +266,69 @@
                     </div>
                   </div>
                 <% else %>
-                  <!-- Four or more photos: show first 3 + overlay -->
-                  <div class="grid grid-cols-2 gap-1 rounded-lg overflow-hidden max-w-md aspect-[4/3]">
-                    <div class="cursor-pointer group">
-                      <%= image_tag optimized_variant(photos[0], :thumb),
-                          class: "w-full h-full object-cover group-hover:brightness-95 transition-all",
-                          data: {
-                            lightbox_target: "thumbnail",
-                            action: "click->lightbox#open",
-                            full_url: url_for(optimized_variant(photos.first, :large))
-                          } %>
-                    </div>
-                    <div class="grid grid-rows-2 gap-1">
-                      <div class="cursor-pointer group">
-                        <%= image_tag optimized_variant(photos[1], :thumb),
+                  <!-- Four or more photos: responsive grid, more visible on wider screens.
+                       Caps per breakpoint: mobile 4, sm 6, md 8, lg 10, xl 12. -->
+                  <% caps = {mobile: 4, sm: 6, md: 8, lg: 10, xl: 12} %>
+                  <% max_visible = caps[:xl] %>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1 rounded-lg overflow-hidden">
+                    <% photos.each_with_index do |photo, i| %>
+                      <% break if i >= max_visible %>
+                      <% visibility = if i < caps[:mobile]
+                                        ""
+                                      elsif i < caps[:sm]
+                                        "hidden sm:block"
+                                      elsif i < caps[:md]
+                                        "hidden md:block"
+                                      elsif i < caps[:lg]
+                                        "hidden lg:block"
+                                      else
+                                        "hidden xl:block"
+                                      end %>
+                      <div class="relative cursor-pointer group aspect-square <%= visibility %>">
+                        <%= image_tag optimized_variant(photo, :thumb),
                             class: "w-full h-full object-cover group-hover:brightness-95 transition-all",
                             data: {
                               lightbox_target: "thumbnail",
                               action: "click->lightbox#open",
-                              full_url: url_for(optimized_variant(photos[1], :large))
+                              full_url: url_for(optimized_variant(photo, :large))
                             } %>
+                        <% if i == caps[:mobile] - 1 && photos.count > caps[:mobile] %>
+                          <div class="absolute inset-0 bg-black/60 flex sm:hidden items-center justify-center pointer-events-none">
+                            <span class="text-white font-bold text-lg">+<%= photos.count - caps[:mobile] %></span>
+                          </div>
+                        <% end %>
+                        <% if i == caps[:sm] - 1 && photos.count > caps[:sm] %>
+                          <div class="absolute inset-0 bg-black/60 hidden sm:flex md:hidden items-center justify-center pointer-events-none">
+                            <span class="text-white font-bold text-lg">+<%= photos.count - caps[:sm] %></span>
+                          </div>
+                        <% end %>
+                        <% if i == caps[:md] - 1 && photos.count > caps[:md] %>
+                          <div class="absolute inset-0 bg-black/60 hidden md:flex lg:hidden items-center justify-center pointer-events-none">
+                            <span class="text-white font-bold text-lg">+<%= photos.count - caps[:md] %></span>
+                          </div>
+                        <% end %>
+                        <% if i == caps[:lg] - 1 && photos.count > caps[:lg] %>
+                          <div class="absolute inset-0 bg-black/60 hidden lg:flex xl:hidden items-center justify-center pointer-events-none">
+                            <span class="text-white font-bold text-lg">+<%= photos.count - caps[:lg] %></span>
+                          </div>
+                        <% end %>
+                        <% if i == caps[:xl] - 1 && photos.count > caps[:xl] %>
+                          <div class="absolute inset-0 bg-black/60 hidden xl:flex items-center justify-center pointer-events-none">
+                            <span class="text-white font-bold text-lg">+<%= photos.count - caps[:xl] %></span>
+                          </div>
+                        <% end %>
                       </div>
-                      <div class="relative cursor-pointer group">
-                        <%= image_tag optimized_variant(photos[2], :thumb),
-                            class: "w-full h-full object-cover",
-                            data: {
-                              lightbox_target: "thumbnail",
-                              action: "click->lightbox#open",
-                              full_url: url_for(optimized_variant(photos[2], :large))
-                            } %>
-                        <div class="absolute inset-0 bg-black/60 flex items-center justify-center group-hover:bg-black/70 transition-colors">
-                          <span class="text-white font-bold text-lg">
-                            +<%= photos.count - 2 %>
-                          </span>
-                            <% if photos.size > 4 %>
-                              <% photos[3..-1].each do |photo| %>
-                                <%= image_tag optimized_variant(photo, :thumb),
-                                    class: "hidden",
-                                    data: {
-                                      lightbox_target: "thumbnail",
-                                      action: "click->lightbox#open",
-                                      full_url: url_for(optimized_variant(photo, :large))
-                                    } %>
-                              <% end %>
-                            <% end %>
-                        </div>
-                      </div>
-                    </div>
+                    <% end %>
+                    <!-- Remaining photos as hidden lightbox targets so navigation works -->
+                    <% photos[max_visible..]&.each do |photo| %>
+                      <%= image_tag optimized_variant(photo, :thumb),
+                          class: "hidden",
+                          data: {
+                            lightbox_target: "thumbnail",
+                            action: "click->lightbox#open",
+                            full_url: url_for(optimized_variant(photo, :large))
+                          } %>
+                    <% end %>
                   </div>
                 <% end %>
               </div>
