@@ -11,7 +11,11 @@ class ProjectsController < ApplicationController
 
   # GET /projects/public
   def public_index
-    @projects = Project.visibility_public.includes(:user).order(updated_at: :desc)
+    @projects = Project.visibility_public
+      .includes(:user)
+      .left_joins(:project_updates)
+      .group("projects.id")
+      .order(Arel.sql("COALESCE(MAX(project_updates.created_at), projects.created_at) DESC"))
     render :index
   end
 
