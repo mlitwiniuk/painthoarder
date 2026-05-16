@@ -1,10 +1,10 @@
 <div id="lightbox-modal" class="modal">
   <% if user_signed_in? %>
-    <div class="modal-box p-0 relative max-w-7xl">
-      <button class="btn btn-circle absolute top-2 right-2" onclick="document.getElementById('lightbox-modal').classList.remove('modal-open')">&#x2715;</button>
+    <div class="modal-box p-0 relative max-w-7xl max-h-[90vh] w-auto overflow-hidden bg-transparent shadow-none">
+      <button class="btn btn-circle absolute top-2 right-2 z-10" onclick="document.getElementById('lightbox-modal').classList.remove('modal-open')">&#x2715;</button>
       <button id="lightbox-prev" class="btn btn-circle absolute left-2 top-1/2 z-10">&#x276E;</button>
       <button id="lightbox-next" class="btn btn-circle absolute right-2 top-1/2 z-10">&#x276F;</button>
-      <img id="lightbox-image" class="w-full h-auto object-contain" alt="Project image" />
+      <img id="lightbox-image" class="max-h-[90vh] max-w-full w-auto h-auto object-contain mx-auto" alt="Project image" />
     </div>
   <% else %>
     <div class="modal-box relative max-w-lg text-center">
