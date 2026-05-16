@@ -62,5 +62,12 @@ Rails.application.routes.draw do
 
   resources :pages
 
+  # Sitemap files live under /sitemaps/ (public/sitemaps symlinks to the
+  # mounted storage volume). Redirect the conventional root-level URL there.
+  constraints filename: /sitemap\d*\.xml(\.gz)?/ do
+    get "/:filename", to: redirect("/sitemaps/%{filename}", status: 301),
+      as: :sitemap_file, format: false
+  end
+
   root "pages#welcome"
 end
