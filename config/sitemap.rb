@@ -31,7 +31,9 @@ SitemapGenerator::Sitemap.create do
   Paint.includes(product_line: :brand).find_each do |paint|
     line  = paint.product_line
     brand = line.brand
-    add brand_product_line_paint_path(brand, line, paint),
+    # Paint#to_param returns the numeric id (standalone /paints/:id route);
+    # the SEO directory route needs the scoped slug.
+    add brand_product_line_paint_path(brand, line, paint.slug),
       lastmod: paint.updated_at, priority: 0.6, changefreq: "monthly"
   end
 
