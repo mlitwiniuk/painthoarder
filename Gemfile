@@ -97,5 +97,6 @@ gem "simple-navigation"
 gem "ruby_llm"
 gem "ruby_llm-schema"
 gem "youtube-transcript-rb"
+gem "sitemap_generator", "~> 6.3"
 
 gem "appsignal", "~> 4.5"
