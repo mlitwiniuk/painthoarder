@@ -96,7 +96,7 @@ GEM
       activesupport (>= 6.1)
     addressable (2.8.9)
       public_suffix (>= 2.0.2, < 8.0)
-    appsignal (4.8.3)
+    appsignal (4.8.4)
       logger
       rack (>= 2.0.0)
     ast (2.4.3)
@@ -419,7 +419,7 @@ GEM
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
-    rack (3.2.5)
+    rack (3.2.6)
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
