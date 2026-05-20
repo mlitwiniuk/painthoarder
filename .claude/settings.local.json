@@ -23,7 +23,9 @@
       "mcp__appsignal-painthoarder-production__get_exception_incidents",
       "mcp__appsignal-painthoarder-production__get_applications",
       "mcp__appsignal-painthoarder-production__get_incident",
-      "Bash(bin/rubocop:*)"
+      "Bash(bin/rubocop:*)",
+      "mcp__appsignal_painthoarder_production__get_incident",
+      "mcp__appsignal_painthoarder_production__get_app_resources"
     ]
   }
 }
