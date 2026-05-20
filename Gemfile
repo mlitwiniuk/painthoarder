@@ -45,7 +45,7 @@ gem "active_storage_validations"
 
 gem "aws-sdk-s3", require: false
 gem "friendly_id", "~> 5.5.0"
-gem "pagy", "~> 9.1"
+gem "pagy", "~> 43.3"
 gem "ransack", github: "activerecord-hackery/ransack", branch: "main"
 gem "premailer-rails"
 gem "mailgun-ruby", "~>1.2"
