@@ -28,7 +28,7 @@ jobs:
       HOST: localhost
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       # Add or replace dependency steps here
       - name: Enable Corepack
         run: corepack enable
@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Enable Corepack
         run: corepack enable
       - name: Install Ruby and gems
