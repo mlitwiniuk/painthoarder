@@ -94,6 +94,9 @@
                   <li class="px-4 py-2 text-sm text-base-content/50 border-b border-base-300">
                     <%= current_user.email %>
                   </li>
+                  <% if current_user.admin? %>
+                    <li><%= link_to "Producer catalog updates", admin_paint_catalog_runs_path %></li>
+                  <% end %>
                   <li><%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "text-base-content/70 hover:bg-base-200 w-full text-left" %></li>
                 </ul>
               </div>

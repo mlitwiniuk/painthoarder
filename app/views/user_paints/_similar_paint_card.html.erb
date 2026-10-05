@@ -3,7 +3,7 @@
     <%= link_to new_user_paint_path(paint_id: user_paint.paint.id), class: "card-body p-4", data: { turbo_frame: "modal" } do %>
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full border shadow-sm flex-shrink-0 relative"
-             style="background-color: rgb(<%= user_paint.paint.red %>, <%= user_paint.paint.green %>, <%= user_paint.paint.blue %>);">
+             style="<%= paint_swatch_style(user_paint.paint) %>">
           <div class="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-content rounded-full flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -26,7 +26,7 @@
     <%= link_to user_paint_path(user_paint), class: "card-body p-4", data: { turbo_frame: "_top" } do %>
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full border shadow-sm flex-shrink-0 relative"
-             style="background-color: rgb(<%= user_paint.paint.red %>, <%= user_paint.paint.green %>, <%= user_paint.paint.blue %>);">
+             style="<%= paint_swatch_style(user_paint.paint) %>">
           <% if user_paint.owned? %>
             <div class="absolute -top-1 -right-1 w-5 h-5 bg-success text-success-content rounded-full flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">

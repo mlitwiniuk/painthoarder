@@ -27,9 +27,6 @@ class PaintTest < ActiveSupport::TestCase
   context "validations" do
     should validate_presence_of(:name)
     should validate_presence_of(:code)
-    should validate_presence_of(:red)
-    should validate_presence_of(:green)
-    should validate_presence_of(:blue)
 
     should validate_numericality_of(:red).only_integer.is_greater_than_or_equal_to(0).is_less_than_or_equal_to(255)
     should validate_numericality_of(:green).only_integer.is_greater_than_or_equal_to(0).is_less_than_or_equal_to(255)
@@ -395,7 +392,7 @@ class PaintTest < ActiveSupport::TestCase
     assert paint.errors[:red].present?
   end
 
-  test "requires all RGB values to be present" do
+  test "requires complete RGB when any channel is provided" do
     paint = build(:paint, red: nil, green: 0, blue: 0)
     assert_not paint.valid?
     assert paint.errors[:red].present?

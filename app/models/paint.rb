@@ -50,8 +50,17 @@ class Paint < ApplicationRecord
 
   ## VALIDATIONS
   validates :name, :code, presence: true
-  validates :red, :green, :blue, presence: true,
+  validates :red, :green, :blue, allow_nil: true,
     numericality: {only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 255}
+
+  validate :complete_rgb
+  validates :color_source, inclusion: {in: %w[legacy_dataset manual unknown]}
+  scope :with_color, -> { where.not(red: nil).where.not(green: nil).where.not(blue: nil).where.not(lab_l: nil).where.not(lab_a: nil).where.not(lab_b: nil) }
+  has_many :paint_catalog_records, dependent: :restrict_with_error
+
+  def color_known?
+    red.present? && green.present? && blue.present?
+  end
 
   ## BEFORE & AFTER
   before_save :set_hex_color
@@ -75,6 +84,8 @@ class Paint < ApplicationRecord
   end
 
   def hsv_values
+    return nil unless color_known?
+
     # Convert RGB to HSV
     r, g, b = red / 255.0, green / 255.0, blue / 255.0
 
@@ -108,6 +119,8 @@ class Paint < ApplicationRecord
   end
 
   def color_category
+    return "Unknown" unless color_known?
+
     # Convert RGB to HSV for better color classification
     r, g, b = red / 255.0, green / 255.0, blue / 255.0
     max_val = [r, g, b].max
@@ -262,8 +275,22 @@ class Paint < ApplicationRecord
 
   private
 
+  def complete_rgb
+    if [red, green, blue].any?(&:nil?) && ![red, green, blue].all?(&:nil?)
+      %i[red green blue].each do |channel|
+        errors.add(channel, "must be provided with the other RGB channels") if self[channel].nil?
+      end
+    end
+  end
+
   ## Callbacks
   def set_hex_color
+    unless color_known?
+      self.hex_color = self.lab_l = self.lab_a = self.lab_b = nil
+      self.color_source = "unknown"
+      return
+    end
+    self.color_source = "manual" if color_source == "unknown" || (persisted? && (red_changed? || green_changed? || blue_changed?))
     self.hex_color = "##{red.to_s(16).rjust(2, "0")}#{green.to_s(16).rjust(2, "0")}#{blue.to_s(16).rjust(2, "0")}"
   end
 

@@ -2,7 +2,7 @@
   <!-- Color Preview -->
   <div class="relative flex-shrink-0">
     <div class="w-12 h-12 rounded-lg overflow-hidden shadow-sm"
-         style="background: linear-gradient(135deg, <%= user_paint.paint.hex_color %> 0%, <%= user_paint.paint.hex_color %>dd 100%);">
+         style="<%= paint_swatch_style(user_paint.paint) %>">
       <!-- Subtle overlay for depth -->
       <div class="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/10"></div>
     </div>
@@ -35,7 +35,7 @@
 
         <!-- Hex Code -->
         <span class="text-xs text-base-content/60 font-mono">
-          <%= user_paint.paint.hex_color %>
+          <%= user_paint.paint.hex_color || "Swatch unknown" %>
         </span>
       </div>
     <% end %>

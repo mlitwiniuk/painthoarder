@@ -100,7 +100,7 @@ class VideosController < ApplicationController
       return
     end
 
-    brand_paints = @brand.paints.includes(product_line: :brand)
+    brand_paints = @brand.paints.with_color.includes(product_line: :brand)
 
     # Preload similarity map for all source product lines
     source_pl_ids = matched_video_paints.filter_map { |vp| vp.paint&.product_line_id }.uniq
@@ -113,6 +113,7 @@ class VideosController < ApplicationController
     @alternatives = {}
     matched_video_paints.each do |vp|
       source = vp.paint
+      next unless source.color_known?
       similar_pls = similar_pl_ids_by_pl[source.product_line_id] || Set.new
 
       # Partition: similar-line paints vs rest

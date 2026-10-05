@@ -62,6 +62,14 @@ Rails.application.routes.draw do
 
   resources :pages
 
+  namespace :admin do
+    resources :paint_catalog_runs, only: [:index, :create, :show] do
+      post :apply, on: :member
+      post :cancel, on: :member
+    end
+    resources :paint_catalog_entries, only: [:show, :update]
+  end
+
   # Sitemap files live under /sitemaps/ (public/sitemaps symlinks to the
   # mounted storage volume). Redirect the conventional root-level URL there.
   constraints filename: /sitemap\d*\.xml(\.gz)?/ do

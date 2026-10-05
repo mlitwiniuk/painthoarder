@@ -72,9 +72,9 @@
             <% current_user.user_paints.includes(:paint => :brand).order(created_at: :desc).limit(12).each do |user_paint| %>
               <div class="group relative">
                 <div class="aspect-square rounded-xl border-2 border-base-300 overflow-hidden shadow-sm hover:shadow-lg transition-all group-hover:scale-105">
-                  <div class="w-full h-full flex items-center justify-center" style="background-color: <%= user_paint.paint.hex_color || '#666' %>;">
+                  <div class="w-full h-full flex items-center justify-center" style="<%= paint_swatch_style(user_paint.paint) %>">
                     <% if user_paint.paint.hex_color %>
-                      <div class="w-full h-full" style="background: linear-gradient(135deg, <%= user_paint.paint.hex_color %> 0%, <%= user_paint.paint.hex_color %>dd 100%);"></div>
+                      <div class="w-full h-full" style="<%= paint_swatch_style(user_paint.paint) %>"></div>
                     <% else %>
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-base-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
@@ -193,7 +193,7 @@
         <div class="space-y-3">
           <% current_user.user_paints.order(created_at: :desc).limit(3).each do |user_paint| %>
             <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-base-200 transition-colors">
-              <div class="w-6 h-6 rounded-full border border-base-300" style="background-color: <%= user_paint.paint.hex_color || '#666' %>;"></div>
+              <div class="w-6 h-6 rounded-full border border-base-300" style="<%= paint_swatch_style(user_paint.paint) %>"></div>
               <div class="flex-1 min-w-0">
                 <p class="text-sm text-base-content/80 truncate">Added <%= user_paint.paint.name %></p>
                 <p class="text-xs text-base-content/50"><%= time_ago_in_words(user_paint.created_at) %> ago</p>

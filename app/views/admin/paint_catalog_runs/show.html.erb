@@ -1,0 +1,57 @@
+<%= link_to "All producer updates", admin_paint_catalog_runs_path, class: "link" %>
+<h1 class="text-3xl font-bold my-4"><%= @run.source_name %> — <%= @run.status.humanize %></h1>
+<% if %w[queued running].include?(@run.status) %>
+  <p class="mb-4">The catalog fetch runs in the background. Refresh this page to check its progress.</p>
+  <%= link_to "Refresh", admin_paint_catalog_run_path(@run), class: "btn" %>
+  <%= button_to "Cancel fetch", cancel_admin_paint_catalog_run_path(@run), class: "btn btn-outline mt-3" %>
+<% elsif @run.status == "failed" %>
+  <div class="alert alert-error"><%= @run.error_message %></div>
+  <p class="mt-3">No paint catalog changes were made by this fetch. Start a new fetch to retry.</p>
+<% else %>
+  <p class="mb-3"><%= @run.snapshot.size %> store products checked. <%= @run.entries.count %> paint comparisons. <%= @run.exclusions.size %> products excluded.</p>
+  <% if @run.auto_apply? %>
+    <p class="mb-3">Automatic publishing: <%= @run.automation_status.humanize %>. <%= @run.entries.where(application_method: "automatic").count %> processed automatically; <%= @run.entries.where(status: "pending").where.not(action: "unchanged").count %> changes held for a decision.</p>
+    <% if @run.automation_error %><div class="alert alert-error mb-3"><%= @run.automation_error %></div><% end %>
+  <% else %>
+    <p class="mb-3">Preview only. This fetch did not publish changes.</p>
+  <% end %>
+  <p class="mb-4">Applying a comparison preserves existing paint IDs, codes, ranges, colors, and collections. It can update a paint name or add a new paint without a swatch.</p>
+  <% unless @run.reviewable? %><div class="alert alert-warning mb-4">This batch is superseded or more than 14 days old. Fetch a fresh catalog before applying changes.</div><% end %>
+  <% @run.warnings.each do |warning| %><div class="alert alert-warning mb-3"><%= warning %></div><% end %>
+  <nav class="flex flex-wrap gap-3 my-5" aria-label="Comparison filters">
+    <% %w[pending add link update ambiguous unchanged applied rejected].each do |filter| %>
+      <%= link_to "#{filter.humanize}#{@counts[filter] ? " (#{@counts[filter]})" : ""}", admin_paint_catalog_run_path(@run, filter: filter), class: "btn btn-sm #{@filter == filter ? 'btn-primary' : 'btn-ghost'}" %>
+    <% end %>
+  </nav>
+  <%= form_with url: apply_admin_paint_catalog_run_path(@run) do |form| %>
+    <div class="overflow-x-auto">
+    <table class="table">
+      <thead><tr><th>Select</th><th>Producer paint</th><th>Range</th><th>Comparison</th><th>Existing paint</th><th></th></tr></thead>
+      <tbody>
+        <% @entries.each do |entry| %>
+          <tr>
+            <td><% if @run.reviewable? && entry.status == "pending" && entry.action != "ambiguous" %>
+              <%= check_box_tag "entry_ids[]", entry.id, false, aria: {label: "Select #{entry.payload['name']}"}, class: "checkbox" %>
+            <% end %></td>
+            <td><%= entry.payload["name"] %><br><span class="text-sm opacity-70"><%= entry.payload["sku"] %></span></td>
+            <td><%= entry.payload["range"] %></td><td><%= entry.action.humanize %> / <%= entry.status %><br><%= entry.application_method %><%= entry.automation_reason %></td>
+            <td><%= entry.paint&.name || "—" %></td>
+            <td><%= link_to "Review", admin_paint_catalog_entry_path(entry), class: "link" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    </div>
+    <% if @run.reviewable? %>
+      <% if @run.warnings.any? %><label class="flex gap-2 my-4"><%= check_box_tag :acknowledge_warnings, "1", false, class: "checkbox" %> I reviewed the batch warnings and exclusions.</label><% end %>
+      <%= form.submit "Apply selected comparisons", class: "btn btn-primary my-4" %>
+    <% end %>
+  <% end %>
+  <%== @pagy.series_nav %>
+  <details class="collapse collapse-arrow bg-base-200 mt-6">
+    <summary class="collapse-title font-semibold">Excluded products (<%= @run.exclusions.size %>)</summary>
+    <div class="collapse-content"><ul class="space-y-2">
+      <% @run.exclusions.each do |item| %><li><%= item["title"] %> — <%= item["reason"] %></li><% end %>
+    </ul></div>
+  </details>
+<% end %>

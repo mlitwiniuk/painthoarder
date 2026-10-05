@@ -3,7 +3,7 @@
   <div class="relative aspect-square overflow-hidden">
     <!-- Main Color Display -->
     <div class="absolute inset-0 transition-transform duration-300 group-hover:scale-105"
-         style="background: linear-gradient(135deg, <%= user_paint.paint.hex_color %> 0%, <%= user_paint.paint.hex_color %>dd 100%);">
+         style="<%= paint_swatch_style(user_paint.paint) %>">
       <!-- Subtle overlay for better text readability -->
       <div class="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent"></div>
     </div>
@@ -113,7 +113,7 @@
       <div class="flex items-center gap-2">
         <!-- Hex Color Code -->
         <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-mono rounded-lg">
-          <%= user_paint.paint.hex_color %>
+          <%= user_paint.paint.hex_color || "Swatch unknown" %>
         </span>
 
         <!-- Color Category (if available) -->

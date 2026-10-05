@@ -2,7 +2,7 @@
   <div class="flex flex-col md:flex-row gap-6">
     <!-- Color swatch -->
     <div class="flex-shrink-0">
-      <div class="w-32 h-32 rounded-lg shadow border" style="background-color: rgb(<%= user_paint.paint.red %>, <%= user_paint.paint.green %>, <%= user_paint.paint.blue %>);"></div>
+      <div class="w-32 h-32 rounded-lg shadow border" style="<%= paint_swatch_style(user_paint.paint) %>"></div>
     </div>
 
     <!-- Paint details -->
@@ -28,6 +28,7 @@
           <% end %>
         </div>
 
+        <% if user_paint.paint.color_known? %>
         <div>
           <span class="text-base-content/60">Color (RGB):</span>
           <span class="font-mono text-sm">rgb(<%= user_paint.paint.red %>, <%= user_paint.paint.green %>, <%= user_paint.paint.blue %>)</span>
@@ -35,7 +36,7 @@
 
         <div>
           <span class="text-base-content/60">Color (HEX):</span>
-          <span class="font-mono text-sm"><%= user_paint.paint.hex_color %></span>
+          <span class="font-mono text-sm"><%= user_paint.paint.hex_color || "Swatch unknown" %></span>
         </div>
         
         <% h, s, l = rgb_to_hsl(user_paint.paint.red, user_paint.paint.green, user_paint.paint.blue) %>
@@ -43,6 +44,9 @@
           <span class="text-base-content/60">Color (HSL):</span>
           <span class="font-mono text-sm">hsl(<%= h %>°, <%= s %>%, <%= l %>%)</span>
         </div>
+        <% else %>
+          <p>Swatch unknown. Color matching is unavailable for this paint.</p>
+        <% end %>
       </div>
     </div>
   </div>

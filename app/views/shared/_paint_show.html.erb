@@ -65,7 +65,7 @@
       <div class="relative">
         <!-- Main Color Background -->
         <div class="h-32 sm:h-48 md:h-56 relative overflow-hidden"
-             style="background: linear-gradient(135deg, <%= @user_paint.paint.hex_color %> 0%, <%= @user_paint.paint.hex_color %>dd 60%, <%= @user_paint.paint.hex_color %>aa 100%);">
+             style="<%= paint_swatch_style(@user_paint.paint) %>">
 
           <!-- Decorative Pattern Overlay -->
           <div class="absolute inset-0 opacity-10">
@@ -93,12 +93,13 @@
 
         <!-- Color Information Panel -->
         <div class="bg-base-100/95 backdrop-blur-sm border-t border-base-300/50 p-4">
+          <% if @user_paint.paint.color_known? %>
           <!-- Color Values Grid -->
           <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
             <div class="text-center">
               <div class="text-[10px] sm:text-xs text-base-content/60 font-medium uppercase tracking-wide mb-1">HEX</div>
               <div class="font-mono text-xs sm:text-sm font-bold bg-base-200 rounded px-2 py-1">
-                <%= @user_paint.paint.hex_color %>
+                <%= @user_paint.paint.hex_color || "Swatch unknown" %>
               </div>
             </div>
             <div class="text-center">
@@ -116,6 +117,9 @@
             </div>
           </div>
 
+          <% else %>
+            <p class="mb-4">Swatch unknown. Color matching is unavailable for this paint.</p>
+          <% end %>
           <!-- Desktop Actions -->
           <div class="hidden sm:block relative">
             <% if user_signed_in? %>

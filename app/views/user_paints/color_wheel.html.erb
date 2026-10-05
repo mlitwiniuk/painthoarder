@@ -16,6 +16,10 @@
 
 
 
+<% unknown_count = @user_paints.count { |up| !up.paint.color_known? } %>
+<% if unknown_count.positive? %>
+  <p class="alert mb-4"><%= pluralize(unknown_count, "paint") %> with unknown swatches remain in your collection but are not plotted on the color wheel.</p>
+<% end %>
 <div class="block">
   <!-- Mobile instructions -->
   <div class="sm:hidden mb-4 p-3 bg-base-100 rounded-lg border text-sm">
@@ -40,7 +44,7 @@
     <div
       class="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] border rounded-lg"
       data-controller="color-wheel"
-      data-color-wheel-paints-value="<%= @user_paints.map do |up|
+      data-color-wheel-paints-value="<%= @user_paints.select { |up| up.paint.color_known? }.map do |up|
         hsv = up.paint.hsv_values
         {
           id: up.id,
