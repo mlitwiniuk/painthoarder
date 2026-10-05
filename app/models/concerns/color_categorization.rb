@@ -10,6 +10,8 @@ module ColorCategorization
 
   # For use by the dashboard charts and other displays
   def self.categorize(paint)
+    return "Unknown" unless paint.color_known?
+
     # Check for metallics based on name first (before RGB analysis)
     name = paint.name.downcase
     if METALLIC_KEYWORDS.any? { |keyword| name.include?(keyword) }

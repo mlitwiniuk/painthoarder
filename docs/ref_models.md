@@ -21,11 +21,22 @@
 - `includes SqliteSearch` — FTS5 on name, code, brand_name, product_line_name, name_code_normalized
 - `has_one_attached :image`
 - `belongs_to :product_line` / `has_one :brand, through: :product_line` / `has_many :user_paints`
-- Validates: name, code (presence), red/green/blue (integer 0-255)
-- Before save: calculates hex_color from RGB
+- Validates: name, code (presence); RGB is either three integers 0-255 or entirely unknown (NULL).
+- Before save: calculates hex_color and LAB from RGB; clears derived values for unknown swatches.
+- `color_source`: legacy_dataset, manual, or unknown. `with_color` excludes unknown/incomplete colors from matching.
+- `has_many :paint_catalog_records, dependent: :restrict_with_error`
 - Methods: `hsv_values`, `color_category`, `brand_name`, `product_line_name`, `name_code_normalized`
 - Stats: `owned_count`, `wishlist_count`, `avoid_count`, `total_users_count`, `collection_stats`
 - Scope: `full_search(query)` — FTS5 prefix search
+
+## Producer catalog
+- `PaintCatalogRun`: source, fetch status, auto_apply flag, automation status/error, raw JSON snapshot, exclusions, warnings, completion time; owns comparison entries. A partial unique index permits one queued/running fetch per source.
+- `PaintCatalogEntry`: normalized producer payload, proposed action, paint baseline, candidate IDs, review status, reviewer, application method (automatic/manual) and exception reason. Only the latest successful batch per source, no more than 14 days old, can be applied.
+- `PaintCatalogRecord`: stable producer variant ID linked to an existing Paint, current producer SKU/URL/payload, historical aliases and last-seen time. Unique by source/variant ID and source/paint ID.
+- `PaintCatalog::Apply`: transactional automatic or admin publication; preserves existing paint IDs, codes, ranges, swatches and associations. New records start with unknown swatches. Aliases are stored for provenance, not included in FTS search yet.
+
+- `PaintCatalog::AutomaticApply` / `AutomaticPolicy`: publish confident entries, preserve local corrections, hold count anomalies and uncertain matches, and resume after failure. Each entry commits independently.
+- `PaintCatalog::Identity`: explicit family mappings and normalized identity comparison. Dismissed payloads carry forward until meaningful producer fields change.
 
 ## UserPaint
 - `belongs_to :paint` / `belongs_to :user`

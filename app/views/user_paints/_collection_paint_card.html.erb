@@ -2,7 +2,7 @@
   <div class="card-body p-4">
     <%= link_to user_paint_path(user_paint), class: "flex items-center gap-3 mb-2", data: { turbo_frame: "_top" } do %>
       <div class="w-10 h-10 rounded-full border shadow-sm flex-shrink-0"
-           style="background-color: <%= user_paint.paint.hex_color %>;"></div>
+           style="<%= paint_swatch_style(user_paint.paint) %>"></div>
       <div>
         <h3 class="font-bold"><%= user_paint.paint.name %></h3>
         <div class="text-xs opacity-70">

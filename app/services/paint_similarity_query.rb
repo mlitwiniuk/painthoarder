@@ -32,6 +32,8 @@ class PaintSimilarityQuery
   # Ordered [paint_id, score] pairs, capped at MAX_RESULTS and filtered to
   # the similarity threshold. Cached per source/strategy/brand filter.
   def ranked
+    return [] unless @source.color_known?
+
     @ranked ||= Rails.cache.fetch(cache_key, expires_in: CACHE_TTL) { compute_ranked }
   end
 
@@ -47,7 +49,7 @@ class PaintSimilarityQuery
     return [] if slice.empty?
 
     scores = slice.to_h
-    paints = Paint.where(id: scores.keys).includes(product_line: :brand).index_by(&:id)
+    paints = Paint.with_color.where(id: scores.keys).includes(product_line: :brand).index_by(&:id)
     slice.filter_map do |paint_id, score|
       paint = paints[paint_id]
       {paint: paint, score: score} if paint
@@ -108,9 +110,9 @@ class PaintSimilarityQuery
   end
 
   def base_scope
-    return Paint.all if @brand_ids.blank?
+    return Paint.with_color if @brand_ids.blank?
 
-    Paint.joins(product_line: :brand).where(product_lines: {brand_id: @brand_ids})
+    Paint.with_color.joins(product_line: :brand).where(product_lines: {brand_id: @brand_ids})
   end
 
   def bounded_scope

@@ -1,0 +1,42 @@
+<h1 class="text-3xl font-bold mb-3">Producer catalog updates</h1>
+<p class="mb-6">Catalogs refresh automatically every day. New paints, reliable matches and linked producer updates are published automatically. Only uncertain changes are held back; the rest of the catalog keeps updating.</p>
+<div class="grid md:grid-cols-2 gap-4 mb-8">
+  <% @sources.each do |source, config| %>
+    <% latest = PaintCatalogRun.where(source: source).order(id: :desc).first %>
+    <% success = PaintCatalogRun.where(source: source, status: "ready").order(id: :desc).first %>
+    <section class="card bg-base-200 p-5">
+      <h2 class="text-xl font-semibold"><%= config[:label] %></h2>
+      <p class="my-2">Last successful fetch: <%= success ? l(success.finished_at, format: :long) : "Never" %></p>
+      <% if latest %><p class="mb-3">Latest fetch: <%= latest.status.humanize %></p><% end %>
+      <% automatic = @latest_runs[source] %>
+      <% if automatic && (automatic.status == "failed" || %w[failed blocked].include?(automatic.automation_status)) %>
+        <p class="text-error mb-3">Updates need attention: <%= automatic.error_message || automatic.automation_error || "Unusual catalog size change" %></p>
+      <% end %>
+      <%= button_to "Refresh now", admin_paint_catalog_runs_path, params: {source: source}, class: "btn btn-primary" %>
+    </section>
+  <% end %>
+</div>
+<h2 class="text-xl font-semibold mb-3">Exceptions (<%= @exception_count %>)</h2>
+<p class="mb-4">These paints keep their existing data until resolved. A resolved match is remembered for future updates. Dismissals stay dismissed until producer details change.</p>
+<% if @exceptions.empty? %>
+  <p class="mb-6">No paint changes need a decision.</p>
+<% else %>
+  <ul class="space-y-3 mb-6">
+    <% @exceptions.each do |entry| %>
+      <li><%= entry.paint_catalog_run.source_name %> — <%= entry.payload["name"] %>: <%= entry.automation_reason || "Awaiting automatic publication" %> · <%= link_to "Resolve", admin_paint_catalog_entry_path(entry), class: "link" %></li>
+    <% end %>
+  </ul>
+  <% if @exception_count > 50 %><p class="mb-4">Showing the first 50. Open the latest producer batch to see all exceptions.</p><% end %>
+<% end %>
+<h2 class="text-xl font-semibold mb-3">Recent fetches</h2>
+<div class="overflow-x-auto">
+<table class="table">
+  <thead><tr><th>Producer</th><th>Started</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    <% @runs.each do |run| %>
+      <tr><td><%= run.source_name %></td><td><%= l(run.created_at, format: :long) %></td><td><%= run.status.humanize %> / <%= run.auto_apply? ? run.automation_status.humanize : "Preview" %></td>
+        <td><%= link_to "Review", admin_paint_catalog_run_path(run), class: "link" %></td></tr>
+    <% end %>
+  </tbody>
+</table>
+</div>

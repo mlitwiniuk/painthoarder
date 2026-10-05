@@ -1,7 +1,7 @@
 <div id="paint-card-<%= user_paint.paint_id %>" class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow duration-300 paint-card">
   <div class="card-body p-4">
     <div class="flex items-start gap-3">
-      <div class="w-12 h-12 rounded-full border shadow-sm relative" style="background-color: rgb(<%= user_paint.paint.red %>, <%= user_paint.paint.green %>, <%= user_paint.paint.blue %>);">
+      <div class="w-12 h-12 rounded-full border shadow-sm relative" style="<%= paint_swatch_style(user_paint.paint) %>">
         <%= link_to "", directory_paint_path_for(user_paint.paint), class: "absolute inset-0", data: { turbo_frame: "_top" } %>
 
       </div>

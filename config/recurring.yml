@@ -3,3 +3,7 @@ production:
     class: RefreshSitemapJob
     queue: default
     schedule: every day at 3am
+  refresh_paint_catalogs:
+    class: RefreshPaintCatalogsJob
+    queue: default
+    schedule: every day at 5am

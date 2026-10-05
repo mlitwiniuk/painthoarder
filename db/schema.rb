@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_14_093000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_05_130000) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
@@ -82,6 +82,60 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_093000) do
     t.index ["slug"], name: "index_pages_on_slug", unique: true
   end
 
+  create_table "paint_catalog_entries", force: :cascade do |t|
+    t.integer "paint_catalog_run_id", null: false
+    t.integer "paint_id"
+    t.string "external_id", null: false
+    t.string "action", null: false
+    t.string "status", default: "pending", null: false
+    t.json "payload", default: {}, null: false
+    t.json "baseline", default: {}, null: false
+    t.json "candidate_ids", default: [], null: false
+    t.integer "reviewed_by_id"
+    t.datetime "reviewed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "application_method"
+    t.string "automation_reason"
+    t.index ["paint_catalog_run_id", "external_id"], name: "paint_catalog_entries_identity", unique: true
+    t.index ["paint_catalog_run_id"], name: "index_paint_catalog_entries_on_paint_catalog_run_id"
+    t.index ["paint_id"], name: "index_paint_catalog_entries_on_paint_id"
+    t.index ["reviewed_by_id"], name: "index_paint_catalog_entries_on_reviewed_by_id"
+  end
+
+  create_table "paint_catalog_records", force: :cascade do |t|
+    t.string "source", null: false
+    t.string "external_id", null: false
+    t.integer "paint_id", null: false
+    t.string "sku", null: false
+    t.string "source_url", null: false
+    t.json "payload", default: {}, null: false
+    t.json "aliases", default: [], null: false
+    t.datetime "last_seen_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["paint_id"], name: "index_paint_catalog_records_on_paint_id"
+    t.index ["source", "external_id"], name: "index_paint_catalog_records_on_source_and_external_id", unique: true
+    t.index ["source", "paint_id"], name: "index_paint_catalog_records_on_source_and_paint_id", unique: true
+  end
+
+  create_table "paint_catalog_runs", force: :cascade do |t|
+    t.string "source", null: false
+    t.string "status", default: "queued", null: false
+    t.json "snapshot", default: [], null: false
+    t.json "warnings", default: [], null: false
+    t.json "exclusions", default: [], null: false
+    t.text "error_message"
+    t.datetime "finished_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "auto_apply", default: true, null: false
+    t.string "automation_status", default: "pending", null: false
+    t.text "automation_error"
+    t.index ["source", "created_at"], name: "index_paint_catalog_runs_on_source_and_created_at"
+    t.index ["source"], name: "one_active_paint_catalog_run", unique: true, where: "status IN ('queued', 'running')"
+  end
+
   create_table "paint_usages", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "project_update_id", null: false
@@ -94,6 +148,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_093000) do
   create_table "paints", force: :cascade do |t|
     t.integer "blue"
     t.string "code"
+    t.string "color_source", default: "legacy_dataset", null: false
     t.datetime "created_at", null: false
     t.integer "green"
     t.string "hex_color"
@@ -239,6 +294,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_093000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "paint_catalog_entries", "paint_catalog_runs"
+  add_foreign_key "paint_catalog_entries", "paints"
+  add_foreign_key "paint_catalog_entries", "users", column: "reviewed_by_id"
+  add_foreign_key "paint_catalog_records", "paints"
   add_foreign_key "paint_usages", "project_updates", on_delete: :cascade
   add_foreign_key "paint_usages", "user_paints", on_delete: :cascade
   add_foreign_key "paints", "product_lines"

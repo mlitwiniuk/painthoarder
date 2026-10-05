@@ -2,7 +2,7 @@
   <!-- Paint Color Circle -->
   <div class="flex-shrink-0">
     <div class="w-12 h-12 rounded-full border-2 border-white shadow-lg flex-shrink-0 relative overflow-hidden"
-         style="background: linear-gradient(135deg, <%= user_paint.paint.hex_color %> 0%, <%= user_paint.paint.hex_color %>dd 100%);">
+         style="<%= paint_swatch_style(user_paint.paint) %>">
       <!-- Status indicator dot -->
       <div class="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm
                   <%= case user_paint.status
@@ -43,7 +43,7 @@
         <span>•</span>
         <span><%= user_paint.paint.product_line.name %></span>
         <span>•</span>
-        <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded"><%= user_paint.paint.hex_color %></span>
+        <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded"><%= user_paint.paint.hex_color || "Swatch unknown" %></span>
       </div>
     <% end %>
 

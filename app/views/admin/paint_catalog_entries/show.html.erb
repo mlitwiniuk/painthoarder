@@ -1,0 +1,31 @@
+<%= link_to "Back to batch", admin_paint_catalog_run_path(@entry.paint_catalog_run), class: "link" %>
+<h1 class="text-3xl font-bold my-4"><%= @entry.payload["name"] %></h1>
+<p class="mb-4"><%= @entry.action.humanize %> · <%= @entry.status.humanize %></p>
+<% if @entry.automation_reason %><p class="alert alert-warning mb-4"><%= @entry.automation_reason %></p><% end %>
+<% if @entry.application_method == "automatic" %><p class="mb-4">Published automatically from the producer catalog.</p><% end %>
+<%= link_to "View producer listing", @entry.payload.fetch("url"), target: "_blank", rel: "noopener noreferrer", class: "link" %>
+<table class="table my-5">
+  <thead><tr><th></th><th>Existing catalog</th><th>Producer listing</th></tr></thead>
+  <tbody>
+    <tr><th>Name</th><td><%= @entry.paint&.name || "—" %></td><td><%= @entry.payload["name"] %></td></tr>
+    <tr><th>Code / SKU</th><td><%= @entry.paint&.code || "—" %></td><td><%= @entry.payload["sku"] %></td></tr>
+    <tr><th>Range</th><td><%= @entry.paint&.product_line&.name || "—" %></td><td><%= @entry.payload["range"] %></td></tr>
+    <tr><th>Swatch</th><td><%= @entry.paint&.hex_color || "Unknown" %></td><td>Not supplied; existing swatch is preserved</td></tr>
+  </tbody>
+</table>
+<p class="mb-4">Existing paint codes and range membership are preserved. The producer SKU is stored separately. New paints are available for collections immediately, with color matching disabled until a swatch is added.</p>
+<% if @entry.status == "pending" && @entry.paint_catalog_run.reviewable? %>
+  <%= form_with url: admin_paint_catalog_entry_path(@entry), method: :patch do |form| %>
+    <%= hidden_field_tag :decision, "apply" %>
+    <% if @entry.action == "ambiguous" %>
+      <div class="alert alert-warning mb-4">Possible existing matches were found. Choose the same paint below, or explicitly add a separate paint. Applying will use the producer name.</div>
+      <%= label_tag :paint_id, "Existing paint", class: "block font-semibold mb-2" %>
+      <%= select_tag :paint_id, options_for_select(@paints.map { |paint| ["#{paint.name} — #{paint.product_line.name} (#{paint.code})", paint.id] }), include_blank: "Choose an existing paint", class: "select select-bordered w-full mb-4" %>
+      <label class="flex gap-2 mb-4"><%= check_box_tag :create_separate, "1", false, class: "checkbox" %> This is a separate paint; create a new record instead.</label>
+    <% end %>
+    <% @entry.paint_catalog_run.warnings.each do |warning| %><div class="alert alert-warning mb-3"><%= warning %></div><% end %>
+    <% if @entry.paint_catalog_run.warnings.any? %><label class="flex gap-2 my-4"><%= check_box_tag :acknowledge_warnings, "1", false, class: "checkbox" %> I reviewed the batch warnings and exclusions.</label><% end %>
+    <%= form.submit "Apply reviewed change", class: "btn btn-primary" %>
+  <% end %>
+  <%= button_to "Dismiss this comparison", admin_paint_catalog_entry_path(@entry), method: :patch, params: {decision: "reject"}, class: "btn btn-outline mt-4" %>
+<% end %>

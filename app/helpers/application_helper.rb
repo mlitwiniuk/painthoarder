@@ -1,4 +1,12 @@
 module ApplicationHelper
+  def paint_swatch_style(paint)
+    if paint.color_known?
+      "background-color: #{paint.hex_color};"
+    else
+      "background: repeating-linear-gradient(45deg, #d1d5db 0 6px, #f3f4f6 6px 12px);"
+    end
+  end
+
   # Convert RGB values to HSL (Hue, Saturation, Lightness)
   # @param r [Integer] Red value (0-255)
   # @param g [Integer] Green value (0-255)

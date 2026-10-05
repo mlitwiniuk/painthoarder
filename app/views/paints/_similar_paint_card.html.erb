@@ -3,7 +3,7 @@
   <div class="relative aspect-[4/3] overflow-hidden">
     <!-- Main Color Display -->
     <div class="absolute inset-0 transition-transform duration-300 group-hover:scale-105"
-         style="background: linear-gradient(135deg, <%= user_paint.paint.hex_color %> 0%, <%= user_paint.paint.hex_color %>dd 50%, <%= user_paint.paint.hex_color %>88 100%);">
+         style="<%= paint_swatch_style(user_paint.paint) %>">
       <!-- Subtle overlay for better text readability -->
       <div class="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent"></div>
     </div>
@@ -70,7 +70,7 @@
     <!-- Color Hex Display -->
     <div class="absolute bottom-3 right-3">
       <div class="bg-base-100/80 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-mono font-medium text-base-content shadow-sm">
-        <%= user_paint.paint.hex_color %>
+        <%= user_paint.paint.hex_color || "Swatch unknown" %>
       </div>
     </div>
   </div>

@@ -59,4 +59,11 @@ GET  /api/paints/:id                api/paints#show
 ## Admin Only
 ```
 Pages CRUD: GET/POST /pages, GET/PATCH/DELETE /pages/:id
+
+GET/POST /admin/paint_catalog_runs           review history / queue producer fetch
+GET      /admin/paint_catalog_runs/:id       batch comparisons and exclusions
+POST     /admin/paint_catalog_runs/:id/apply apply up to 50 selected comparisons atomically
+POST     /admin/paint_catalog_runs/:id/cancel release a stuck or unwanted fetch
+GET      /admin/paint_catalog_entries/:id    review details and manual matching
+PATCH    /admin/paint_catalog_entries/:id    apply or dismiss a comparison
 ```
