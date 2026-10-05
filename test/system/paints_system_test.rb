@@ -20,17 +20,12 @@ class PaintsSystemTest < ApplicationSystemTestCase
 
     assert_selector "h1", text: "Paint Catalog"
 
-    # Test sort bar with pagination info is present
-    assert_selector "h2.text-lg.font-semibold"
-    assert_text "Sort by:"
-
-    # Test paint cards are displayed
-    assert_selector ".card.bg-base-100", minimum: 1
-
-    # Test individual paint card elements
-    within(first(".card.bg-base-100")) do
-      assert_selector ".card-title"
-      assert_selector ".card-body"
+    assert_link "Name A-Z"
+    assert_link "Brand A-Z"
+    assert_selector "[id^='paint-card-']", count: 2
+    within("#paint-card-#{@paint1.id}") do
+      assert_link @paint1.name
+      assert_text @brand.name
     end
   end
 
@@ -42,7 +37,8 @@ class PaintsSystemTest < ApplicationSystemTestCase
     # Verify paint info is correctly displayed
     assert_text "Test Paint 1"
     assert_text "Test Paint 2"
-    assert_text "Test Brand • Test Line"
+    assert_text "Test Brand"
+    assert_text "Test Line"
     assert_text "Owned"
   end
 
@@ -53,7 +49,8 @@ class PaintsSystemTest < ApplicationSystemTestCase
     visit user_paints_path
 
     # Test empty state is displayed
-    assert_selector ".card.bg-base-200"
-    assert_text "No paints found"
+    assert_selector "h2", text: "Start your collection"
+    assert_link "Add Your First Paint"
+    assert_no_text @paint1.name
   end
 end

@@ -18,15 +18,11 @@ class DashboardSystemTest < ApplicationSystemTestCase
   test "viewing dashboard with paint collections" do
     visit user_root_path
 
+    assert_selector "h1", text: "Welcome back, #{@user.name}"
+    assert_selector "h2", text: "Recently Added Paints"
+    assert_text @paint1.name
+    assert_text @paint2.name
+    click_on "View My Collection"
     assert_selector "h1", text: "My Paint Collection"
-
-    # Test recent paints section
-    assert_selector "h2.card-title", text: "Recently Added"
-
-    # There might be user paints or the empty state message
-    assert_selector("ul.space-y-2", minimum: 0)
-
-    # No need to assert on specific paint card elements as they might not be there
-    # Just checking for the main sections is sufficient
   end
 end

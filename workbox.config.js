@@ -4,8 +4,9 @@ module.exports = {
     '**/*.{css,eot,html,ico,jpg,js,json,png,svg,ttf,txt,webmanifest,woff,woff2,webm,xml}'
   ],
   globFollow: true,
-  globStrict: true,
   globIgnores: [
+    'service-worker.js',
+    'service-worker.js.map',
     '**/*-es5.*.js',
     '3rdpartylicenses.txt',
     'assets/images/icons/icon-*.png',

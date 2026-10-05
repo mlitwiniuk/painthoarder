@@ -10,6 +10,20 @@
 @import "./components/slider.css";
 @import "./components/paint_details.css";
 
+/* Pagy's native navigation keeps the existing DaisyUI pagination appearance. */
+.pagy.series-nav {
+  @apply join;
+}
+.pagy.series-nav a {
+  @apply join-item btn btn-sm;
+}
+.pagy.series-nav a[aria-current="page"] {
+  @apply btn-primary;
+}
+.pagy.series-nav a[aria-disabled="true"]:not([aria-current="page"]) {
+  @apply btn-disabled;
+}
+
 @layer base {
   html {
     font-size: 0.9375rem;

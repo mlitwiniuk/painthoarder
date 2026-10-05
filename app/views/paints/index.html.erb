@@ -95,7 +95,7 @@
     <!-- Results Info -->
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
       <div class="text-base-content/60">
-        <%= raw pagy_info(@pagy) %>
+        <%= raw @pagy.info_tag %>
       </div>
     </div>
 
@@ -120,7 +120,7 @@
     <!-- Pagination -->
     <div class="flex justify-center">
       <div class="join">
-        <%== pagy_nav(@pagy, link_extra: 'class="join-item btn btn-sm"') %>
+        <%== @pagy.series_nav %>
       </div>
     </div>
   <% else %>

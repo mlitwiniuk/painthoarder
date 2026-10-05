@@ -8,7 +8,7 @@ class ProductLinesController < ApplicationController
     @q = @product_line.paints.includes(product_line: :brand).ransack(params[:q])
 
     @query = apply_filters(@q.result).order(name: :asc)
-    @pagy, @paints = pagy(@query, items: 24)
+    @pagy, @paints = pagy(@query, limit: 24)
 
     @color_categories = ColorCategorization::COLOR_CATEGORIES
   end

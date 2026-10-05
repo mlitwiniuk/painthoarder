@@ -38,8 +38,10 @@ class PaintPhotoAnalyzerTest < ActiveSupport::TestCase
     fake_chat = stub("chat")
     fake_chat.stubs(:with_temperature).returns(fake_chat)
     fake_chat.stubs(:with_instructions).returns(fake_chat)
-    fake_chat.stubs(:with_tool).returns(fake_chat)
-    fake_chat.stubs(:ask).returns(stub(content: "Done"))
+    fake_chat.stubs(:with_tools).returns(fake_chat)
+    fake_chat.stubs(:generate)
+    fake_chat.stubs(:run_tools)
+    fake_chat.stubs(:ask_later).returns(stub(content: "Done"))
 
     RubyLLM.stubs(:chat).returns(fake_chat)
 
@@ -60,8 +62,10 @@ class PaintPhotoAnalyzerTest < ActiveSupport::TestCase
     fake_chat = stub("chat")
     fake_chat.stubs(:with_temperature).returns(fake_chat)
     fake_chat.stubs(:with_instructions).returns(fake_chat)
-    fake_chat.stubs(:with_tool).returns(fake_chat)
-    fake_chat.stubs(:ask).returns(stub(content: "No paints found"))
+    fake_chat.stubs(:with_tools).returns(fake_chat)
+    fake_chat.stubs(:generate)
+    fake_chat.stubs(:run_tools)
+    fake_chat.stubs(:ask_later).returns(stub(content: "No paints found"))
 
     RubyLLM.stubs(:chat).returns(fake_chat)
 
@@ -75,8 +79,10 @@ class PaintPhotoAnalyzerTest < ActiveSupport::TestCase
     fake_chat = stub("chat")
     fake_chat.stubs(:with_temperature).returns(fake_chat)
     fake_chat.stubs(:with_instructions).returns(fake_chat)
-    fake_chat.stubs(:with_tool).returns(fake_chat)
-    fake_chat.stubs(:ask).raises(RubyLLM::Error.new(nil, "API connection failed"))
+    fake_chat.stubs(:with_tools).returns(fake_chat)
+    fake_chat.stubs(:generate)
+    fake_chat.stubs(:run_tools)
+    fake_chat.stubs(:ask_later).raises(RubyLLM::Error.new("API connection failed"))
 
     RubyLLM.stubs(:chat).returns(fake_chat)
 

@@ -1,5 +1,7 @@
 require:
   - standard
+
+plugins:
   - standard-custom
   - standard-performance
   - standard-rails
@@ -13,12 +15,10 @@ inherit_gem:
   standard-performance: config/base.yml
   standard-custom: config/base.yml
   standard-rails: config/base.yml
-  rubocop-rails: config/default.yml
-  rubocop-factory_bot: config/default.yml
 
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.3
+  TargetRubyVersion: 4.0
   Exclude:
     - bin/*
     - config/**/*

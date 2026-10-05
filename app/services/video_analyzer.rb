@@ -1,7 +1,7 @@
 class VideoAnalyzer
   class AnalysisError < StandardError; end
 
-  class PaintListSchema < RubyLLM::Schema
+  class PaintListSchema < Schematist::Schema
     description "List of miniature paints identified from a YouTube video"
 
     array :paints, description: "List of identified paints used in the video" do
@@ -63,29 +63,23 @@ class VideoAnalyzer
   def analyze_video
     Rails.logger.info("[VideoAnalyzer] Using low-res video analysis for video #{@video.youtube_video_id}")
 
-    content = RubyLLM::Content::Raw.new([
-      {
-        fileData: {
-          mimeType: "video/youtube",
-          fileUri: @video.youtube_url
-        }
-      },
-      {
-        text: "Please identify all the miniature paints mentioned or shown in this YouTube video."
-      }
-    ])
-
     chat = RubyLLM.chat(model: "gemini-2.5-flash")
       .with_temperature(0.3)
       .with_instructions(video_system_prompt)
       .with_schema(PaintListSchema)
-      .with_params(generationConfig: {mediaResolution: "MEDIA_RESOLUTION_LOW"})
+      .with_provider_options(generationConfig: {mediaResolution: "MEDIA_RESOLUTION_LOW"})
 
-    chat.ask(content)
+    chat.before_request do |payload|
+      payload.fetch(:contents).last.fetch(:parts).unshift(
+        {fileData: {mimeType: "video/youtube", fileUri: @video.youtube_url}}
+      )
+    end
+
+    chat.ask("Please identify all the miniature paints mentioned or shown in this YouTube video.")
   end
 
   def parse_response(response)
-    paints = response.content&.dig("paints") || []
+    paints = response.parsed&.dig("paints") || []
 
     paints.map do |paint|
       {

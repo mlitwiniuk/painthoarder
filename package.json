@@ -2,40 +2,47 @@
   "name": "app",
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",
-    "@hotwired/turbo-rails": "^8.0.13",
-    "@rails/actioncable": "^8.1.200",
-    "@rails/actiontext": "^8.1.200",
-    "@rails/activestorage": "^8.1.200",
-    "@rails/request.js": "^0.0.11",
+    "@hotwired/turbo-rails": "^8.0.23",
+    "@rails/actioncable": "^8.1.400",
+    "@rails/actiontext": "^8.1.400",
+    "@rails/activestorage": "^8.1.400",
+    "@rails/request.js": "^0.0.13",
     "@stimulus-components/rails-nested-form": "^5.0.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
-    "@tailwindcss/typography": "^0.5.16",
-    "autoprefixer": "^10.4.21",
+    "@tailwindcss/typography": "^0.5.20",
+    "autoprefixer": "^10.6.1",
     "d3": "^7.9.0",
-    "daisyui": "^5.0.6",
+    "daisyui": "^5.7.47",
     "heroicons": "^2.2.0",
-    "tailwind-scrollbar": "^4.0.1",
-    "tailwindcss": "^4.0.14",
+    "tailwind-scrollbar": "^4.0.2",
+    "tailwindcss": "4.3.3",
     "tailwindcss-displaymodes": "^1.0.8",
-    "tinymce": "^7.7.2",
-    "tom-select": "^2.4.3",
-    "trix": "^2.1.15",
-    "workbox-precaching": "^7.3.0",
-    "workbox-recipes": "^7.3.0",
-    "workbox-routing": "^7.3.0",
-    "workbox-strategies": "^7.3.0"
+    "tom-select": "^2.6.2",
+    "trix": "^2.1.19",
+    "workbox-precaching": "^7.4.1",
+    "workbox-routing": "^7.4.1",
+    "workbox-strategies": "^7.4.1"
   },
   "scripts": {
     "build": "node esbuild.config.mjs",
-    "build:css": "npx @tailwindcss/cli -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application-main.css --minify"
+    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application-main.css --minify",
+    "build:service-worker": "node script/build-service-worker.mjs"
   },
   "devDependencies": {
-    "@tailwindcss/cli": "4.1.10",
-    "esbuild": "^0.25.1",
+    "@tailwindcss/cli": "4.3.3",
+    "esbuild": "^0.28.2",
     "esbuild-plugin-copy": "^2.1.1",
-    "esbuild-rails": "^1.0.7",
-    "postcss": "^8.5.3",
-    "workbox-cli": "^7.3.0"
+    "esbuild-rails": "^1.0.8",
+    "postcss": "^8.5.28",
+    "workbox-build": "^7.4.1"
   },
-  "packageManager": "yarn@4.8.1+sha512.bc946f2a022d7a1a38adfc15b36a66a3807a67629789496c3714dd1703d2e6c6b1c69ff9ec3b43141ac7a1dd853b7685638eb0074300386a59c18df351ef8ff6"
+  "packageManager": "yarn@4.8.1+sha512.bc946f2a022d7a1a38adfc15b36a66a3807a67629789496c3714dd1703d2e6c6b1c69ff9ec3b43141ac7a1dd853b7685638eb0074300386a59c18df351ef8ff6",
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
+  "resolutions": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "@babel/plugin-transform-modules-systemjs": "^7.29.8"
+  }
 }

@@ -1,6 +1,6 @@
 # PaintHoarder Architecture
 
-Rails 8.1 / Ruby 3.4.7 / SQLite / Hotwire / DaisyUI
+Rails 8.1.4 / Ruby 4.0.7 / SQLite / Hotwire / DaisyUI
 
 ## Domain
 
@@ -52,6 +52,7 @@ Page (CMS, standalone)
 | Service | Purpose |
 |---|---|
 | PaintPhotoAnalyzer | LLM vision (RubyLLM + claude-haiku-4-5) identifies paints from photos. Uses RubyLLM::Tool for structured output. |
+| VideoAnalyzer | Gemini transcript analysis with direct YouTube fallback; Schematist structured responses. |
 | MarkdownColorParser | Parses markdown tables with paint/color data for bulk import |
 
 ## Concerns & Modules
@@ -66,7 +67,7 @@ Page (CMS, standalone)
 
 - **CSS**: TailwindCSS 4 + DaisyUI 5 + Propshaft
 - **JS**: esbuild (entry: `app/assets/javascripts/application.js`)
-- **Stimulus controllers**: `app/assets/javascripts/controllers/` (29 controllers)
+- **Stimulus controllers**: `app/assets/javascripts/controllers/`
 - **Turbo**: Heavy use of turbo_stream responses for index/show/search/create/update
 - **PWA**: Workbox service worker
 
@@ -81,7 +82,6 @@ Page (CMS, standalone)
 | add_to_collection_controller | Quick add paint to collection |
 | photo_analyze_controller | LLM photo upload flow |
 | modal_controller | DaisyUI modal management |
-| tinymce_controller | Rich text editor for pages |
 | theme_controller | Theme switching |
 
 ## Auth & Authorization
@@ -93,7 +93,11 @@ Page (CMS, standalone)
 
 ## External Integrations
 
-- **RubyLLM**: Claude API for paint photo analysis (credentials: `llm.anthropic_api_key`)
+- **RubyLLM 2**: Gemini API for videos; Claude API for paint photo analysis (credentials: `llm.anthropic_api_key`)
 - **AWS S3**: Active Storage in production
 - **Mailgun**: Email delivery
 - **AppSignal**: Monitoring
+
+## Dependency maintenance
+
+See [the upgrade summary](summary_dependency-upgrade.md) for runtime pins, compatibility decisions, audit exceptions, and deployment validation. Pages use Action Text/Trix. Yarn 4 owns the JavaScript lockfile.
