@@ -119,12 +119,15 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "can_create_video? respects week period" do
-    ENV["VIDEO_LIMIT_PERIOD"] = "week"
-    user = create(:confirmed_user, video_limit: 1)
-    create(:video, user: user, created_at: 2.days.ago)
-    refute user.can_create_video?
-  ensure
-    ENV.delete("VIDEO_LIMIT_PERIOD")
+    User.stubs(:video_limit_period).returns("week")
+    travel_to Time.zone.local(2026, 10, 5, 12) do
+      user = create(:confirmed_user, video_limit: 1)
+      video = create(:video, user: user, created_at: Time.current.beginning_of_week)
+      refute user.can_create_video?
+
+      video.update!(created_at: Time.current.beginning_of_week - 1.second)
+      assert user.can_create_video?
+    end
   end
 
   test "factory traits work correctly" do

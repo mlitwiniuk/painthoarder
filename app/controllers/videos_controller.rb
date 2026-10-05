@@ -7,7 +7,7 @@ class VideosController < ApplicationController
   def public_index
     @pagy, @videos = pagy(
       Video.completed.recent.includes(:user, :video_paints),
-      items: 12
+      limit: 12
     )
   end
 
@@ -15,7 +15,7 @@ class VideosController < ApplicationController
   def index
     @pagy, @videos = pagy(
       current_user.videos.recent.includes(:video_paints),
-      items: 12
+      limit: 12
     )
   end
 

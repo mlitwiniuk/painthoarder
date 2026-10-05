@@ -30,7 +30,7 @@
         <% end %>
       </div>
     <div class="mt-8 flex justify-center">
-      <%== pagy_nav(@pagy) %>
+      <%== @pagy.series_nav %>
     </div>
   <% else %>
     <%= render 'no_paints' %>

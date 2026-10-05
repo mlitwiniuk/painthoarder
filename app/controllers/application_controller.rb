@@ -2,7 +2,7 @@
 
 class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  include Pagy::Backend
+  include Pagy::Method
 
   # allow_browser versions: :modern
   self.responder = ApplicationResponder
@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
 
   rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
   rescue_from ActionController::UnknownFormat, with: :unknown_format
-  rescue_from Pagy::OverflowError, with: :pagy_overflow
+  rescue_from Pagy::RangeError, with: :pagy_overflow
 
   private
 

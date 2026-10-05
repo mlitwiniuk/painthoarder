@@ -13,13 +13,14 @@ class VideoAnalyzerTest < ActiveSupport::TestCase
     ]
 
     @mock_response = mock("response")
-    @mock_response.stubs(:content).returns({"paints" => @paint_data})
+    @mock_response.stubs(:parsed).returns({"paints" => @paint_data})
 
     @mock_chat = mock("chat")
     @mock_chat.stubs(:with_temperature).returns(@mock_chat)
     @mock_chat.stubs(:with_instructions).returns(@mock_chat)
     @mock_chat.stubs(:with_schema).returns(@mock_chat)
-    @mock_chat.stubs(:with_params).returns(@mock_chat)
+    @mock_chat.stubs(:with_provider_options).returns(@mock_chat)
+    @mock_chat.stubs(:before_request).returns(@mock_chat)
     @mock_chat.stubs(:ask).returns(@mock_response)
 
     RubyLLM.stubs(:chat).returns(@mock_chat)
@@ -71,16 +72,18 @@ class VideoAnalyzerTest < ActiveSupport::TestCase
     mock_api.stubs(:fetch).raises(StandardError.new("No transcript"))
     YoutubeRb::Transcript::YouTubeTranscriptApi.stubs(:new).returns(mock_api)
 
-    # Verify Raw content (not plain text) is sent
-    @mock_chat.expects(:ask).with(is_a(RubyLLM::Content::Raw)).returns(@mock_response)
+    payload = {contents: [{role: "user", parts: [{text: "Identify paints"}]}]}
+    @mock_chat.expects(:before_request).yields(payload).returns(@mock_chat)
+    @mock_chat.expects(:ask).with(is_a(String)).returns(@mock_response)
     # Verify low-res param is set
-    @mock_chat.expects(:with_params).with(generationConfig: {mediaResolution: "MEDIA_RESOLUTION_LOW"}).returns(@mock_chat)
+    @mock_chat.expects(:with_provider_options).with(generationConfig: {mediaResolution: "MEDIA_RESOLUTION_LOW"}).returns(@mock_chat)
 
     analyzer = VideoAnalyzer.new(@video)
     results = analyzer.analyze
 
     assert_equal 2, results.length
     assert_equal "Citadel", results[0][:brand]
+    assert_equal @video.youtube_url, payload[:contents][0][:parts][0][:fileData][:fileUri]
   end
 
   # --- Shared response parsing ---
@@ -110,7 +113,7 @@ class VideoAnalyzerTest < ActiveSupport::TestCase
     mock_api.stubs(:fetch).raises(StandardError.new("No transcript"))
     YoutubeRb::Transcript::YouTubeTranscriptApi.stubs(:new).returns(mock_api)
 
-    @mock_response.stubs(:content).returns({"paints" => []})
+    @mock_response.stubs(:parsed).returns({"paints" => []})
 
     analyzer = VideoAnalyzer.new(@video)
     results = analyzer.analyze
@@ -123,7 +126,7 @@ class VideoAnalyzerTest < ActiveSupport::TestCase
     mock_api.stubs(:fetch).raises(StandardError.new("No transcript"))
     YoutubeRb::Transcript::YouTubeTranscriptApi.stubs(:new).returns(mock_api)
 
-    @mock_response.stubs(:content).returns(nil)
+    @mock_response.stubs(:parsed).returns(nil)
 
     analyzer = VideoAnalyzer.new(@video)
     results = analyzer.analyze
@@ -138,7 +141,7 @@ class VideoAnalyzerTest < ActiveSupport::TestCase
     mock_api.stubs(:fetch).raises(StandardError.new("No transcript"))
     YoutubeRb::Transcript::YouTubeTranscriptApi.stubs(:new).returns(mock_api)
 
-    @mock_chat.stubs(:ask).raises(RubyLLM::Error.new(nil, "API error"))
+    @mock_chat.stubs(:ask).raises(RubyLLM::Error.new("API error"))
 
     analyzer = VideoAnalyzer.new(@video)
     assert_raises(VideoAnalyzer::AnalysisError) { analyzer.analyze }
@@ -146,6 +149,6 @@ class VideoAnalyzerTest < ActiveSupport::TestCase
 
   test "PaintListSchema generates valid JSON schema" do
     schema = VideoAnalyzer::PaintListSchema.new.to_json_schema
-    assert schema[:schema][:properties].key?(:paints)
+    assert schema.fetch("properties").key?("paints")
   end
 end

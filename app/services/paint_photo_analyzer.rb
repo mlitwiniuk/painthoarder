@@ -4,7 +4,7 @@ class PaintPhotoAnalyzer
   class PaintIdentifier < RubyLLM::Tool
     description "Submit the list of identified miniature paints from the photo"
 
-    params do
+    parameters do
       array :paints, description: "List of identified paints" do
         object do
           string :brand, description: "Paint brand name (e.g., Citadel, Vallejo, Army Painter)"
@@ -18,7 +18,7 @@ class PaintPhotoAnalyzer
 
     def execute(paints:)
       @identified_paints = paints
-      halt "Paints identified"
+      "Paints identified"
     end
   end
 
@@ -33,12 +33,15 @@ class PaintPhotoAnalyzer
     chat = RubyLLM.chat
       .with_temperature(0.3)
       .with_instructions(system_prompt)
-      .with_tool(tool)
+      .with_tools(tool)
 
-    chat.ask(
+    chat.ask_later(
       "Please identify all the miniature paints visible in this image and submit them using the paint identifier tool.",
       with: tempfile.path
     )
+
+    chat.generate
+    chat.run_tools
 
     paints = tool.identified_paints || []
     paints.map do |paint|

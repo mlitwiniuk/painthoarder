@@ -1,13 +1,14 @@
 source "https://rubygems.org"
+ruby file: ".ruby-version"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.1.0"
+gem "rails", "~> 8.1.4"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use sqlite3 as the database for Active Record
-gem "sqlite3", ">= 2.1"
+gem "sqlite3", "~> 2.9", ">= 2.9.6"
 # Use the Puma web server [https://github.com/puma/puma]
-gem "puma", ">= 5.0"
+gem "puma", "~> 8.0", ">= 8.0.2"
 # Bundle and transpile JavaScript [https://github.com/rails/jsbundling-rails]
 gem "jsbundling-rails"
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
@@ -28,7 +29,7 @@ gem "tzinfo-data", platforms: %i[windows jruby]
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
 gem "solid_cache"
 gem "solid_queue"
-gem "solid_cable"
+gem "solid_cable", "~> 3.0"
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
@@ -45,8 +46,8 @@ gem "active_storage_validations"
 
 gem "aws-sdk-s3", require: false
 gem "friendly_id", "~> 5.5.0"
-gem "pagy", "~> 9.1"
-gem "ransack", github: "activerecord-hackery/ransack", branch: "main"
+gem "pagy", "~> 43.7"
+gem "ransack", "~> 4.4", ">= 4.4.3"
 gem "premailer-rails"
 gem "mailgun-ruby", "~>1.2"
 
@@ -75,6 +76,7 @@ group :test do
   gem "mocha"
   gem "shoulda-context"
   gem "shoulda-matchers"
+  gem "webmock", "~> 3.0"
 end
 
 group :development do
@@ -87,15 +89,14 @@ end
 
 # Addons
 gem "acts_as_list"
-gem "devise"
+gem "devise", "~> 5.0", ">= 5.0.4"
 gem "enum_help"
 gem "inline_svg"
 gem "responders"
 gem "show_for"
 gem "simple_form"
 gem "simple-navigation"
-gem "ruby_llm"
-gem "ruby_llm-schema"
+gem "ruby_llm", "~> 2.0"
 gem "youtube-transcript-rb"
 gem "sitemap_generator", "~> 6.3"
 

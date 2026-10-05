@@ -15,7 +15,7 @@ class PaintsController < ApplicationController
     @query = @query.order(name: :asc)
 
     # Pagination with pagy
-    @pagy, @paints = pagy(@query, items: 24)
+    @pagy, @paints = pagy(@query, limit: 24)
 
     # Data for filter dropdowns
     @brands = Brand.order(:name)
