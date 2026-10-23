@@ -1,8 +1,8 @@
 module PaintCatalog
   class Sync
-    def initialize(run, client: ShopifyClient.new)
+    def initialize(run, client: nil)
       @run = run
-      @client = client
+      @client = client || Sources.client(run.source)
     end
 
     def call
@@ -21,8 +21,10 @@ module PaintCatalog
       end
       return unless claimed
 
-      products = @client.fetch(@run.source)
-      payloads, exclusions = Normalizer.new(@run.source).call(products)
+      response = @client.fetch(@run.source)
+      products = Sources.warhub?(@run.source) ? response.fetch("paints") : response
+      metadata = Sources.warhub?(@run.source) ? response.except("paints") : {}
+      payloads, exclusions = Sources.normalizer(@run.source).call(products)
       raise ShopifyClient::FetchError, "No recognizable paints; producer format may have changed" if payloads.empty?
       @run.with_lock do
         raise ShopifyClient::FetchError, "This run has been cancelled" unless @run.status == "running"
@@ -31,7 +33,7 @@ module PaintCatalog
         payloads.each { |payload| @run.entries.create!(diff.call(payload)) }
         PaintCatalogRecord.where(source: @run.source, external_id: payloads.pluck("external_id"))
           .update_all(last_seen_at: Time.current)
-        @run.update!(status: "ready", snapshot: products, exclusions: exclusions,
+        @run.update!(status: "ready", snapshot: products, source_metadata: metadata, exclusions: exclusions,
           warnings: warnings, finished_at: Time.current)
       end
       @run

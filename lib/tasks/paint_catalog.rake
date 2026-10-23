@@ -2,7 +2,7 @@ namespace :paint_catalog do
   desc "Refresh and publish confident producer changes (DRY_RUN=1 saves a preview only)"
   task :fetch, [:source] => :environment do |_task, args|
     source = args.fetch(:source)
-    abort "Choose monument or army_painter" unless PaintCatalog::Sources::CONFIG.key?(source)
+    abort "Choose one of: #{PaintCatalog::Sources::CONFIG.keys.join(", ")}" unless PaintCatalog::Sources::CONFIG.key?(source)
     run = PaintCatalogRun.start!(source, auto_apply: ENV["DRY_RUN"] != "1")
     PaintCatalog::Sync.new(run).call
     puts "Batch #{run.id}: #{run.status}"

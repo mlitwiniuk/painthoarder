@@ -1,6 +1,6 @@
 class PaintCatalogRun < ApplicationRecord
   has_many :entries, class_name: "PaintCatalogEntry", dependent: :destroy
-  validates :source, inclusion: {in: %w[monument army_painter]}
+  validates :source, inclusion: {in: ->(_) { PaintCatalog::Sources::CONFIG.keys }}
   validates :status, inclusion: {in: %w[queued running ready failed]}
   validates :automation_status, inclusion: {in: %w[pending completed blocked failed]}
 

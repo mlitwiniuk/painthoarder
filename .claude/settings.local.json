@@ -25,7 +25,9 @@
       "mcp__appsignal-painthoarder-production__get_incident",
       "Bash(bin/rubocop:*)",
       "mcp__appsignal_painthoarder_production__get_incident",
-      "mcp__appsignal_painthoarder_production__get_app_resources"
+      "mcp__appsignal_painthoarder_production__get_app_resources",
+      "Bash(rbenv versions *)",
+      "Bash(asdf list *)"
     ]
   }
 }

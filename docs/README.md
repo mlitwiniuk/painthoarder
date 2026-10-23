@@ -17,7 +17,7 @@ Types: `ref` = current reference, `guide` = operating instructions, `summary` = 
 
 ## Guides
 
-- `guide` [Paint catalog refresh](guide_paint-catalog.md): Automatic producer updates, exceptions, scheduling, unknown swatches, and recovery.
+- `guide` [Paint catalog refresh](guide_paint-catalog.md): Automatic producer and WarHub updates, exceptions, color provenance, and recovery.
 - `guide` [Testing](guide_testing.md): Setup, regression coverage, audit commands, and validation limits.
 
 ## Implementation summaries

@@ -3,6 +3,8 @@ module PaintCatalog
     def initialize(source)
       @source = source
       @paints = Brand.find_by(name: Sources.fetch(source).fetch(:brand))&.paints&.includes(:product_line)&.to_a || []
+      @by_code = @paints.group_by { |paint| Identity.code(source, paint.code) }
+      @by_name = @paints.group_by { |paint| Identity.paint_name(source, paint.name) }
       @records = PaintCatalogRecord.where(source: source).includes(:paint).index_by(&:external_id)
       @rejections = PaintCatalogEntry.joins(:paint_catalog_run).includes(:paint)
         .where(paint_catalog_runs: {source: source}, status: %w[rejected applied]).order(id: :desc)
@@ -19,17 +21,19 @@ module PaintCatalog
       if (record = @records[payload.fetch("external_id")])
         paint = record.paint
         fields = Identity::FIELDS
-        unchanged = paint.name == payload.fetch("name") && record.payload.slice(*fields) == payload.slice(*fields)
+        unchanged = paint.name == payload.fetch("name") && record.payload.slice(*fields) == payload.slice(*fields) &&
+          !(payload["hex"].present? && !paint.color_known?)
         action = unchanged ? "unchanged" : "update"
         return attributes(payload, action, paint)
       end
 
-      codes = [payload.fetch("sku"), payload.fetch("code")]
-      candidates = @paints.select { |paint| codes.include?(paint.code) }
+      candidates = Identity.codes(@source, payload).flat_map { |code| @by_code.fetch(code, []) }.uniq
+      if Sources.warhub?(@source) && candidates.many?
+        within_family = candidates.select { |paint| same_family?(paint, payload) }
+        candidates = within_family if within_family.any?
+      end
       if candidates.empty?
-        candidates = @paints.select do |paint|
-          Identity.name(paint.name) == Identity.name(payload.fetch("name")) && same_family?(paint, payload)
-        end
+        candidates = name_candidates(payload).select { |paint| same_family?(paint, payload) }
       end
       if candidates.one?
         paint = candidates.first
@@ -39,7 +43,7 @@ module PaintCatalog
         end
       end
       if candidates.empty?
-        candidates = @paints.select { |paint| Identity.name(paint.name) == Identity.name(payload.fetch("name")) }
+        candidates = name_candidates(payload)
         # Equal names in explicitly different families represent different paints.
         # Unknown legacy ranges remain exceptions rather than guessed matches.
         family = Identity.family(@source, payload.fetch("range"))
@@ -53,6 +57,14 @@ module PaintCatalog
     end
 
     private
+
+    def name_candidates(payload)
+      variants = Array(payload["variant_codes"]).map { |code| Identity.code(@source, code) }
+      @by_name.fetch(Identity.paint_name(@source, payload.fetch("name")), []).reject do |paint|
+        variants.include?(Identity.code(@source, paint.code)) &&
+          Identity.code(@source, paint.code) != Identity.code(@source, payload.fetch("code"))
+      end
+    end
 
     def same_family?(paint, payload)
       family = Identity.family(@source, payload.fetch("range"))

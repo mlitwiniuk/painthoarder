@@ -1,4 +1,4 @@
-generated_at: "2026-10-05T10:29:59+00:00"
+generated_at: "2026-10-23T11:43:56+00:00"
 generated_from: "docs/README.md"
 fast_paths:
 - label: "Producer updates"
@@ -37,7 +37,7 @@ docs:
   title: "Paint catalog refresh"
   type: "guide"
   section: "Guides"
-  summary: "Automatic producer updates, exceptions, scheduling, unknown swatches, and recovery."
+  summary: "Automatic producer and WarHub updates, exceptions, color provenance, and recovery."
 - path: "docs/guide_testing.md"
   title: "Testing"
   type: "guide"

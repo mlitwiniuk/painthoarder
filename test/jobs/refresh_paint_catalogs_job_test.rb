@@ -2,13 +2,13 @@ require "test_helper"
 
 class RefreshPaintCatalogsJobTest < ActiveJob::TestCase
   test "scheduled refresh queues automatic publication once per producer" do
-    assert_enqueued_jobs 2, only: PaintCatalogSyncJob do
+    assert_enqueued_jobs PaintCatalog::Sources::CONFIG.size, only: PaintCatalogSyncJob do
       assert_no_difference("Paint.count") { RefreshPaintCatalogsJob.perform_now }
     end
     assert_no_enqueued_jobs only: PaintCatalogSyncJob do
       RefreshPaintCatalogsJob.perform_now
     end
-    assert_equal %w[army_painter monument], PaintCatalogRun.order(:source).pluck(:source)
+    assert_equal PaintCatalog::Sources::CONFIG.keys.sort, PaintCatalogRun.order(:source).pluck(:source)
     assert PaintCatalogRun.all.all?(&:auto_apply?)
   end
 
@@ -23,7 +23,7 @@ class RefreshPaintCatalogsJobTest < ActiveJob::TestCase
     stale = PaintCatalogRun.start!("monument")
     stale.update_columns(status: "running", updated_at: 3.hours.ago)
     fresh = PaintCatalogRun.start!("army_painter")
-    assert_enqueued_jobs 1, only: PaintCatalogSyncJob do
+    assert_enqueued_jobs PaintCatalog::Sources::CONFIG.size - 1, only: PaintCatalogSyncJob do
       RefreshPaintCatalogsJob.perform_now
     end
     assert_equal "failed", stale.reload.status

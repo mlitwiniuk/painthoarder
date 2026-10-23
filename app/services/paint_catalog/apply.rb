@@ -44,15 +44,19 @@ module PaintCatalog
           if line.paints.where(code: [payload.fetch("code"), payload.fetch("sku")]).exists?
             raise Conflict, "That code already exists in the range; link the existing paint"
           end
-          paint = line.paints.create!(name: payload.fetch("name"), code: payload.fetch("code"), color_source: "unknown")
+          paint = line.paints.create!({name: payload.fetch("name"), code: payload.fetch("code"), color_source: "unknown"}
+            .merge(swatch_attributes(run.source, payload)))
         end
         other = PaintCatalogRecord.where(source: run.source, paint_id: paint.id).where.not(external_id: entry.external_id)
         raise Conflict, "This paint is already linked to another producer identity" if other.exists?
 
         record = existing || PaintCatalogRecord.new(source: run.source, external_id: entry.external_id, paint: paint)
         aliases = (record.aliases + [paint.name, paint.code, payload.fetch("sku")]).uniq
-        # Existing codes, range membership, RGB/LAB, and associations survive.
-        paint.update!(name: payload.fetch("name")) if paint.name != payload.fetch("name")
+        # Existing codes, range membership, known colors, and associations survive.
+        changes = {}
+        changes[:name] = payload.fetch("name") if paint.name != payload.fetch("name")
+        changes.merge!(swatch_attributes(run.source, payload)) unless paint.color_known?
+        paint.update!(changes) if changes.any?
         record.update!(sku: payload.fetch("sku"), source_url: payload.fetch("url"), payload: payload,
           aliases: aliases, last_seen_at: run.finished_at)
         entry.update!(paint: paint, status: "applied", reviewed_by: reviewer, reviewed_at: Time.current,
@@ -61,6 +65,14 @@ module PaintCatalog
       end
     rescue ActiveRecord::RecordNotUnique
       raise Conflict, "Another reviewer applied a conflicting match; fetch again"
+    end
+
+    def self.swatch_attributes(source, payload)
+      return {} unless Sources.warhub?(source) && payload["hex"].present?
+      hex = payload.fetch("hex")
+      raise Conflict, "Invalid catalog swatch" unless hex.match?(/\A#[0-9a-fA-F]{6}\z/)
+      red, green, blue = hex.delete_prefix("#").scan(/../).map { |channel| channel.to_i(16) }
+      {red: red, green: green, blue: blue, color_source: "warhub"}
     end
   end
 end

@@ -3,17 +3,17 @@
 <p class="mb-4"><%= @entry.action.humanize %> · <%= @entry.status.humanize %></p>
 <% if @entry.automation_reason %><p class="alert alert-warning mb-4"><%= @entry.automation_reason %></p><% end %>
 <% if @entry.application_method == "automatic" %><p class="mb-4">Published automatically from the producer catalog.</p><% end %>
-<%= link_to "View producer listing", @entry.payload.fetch("url"), target: "_blank", rel: "noopener noreferrer", class: "link" %>
+<%= link_to "View source listing", @entry.payload.fetch("url"), target: "_blank", rel: "noopener noreferrer", class: "link" %>
 <table class="table my-5">
   <thead><tr><th></th><th>Existing catalog</th><th>Producer listing</th></tr></thead>
   <tbody>
     <tr><th>Name</th><td><%= @entry.paint&.name || "—" %></td><td><%= @entry.payload["name"] %></td></tr>
     <tr><th>Code / SKU</th><td><%= @entry.paint&.code || "—" %></td><td><%= @entry.payload["sku"] %></td></tr>
     <tr><th>Range</th><td><%= @entry.paint&.product_line&.name || "—" %></td><td><%= @entry.payload["range"] %></td></tr>
-    <tr><th>Swatch</th><td><%= @entry.paint&.hex_color || "Unknown" %></td><td>Not supplied; existing swatch is preserved</td></tr>
+    <tr><th>Swatch</th><td><%= @entry.paint&.hex_color || "Unknown" %></td><td><%= @entry.payload["hex"] || "Not supplied; existing swatch is preserved" %></td></tr>
   </tbody>
 </table>
-<p class="mb-4">Existing paint codes and range membership are preserved. The producer SKU is stored separately. New paints are available for collections immediately, with color matching disabled until a swatch is added.</p>
+<p class="mb-4">Existing paint codes, range membership and known swatches are preserved. Source identifiers are stored separately. Paints without a source swatch are available for collections, with color matching disabled until a swatch is added.</p>
 <% if @entry.status == "pending" && @entry.paint_catalog_run.reviewable? %>
   <%= form_with url: admin_paint_catalog_entry_path(@entry), method: :patch do |form| %>
     <%= hidden_field_tag :decision, "apply" %>
