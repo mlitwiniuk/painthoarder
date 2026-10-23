@@ -1,10 +1,11 @@
 import { Controller } from "@hotwired/stimulus";
+
+const THEMES = ["painthoarder", "painthoarder-light"];
+
 export default class extends Controller {
   initialize() {
     this.apply();
   }
-
-  connect() {}
 
   apply() {
     document.documentElement.setAttribute("data-theme", this.theme);
@@ -12,23 +13,25 @@ export default class extends Controller {
 
   switch(event) {
     this.theme = event.params.theme;
-    console.log("switching" + this.theme);
     this.apply();
   }
 
-  get systemDefault() {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
+  toggle() {
+    this.theme = this.theme === THEMES[0] ? THEMES[1] : THEMES[0];
+    this.apply();
   }
 
   get theme() {
-    return (
-      window.localStorage.getItem("theme") || (this.theme = this.systemDefault)
-    );
+    let stored = null;
+    try {
+      stored = window.localStorage.getItem("theme");
+    } catch (e) {}
+    return THEMES.includes(stored) ? stored : THEMES[0];
   }
 
   set theme(value) {
-    window.localStorage.setItem("theme", value);
+    try {
+      window.localStorage.setItem("theme", value);
+    } catch (e) {}
   }
 }

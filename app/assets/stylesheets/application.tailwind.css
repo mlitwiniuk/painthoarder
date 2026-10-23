@@ -3,10 +3,89 @@
 @plugin "tailwindcss-displaymodes";
 @plugin 'tailwind-scrollbar';
 @plugin "daisyui" {
-  themes: all;
+  themes: false;
+}
+
+/* PaintHoarder design system: bone-on-ink dark default, warm light variant.
+   Tokens come from the "C · Bold" redesign (design/redesign-reference). */
+@plugin "daisyui/theme" {
+  name: "painthoarder";
+  default: true;
+  prefersdark: true;
+  color-scheme: dark;
+
+  /* base-100 = surface, base-200 = surface-2, base-300 = border.
+     The page itself sits one step darker (--color-page). */
+  --color-base-100: #1E1B21;
+  --color-base-200: #26222A;
+  --color-base-300: #2E2A31;
+  --color-base-content: #EEE7D8;
+  --color-primary: #FF6B2C;
+  --color-primary-content: #141216;
+  --color-secondary: #C9C1B2;
+  --color-secondary-content: #141216;
+  --color-accent: #FF6B2C;
+  --color-accent-content: #141216;
+  --color-neutral: #EEE7D8;
+  --color-neutral-content: #141216;
+  --color-info: #8FB8E8;
+  --color-info-content: #141216;
+  --color-success: #9FD39A;
+  --color-success-content: #141216;
+  --color-warning: #F2C14E;
+  --color-warning-content: #141216;
+  --color-error: #FF8A80;
+  --color-error-content: #141216;
+
+  --radius-selector: 0.125rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.25rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.3rem;
+  --border: 2px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "painthoarder-light";
+  default: false;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #FAF7F1;
+  --color-base-200: #E9E3D7;
+  --color-base-300: #D9D1C2;
+  --color-base-content: #17141A;
+  --color-primary: #FF6B2C;
+  --color-primary-content: #141216;
+  --color-secondary: #3D3731;
+  --color-secondary-content: #F1ECE2;
+  --color-accent: #FF6B2C;
+  --color-accent-content: #141216;
+  --color-neutral: #17141A;
+  --color-neutral-content: #F1ECE2;
+  --color-info: #1F5C99;
+  --color-info-content: #FAF7F1;
+  --color-success: #2F6B2C;
+  --color-success-content: #FAF7F1;
+  --color-warning: #8A6100;
+  --color-warning-content: #FAF7F1;
+  --color-error: #B3261E;
+  --color-error-content: #FAF7F1;
+
+  --radius-selector: 0.125rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.25rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.3rem;
+  --border: 2px;
+  --depth: 0;
+  --noise: 0;
 }
 
 /* Import component styles */
+@import "./components/painthoarder.css";
 @import "./components/slider.css";
 @import "./components/paint_details.css";
 
@@ -24,11 +103,6 @@
   @apply btn-disabled;
 }
 
-@layer base {
-  html {
-    font-size: 0.9375rem;
-  } /* 15 px; adjust to taste */
-}
 
 .scrollbar-rounded {
   @apply scrollbar-thin scrollbar-thumb-primary hover:scrollbar-thumb-primary active:scrollbar-thumb-primary scrollbar-track-base-200;
@@ -162,17 +236,17 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--color-base-200);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--color-line-strong);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--color-muted);
 }
 
 /* Custom scrollbar for modal */
@@ -242,51 +316,22 @@ html {
   transition: all 0.2s ease;
 }
 
-/* Status-specific radio card styling with theme support */
-:root {
-  --radio-owned-bg: #3b82f6;
-  --radio-owned-text: white;
-  --radio-wishlist-bg: #8b5cf6;
-  --radio-wishlist-text: white;
-  --radio-avoid-bg: #ef4444;
-  --radio-avoid-text: white;
-}
-
-/* Dark theme overrides */
-[data-theme="dark"],
-[data-theme="night"],
-[data-theme="coffee"],
-[data-theme="black"] {
-  --radio-owned-bg: #60a5fa;
-  --radio-owned-text: #1e293b;
-  --radio-wishlist-bg: #a78bfa;
-  --radio-wishlist-text: #1e293b;
-  --radio-avoid-bg: #f87171;
-  --radio-avoid-text: #1e293b;
-}
-
+/* Status radio cards share the status semantics: owned = filled bone,
+   wanted = yellow outline, avoid = coral outline. */
 input[type="radio"][value="owned"]:checked + .radio-card {
-  background-color: var(--radio-owned-bg) !important;
-  border-color: var(--radio-owned-bg) !important;
-  color: var(--radio-owned-text) !important;
-  font-weight: 600 !important;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+  background-color: var(--color-neutral) !important;
+  border-color: var(--color-neutral) !important;
+  color: var(--color-neutral-content) !important;
 }
 
 input[type="radio"][value="wishlist"]:checked + .radio-card {
-  background-color: var(--radio-wishlist-bg) !important;
-  border-color: var(--radio-wishlist-bg) !important;
-  color: var(--radio-wishlist-text) !important;
-  font-weight: 600 !important;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3) !important;
+  border-color: var(--color-wanted) !important;
+  color: var(--color-wanted) !important;
 }
 
 input[type="radio"][value="avoid"]:checked + .radio-card {
-  background-color: var(--radio-avoid-bg) !important;
-  border-color: var(--radio-avoid-bg) !important;
-  color: var(--radio-avoid-text) !important;
-  font-weight: 600 !important;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
+  border-color: var(--color-avoid) !important;
+  color: var(--color-avoid) !important;
 }
 
 /* Step content animations */

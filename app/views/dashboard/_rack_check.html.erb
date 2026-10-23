@@ -1,0 +1,36 @@
+<%# "At the shop? Do I own it?" results; rendered alone for the rack-check frame. %>
+<turbo-frame id="rack-check">
+  <% if @check_query.present? %>
+    <% if @check_results.any? %>
+      <ul class="flex flex-col gap-2" aria-live="polite">
+        <% @check_results.each do |paint, user_paint| %>
+          <li>
+            <%= link_to (user_paint ? user_paint_path(user_paint) : directory_paint_path_for(paint)),
+                  class: "flex items-center gap-3 p-3 rounded bg-page text-base-content no-underline hover:text-accent-text",
+                  data: {turbo_frame: "_top"} do %>
+              <span class="w-10 h-10 rounded-[3px] border border-line-strong shrink-0" style="<%= paint_swatch_style(paint) %>"></span>
+              <span class="flex-1 min-w-0 flex flex-col">
+                <b class="text-base font-bold leading-tight"><%= paint.name %></b>
+                <span class="text-[13px] text-muted"><%= paint.product_line.brand.name %> · <%= paint.product_line.name %></span>
+              </span>
+              <%= status_tag(user_paint&.status, size: :lg, add: true) %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+      <% top_status = @check_results.first.last&.status %>
+      <p class="mt-3 text-sm font-semibold">
+        <%= case top_status
+            when "owned" then "Put it back. It's already on your rack."
+            when "wishlist" then "It's on your shopping list, so go ahead."
+            when "avoid" then "You marked this one Avoid. Walk away."
+            else "Not on your rack yet."
+            end %>
+      </p>
+    <% else %>
+      <p class="text-sm font-semibold" aria-live="polite">No paints match “<%= @check_query %>”.</p>
+    <% end %>
+  <% else %>
+    <p class="text-sm">Type a paint name to see if it's already on your rack.</p>
+  <% end %>
+</turbo-frame>

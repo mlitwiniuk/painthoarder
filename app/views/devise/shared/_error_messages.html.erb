@@ -1,15 +1,15 @@
 <% if resource.errors.any? %>
-  <div id="error_explanation" data-turbo-cache="false">
-    <h2>
-      <%= I18n.t("errors.messages.not_saved",
-                 count: resource.errors.count,
-                 resource: resource.class.model_name.human.downcase)
-       %>
-    </h2>
-    <ul>
-      <% resource.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
+  <div id="error_explanation" role="alert" data-turbo-cache="false"
+       class="flex items-start gap-2.5 px-3.5 py-3 border-2 border-avoid rounded text-sm leading-snug">
+    <%= ph_icon(:alert, size: 18, stroke: 2.4, css: "shrink-0 mt-px text-avoid") %>
+    <span>
+      <% if resource.errors.count == 1 %>
+        Fix one thing below and you're in.
+      <% else %>
+        Fix <%= resource.errors.count %> things below and you're in.
       <% end %>
-    </ul>
+      <% base = resource.errors.full_messages_for(:base) %>
+      <% if base.any? %><br><%= base.to_sentence %><% end %>
+    </span>
   </div>
 <% end %>

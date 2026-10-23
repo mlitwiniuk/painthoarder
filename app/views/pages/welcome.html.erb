@@ -1,311 +1,110 @@
 <%# app/views/pages/welcome.html.erb %>
 <% content_for :title, "PaintHoarder - The Social Hub for Miniature Painters" %>
-<% @hide_footer = true %>
+<% content_for :bare, true %>
+<%
+  # "12,500+" style: round big numbers down so the claim stays true.
+  rounded_count = ->(n) { n >= 1000 ? "#{number_with_delimiter((n / 100) * 100)}+" : number_with_delimiter(n) }
 
-<% content_for(:hero) do %>
-<!-- Hero Section -->
-<header class="hero min-h-screen bg-gradient-to-br from-primary via-primary to-secondary">
-  <div class="hero-content text-center text-primary-content">
-    <div class="max-w-4xl">
-      <div class="mb-8">
-        <div class="flex justify-center mb-6">
-          <div class="badge badge-accent badge-lg font-bold">
-            <%= number_to_human(@paint_count, precision: 1) %>+ Paints Catalogued
-          </div>
-        </div>
-        <h1 class="text-6xl font-bold mb-6 leading-tight">
-          The Social Hub for <br>
-          <span class="text-accent">Miniature Painters</span>
-        </h1>
-        <p class="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-          Organize your paint collection, discover new projects, and connect with fellow painters.
-          Turn your hobby into inspiration for others.
-        </p>
-      </div>
+  rack = [
+    ["#9A1115", "MEPHISTON RED", 220], ["#1F3A5A", "DK PRUSSIAN BLUE", 180], ["#A07D3B", "RETRIBUTOR", 240],
+    ["#DBD1B2", "WRAITHBONE", 200], ["#8A5A2B", "SNAKEBITE", 160], ["#F2F1EC", "TITANIUM WHT", 230],
+    ["#5E6466", "LEADBELCHER", 190], ["#1C1A1A", "NULN OIL", 150], ["#D2A285", "KISLEV FLESH", 210],
+    ["#3E6B3A", "WARBOSS GRN", 175], ["#8E4A26", "RUST", 225], ["#4B2E5C", "NAGGAROTH NT", 195],
+    ["#D9762B", "GRYPH-HOUND", 170], ["#2C6E7A", "AHRIMAN BLUE", 205]
+  ]
+%>
 
-      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-        <%= link_to new_user_registration_path, class: "btn btn-accent btn-lg" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          Start Your Collection
-        <% end %>
-        <%= link_to "#community", class: "btn btn-ghost btn-lg border-2 border-accent text-accent hover:bg-accent hover:text-accent-content" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          Explore Community
-        <% end %>
-      </div>
-
-      <!-- Community Stats -->
-      <div class="flex justify-center items-center space-x-8 text-sm opacity-80">
-        <div class="flex items-center space-x-2">
-          <div class="flex -space-x-2">
-            <% @last_users.each_with_index do |user, i| %>
-              <div class="avatar">
-                <div class="w-8 h-8 rounded-full ring-2 ring-accent" style="background: linear-gradient(<%= i * 45 %>deg, hsl(var(--p)), hsl(var(--s)))">
-                  <%= gravatar_for(user, size: 32) %>
-                </div>
-              </div>
-            <% end %>
-          </div>
-          <span><%= number_to_human(@user_count, precision: 1) %> painters</span>
-        </div>
-        <div class="flex items-center space-x-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-          <span>Join the community</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</header>
-<% end %>
-
-<!-- App Screenshots Showcase -->
-<section class="py-20 bg-base-100">
-  <div class="container mx-auto px-4">
-    <div class="text-center mb-16">
-      <h2 class="text-4xl font-bold mb-4">Everything You Need in One Place</h2>
-      <p class="text-xl opacity-70">From organizing your collection to sharing your masterpieces</p>
-    </div>
-
-    <div class="max-w-6xl mx-auto">
-      <div class="mockup-browser bg-base-200 border shadow-2xl">
-        <div class="mockup-browser-toolbar">
-          <div class="input">painthoarder.com</div>
-        </div>
-
-        <div class="bg-base-200 h-96 relative overflow-hidden">
-          <div class="carousel w-full h-full" data-controller="carousel">
-            <!-- Dashboard Screenshot -->
-            <div id="slide1" class="carousel-item relative w-full">
-              <%= image_tag "painthoarder-dashboard.png", alt: "Dashboard", class: "w-full h-full object-cover object-top" %>
-              <div class="absolute bottom-4 left-4 bg-base-100/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
-                <div class="font-bold text-sm">Your Personal Dashboard</div>
-                <div class="text-xs opacity-70">Track your collection at a glance</div>
-              </div>
-            </div>
-
-            <!-- Paint Collection Screenshot -->
-            <div id="slide2" class="carousel-item relative w-full">
-              <%= image_tag "painthoarder-paints.png", alt: "Paint Collection", class: "w-full h-full object-cover object-top" %>
-              <div class="absolute bottom-4 left-4 bg-base-100/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
-                <div class="font-bold text-sm">Smart Paint Organization</div>
-                <div class="text-xs opacity-70">Filter by brand, color, and more</div>
-              </div>
-            </div>
-
-            <!-- Community Gallery Screenshot -->
-            <div id="slide3" class="carousel-item relative w-full">
-              <%= image_tag "painthoarder-gallery.png", alt: "Community Gallery", class: "w-full h-full object-cover object-top" %>
-              <div class="absolute bottom-4 left-4 bg-base-100/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
-                <div class="font-bold text-sm">Community Gallery</div>
-                <div class="text-xs opacity-70">Get inspired by others' work</div>
-              </div>
-            </div>
-
-            <!-- Project Details Screenshot -->
-            <div id="slide4" class="carousel-item relative w-full">
-              <%= image_tag "painthoarder-project-details.png", alt: "Project Details", class: "w-full h-full object-cover object-top" %>
-              <div class="absolute bottom-4 left-4 bg-base-100/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
-                <div class="font-bold text-sm">Project Timeline</div>
-                <div class="text-xs opacity-70">Document your painting process</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Navigation -->
-          <div class="flex justify-center w-full py-2 gap-2 absolute bottom-2 right-2">
-            <a href="#slide1" class="btn btn-xs btn-circle btn-primary">1</a>
-            <a href="#slide2" class="btn btn-xs btn-circle btn-primary">2</a>
-            <a href="#slide3" class="btn btn-xs btn-circle btn-primary">3</a>
-            <a href="#slide4" class="btn btn-xs btn-circle btn-primary">4</a>
-          </div>
-        </div>
-      </div>
+<section class="wrap pt-14 pb-10 flex flex-col gap-7">
+  <span class="font-mono text-[13px] text-muted tracking-[.06em]">
+    // <%= rounded_count.call(@paint_count) %> PAINTS · <%= @brand_count %> BRANDS · FREE FOR HOBBY PAINTERS
+  </span>
+  <h1 class="display-title">Your rack.<br><span class="text-accent-text">Catalogued.</span></h1>
+  <div class="flex flex-wrap gap-8 items-end justify-between">
+    <p class="text-[19px] leading-normal text-soft max-w-[520px]">
+      Know what you own before you buy it again, swap brands without guessing, and pull the paint list out of any tutorial.
+    </p>
+    <div class="flex flex-wrap gap-3">
+      <%= link_to "Start your rack", new_user_registration_path, class: "btn btn-primary btn-lg" %>
+      <%= link_to "Browse paints", paints_path, class: "btn btn-outline btn-lg" %>
     </div>
   </div>
 </section>
 
-<!-- Features Grid -->
-<section class="py-20 bg-base-200">
-  <div class="container mx-auto px-4">
-    <div class="text-center mb-16">
-      <h2 class="text-4xl font-bold mb-4">Why Painters Love PaintHoarder</h2>
-      <p class="text-xl opacity-70">More than just organization - it's your creative companion</p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-      <!-- Never Buy Duplicates -->
-      <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-        <div class="card-body">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 rounded-full bg-success text-success-content flex items-center justify-center mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 class="card-title text-lg">Never Buy Duplicates</h3>
-          </div>
-          <p class="text-sm opacity-75">Check your collection before shopping. Know exactly what you have and what you need.</p>
-        </div>
+<section class="wrap pb-20" aria-label="Example paint rack">
+  <div class="grid grid-cols-7 md:grid-cols-14 gap-2 items-end" aria-hidden="true">
+    <% rack.each do |hex, code, height| %>
+      <div class="flex flex-col gap-2 min-w-0">
+        <div class="rounded-t-[3px] border border-line h-[calc(var(--h)*0.6)] md:h-(--h)" style="--h: <%= height %>px; background: <%= hex %>"></div>
+        <span class="font-mono text-[10px] text-muted truncate"><%= code %></span>
       </div>
-
-      <!-- Discover New Techniques -->
-      <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-        <div class="card-body">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 rounded-full bg-info text-info-content flex items-center justify-center mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h3 class="card-title text-lg">Get Inspired</h3>
-          </div>
-          <p class="text-sm opacity-75">Browse community projects and discover new painting techniques and color combinations.</p>
-        </div>
-      </div>
-
-      <!-- Share Your Work -->
-      <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-        <div class="card-body">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 rounded-full bg-accent text-accent-content flex items-center justify-center mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-              </svg>
-            </div>
-            <h3 class="card-title text-lg">Share Your Art</h3>
-          </div>
-          <p class="text-sm opacity-75">Showcase your painted miniatures and connect with fellow hobbyists in the community.</p>
-        </div>
-      </div>
-
-      <!-- Track Progress -->
-      <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-        <div class="card-body">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 rounded-full bg-primary text-primary-content flex items-center justify-center mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <h3 class="card-title text-lg">Track Your Progress</h3>
-          </div>
-          <p class="text-sm opacity-75">Document your painting journey and see how your skills improve over time.</p>
-        </div>
-      </div>
-
-      <!-- Find Color Matches -->
-      <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-        <div class="card-body">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 rounded-full bg-secondary text-secondary-content flex items-center justify-center mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-              </svg>
-            </div>
-            <h3 class="card-title text-lg">Smart Color Matching</h3>
-          </div>
-          <p class="text-sm opacity-75">Find equivalent colors across brands when your favorite paint is out of stock.</p>
-        </div>
-      </div>
-
-      <!-- Build Community -->
-      <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-        <div class="card-body">
-          <div class="flex items-center mb-4">
-            <div class="w-12 h-12 rounded-full bg-warning text-warning-content flex items-center justify-center mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-            <h3 class="card-title text-lg">Join the Community</h3>
-          </div>
-          <p class="text-sm opacity-75">Connect with painters worldwide, share tips, and grow together in this amazing hobby.</p>
-        </div>
-      </div>
-    </div>
+    <% end %>
   </div>
 </section>
 
-<!-- Community Showcase -->
-<section id="community" class="py-20 bg-base-100">
-  <div class="container mx-auto px-4">
-    <div class="text-center mb-16">
-      <h2 class="text-4xl font-bold mb-4">A Thriving Community of Artists</h2>
-      <p class="text-xl opacity-70">See what fellow painters are creating and sharing</p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-      <!-- Community Stats -->
-      <div class="stat bg-base-200 rounded-lg shadow-lg">
-        <div class="stat-figure text-primary">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
+<section class="wrap pb-22 flex flex-col gap-8">
+  <h2 class="cond font-black text-[clamp(2.5rem,6vw,3.5rem)] leading-[.9]">Three things it's<br>really good at</h2>
+  <div class="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-5">
+    <article class="panel p-7 flex flex-col gap-5">
+      <div class="bg-page border-2 border-line rounded p-3.5 flex flex-col gap-2.5" aria-hidden="true">
+        <div class="flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-[3px] shrink-0" style="background: #1C1A1A"></span>
+          <span class="flex-1 text-sm font-semibold">Abaddon Black</span>
+          <%= status_tag("owned", size: :sm, count: 2) %>
         </div>
-        <div class="stat-title">Active Painters</div>
-        <div class="stat-value text-primary"><%= number_to_human(@user_count, precision: 1) %></div>
-        <div class="stat-desc">Growing every day</div>
-      </div>
-
-      <div class="stat bg-base-200 rounded-lg shadow-lg">
-        <div class="stat-figure text-secondary">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-          </svg>
+        <div class="flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-[3px] shrink-0" style="background: #D9762B"></span>
+          <span class="flex-1 text-sm font-semibold">Gryph-Hound Orange</span>
+          <%= status_tag("wishlist", size: :sm) %>
         </div>
-        <div class="stat-title">Paint Database</div>
-        <div class="stat-value text-secondary"><%= number_to_human(@paint_count, precision: 1) %></div>
-        <div class="stat-desc">Paints catalogued</div>
       </div>
+      <span class="cond font-black text-[44px] leading-none text-accent-text">01</span>
+      <h3 class="cond font-extrabold text-[30px] leading-none">Your rack, in your pocket</h3>
+      <p class="text-base leading-relaxed text-soft">Owned, wanted, avoid. Import a typed list or a photo of your shelf, then check it at the shop.</p>
+    </article>
 
-      <div class="stat bg-base-200 rounded-lg shadow-lg">
-        <div class="stat-figure text-accent">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
+    <article class="panel p-7 flex flex-col gap-5">
+      <div class="bg-page border-2 border-line rounded p-3.5 flex flex-col gap-2.5" aria-hidden="true">
+        <div class="flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-[3px] shrink-0" style="background: #9A1115"></span>
+          <span class="flex-1 text-sm font-semibold">Mephiston Red <span class="text-muted font-normal">→</span></span>
         </div>
-        <div class="stat-title">Projects Shared</div>
-        <div class="stat-value text-accent"><%= number_to_human(@project_count, precision: 1) %></div>
-        <div class="stat-desc">And counting</div>
+        <div class="flex items-center gap-2.5">
+          <span class="w-7 h-7 rounded-[3px] shrink-0" style="background: #A01B20"></span>
+          <span class="flex-1 text-sm font-semibold">Bloody Red</span>
+          <%= match_meter(3, small: true) %>
+          <span class="text-xs text-muted">Very close</span>
+        </div>
       </div>
-    </div>
+      <span class="cond font-black text-[44px] leading-none text-accent-text">02</span>
+      <h3 class="cond font-extrabold text-[30px] leading-none">Brand swaps, rated</h3>
+      <p class="text-base leading-relaxed text-soft">Closest equivalents across every brand, with the ones already on your rack listed first.</p>
+    </article>
+
+    <article class="panel p-7 flex flex-col gap-5">
+      <div class="bg-page border-2 border-line rounded p-3.5 flex flex-col gap-2.5" aria-hidden="true">
+        <div class="flex items-center gap-2.5">
+          <span class="font-mono text-[11px] text-accent-text w-10">03:12</span>
+          <span class="w-5 h-5 rounded-[3px] shrink-0" style="background: #5E6466"></span>
+          <span class="flex-1 text-sm font-semibold">Leadbelcher</span>
+          <span class="text-xs text-muted">You own it</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <span class="font-mono text-[11px] text-accent-text w-10">07:45</span>
+          <span class="w-5 h-5 rounded-[3px] shrink-0" style="background: #1C1A1A"></span>
+          <span class="flex-1 text-sm font-semibold">Nuln Oil</span>
+          <span class="text-xs text-muted">You own it</span>
+        </div>
+      </div>
+      <span class="cond font-black text-[44px] leading-none text-accent-text">03</span>
+      <h3 class="cond font-extrabold text-[30px] leading-none">Tutorial → paint list</h3>
+      <p class="text-base leading-relaxed text-soft">Paste a YouTube link. Get every paint mentioned, with timestamps, checked against your rack.</p>
+    </article>
   </div>
 </section>
 
-<!-- Final CTA -->
-<section class="py-20 bg-gradient-to-r from-primary to-secondary text-primary-content">
-  <div class="container mx-auto px-4 text-center">
-    <div class="max-w-3xl mx-auto">
-      <h2 class="text-5xl font-bold mb-6">Ready to Transform Your Hobby?</h2>
-      <p class="text-xl mb-8 opacity-90">
-        Join thousands of painters who've organized their collections, discovered new techniques,
-        and connected with fellow artists. Your next masterpiece starts here.
-      </p>
-
-      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-        <%= link_to new_user_registration_path, class: "btn btn-accent btn-lg" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          Start Your Journey
-        <% end %>
-        <%= link_to new_user_session_path, class: "btn btn-ghost btn-lg border-2 border-accent text-accent hover:bg-accent hover:text-accent-content" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-          </svg>
-          Sign In
-        <% end %>
-      </div>
-
-      <div class="text-sm opacity-75">
-        <p>Free to start • No credit card required • Join the community</p>
-      </div>
-    </div>
+<section class="border-t-2 border-line">
+  <div class="wrap py-18 flex flex-wrap justify-between items-center gap-6">
+    <h2 class="cond font-black text-[clamp(2.5rem,6vw,4rem)] leading-[.9]">The pile of shame<br>has a database now.</h2>
+    <%= link_to "Create free account", new_user_registration_path, class: "btn btn-primary btn-lg" %>
   </div>
 </section>

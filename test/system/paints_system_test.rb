@@ -18,13 +18,13 @@ class PaintsSystemTest < ApplicationSystemTestCase
   test "viewing paint grid on paints index" do
     visit paints_path
 
-    assert_selector "h1", text: "Paint Catalog"
+    assert_selector "h1", text: /catalogue/i
 
-    assert_link "Name A-Z"
-    assert_link "Brand A-Z"
+    assert_select "Sort", with_options: ["Name A–Z", "Brand A–Z", "Newest"]
     assert_selector "[id^='paint-card-']", count: 2
     within("#paint-card-#{@paint1.id}") do
-      assert_link @paint1.name
+      # Paint names render in condensed caps, so match case-insensitively
+      assert_selector "a", text: /#{@paint1.name}/i
       assert_text @brand.name
     end
   end
@@ -32,14 +32,15 @@ class PaintsSystemTest < ApplicationSystemTestCase
   test "viewing user paints collection" do
     visit user_paints_path
 
-    assert_selector "h1", text: "My Paint Collection"
+    assert_selector "h1", text: /my rack/i
 
     # Verify paint info is correctly displayed
-    assert_text "Test Paint 1"
-    assert_text "Test Paint 2"
+    # Paint names render in condensed caps, so match case-insensitively
+    assert_text(/Test Paint 1/i)
+    assert_text(/Test Paint 2/i)
     assert_text "Test Brand"
     assert_text "Test Line"
-    assert_text "Owned"
+    assert_text(/owned/i)
   end
 
   test "empty state is shown when no paints are found" do
@@ -49,8 +50,8 @@ class PaintsSystemTest < ApplicationSystemTestCase
     visit user_paints_path
 
     # Test empty state is displayed
-    assert_selector "h2", text: "Start your collection"
-    assert_link "Add Your First Paint"
+    assert_selector "h2", text: /start your collection/i
+    assert_link "Add your first paint"
     assert_no_text @paint1.name
   end
 end

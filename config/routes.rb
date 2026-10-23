@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   resources :paints do
     get :search, on: :collection
     get :similar, on: :member
+    patch :collection_status, on: :member
   end
   resources :user_paints do
     collection do

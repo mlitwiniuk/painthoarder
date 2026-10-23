@@ -1,29 +1,8 @@
 <% if @similar_paints.any? %>
-  <%= turbo_stream.remove "load-more-#{@strategy}" %>
-  <%= turbo_stream.append "similar-paints-frame-#{@strategy}" do %>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-2">
-      <% @similar_paints.each do |user_paint| %>
-        <div class="similar-paint-item">
-          <%= render "similar_paint_card",
-                user_paint: user_paint,
-                score_label: similarity_score_label(@strategy, @scores[user_paint.paint_id]) %>
-        </div>
-      <% end %>
-    </div>
-    <% if @has_more %>
-      <div id="load-more-<%= @strategy %>" class="text-center py-6">
-        <% load_more_params = { page: @page + 1, similar_type: @strategy, per_page: @per_page, format: :turbo_stream } %>
-        <% load_more_params[:brand_ids] = @brand_ids.join(',') if @brand_ids.present? %>
-        <%= link_to similar_paint_path(@source_paint, load_more_params),
-                  class: "btn btn-outline" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-          Load more
-        <% end %>
-      </div>
-    <% else %>
-      <div id="load-more-<%= @strategy %>"></div>
+  <%= turbo_stream.append "swap-list-#{@strategy}" do %>
+    <% @similar_paints.each do |user_paint| %>
+      <%= render "paints/swap_row", user_paint: user_paint, source: @source_paint, score: @scores[user_paint.paint_id], strategy: @strategy %>
     <% end %>
   <% end %>
 <% end %>
+<%= turbo_stream.replace "load-more-#{@strategy}", partial: "paints/similar_load_more" %>

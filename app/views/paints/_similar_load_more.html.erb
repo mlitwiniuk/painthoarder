@@ -1,0 +1,7 @@
+<div id="load-more-<%= @strategy %>" class="flex justify-center pt-2">
+  <% if @has_more %>
+    <% load_more_params = {page: @page + 1, similar_type: @strategy, per_page: @per_page, format: :turbo_stream} %>
+    <% load_more_params[:brand_ids] = @brand_ids.join(",") if @brand_ids.present? %>
+    <%= link_to "Show more matches", similar_paint_path(@source_paint, load_more_params), class: "btn btn-outline" %>
+  <% end %>
+</div>

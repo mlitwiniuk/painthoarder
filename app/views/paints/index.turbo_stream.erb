@@ -1,12 +1,7 @@
-<%= turbo_stream.update "catalog-results" do %>
-  <% if @paints.any? %>
-    <%= render 'sort_bar' %>
-    <%= render 'paint_grid' %>
-
-    <div class="mt-8 flex justify-center">
-      <%== @pagy.series_nav %>
-    </div>
-  <% else %>
-    <%= render 'no_paints' %>
+<%# "Load more": append the next page and swap the pager. %>
+<%= turbo_stream.append "catalog-grid" do %>
+  <% @catalog_user_paints.each do |user_paint| %>
+    <%= render "paints/modern_catalog_card", user_paint: user_paint %>
   <% end %>
 <% end %>
+<%= turbo_stream.replace "catalog-pager", partial: "paints/catalog_pager" %>

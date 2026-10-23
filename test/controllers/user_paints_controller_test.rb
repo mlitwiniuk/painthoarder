@@ -1,6 +1,8 @@
 require "test_helper"
 
 class UserPaintsControllerTest < ActionDispatch::IntegrationTest
+  include ActionView::RecordIdentifier
+
   setup do
     @user = create(:user, :confirmed)
     @other_user = create(:user, :confirmed)
@@ -30,6 +32,29 @@ class UserPaintsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, @user_paint.paint.name
     assert_not_includes response.body, @other_user_paint.paint.name
+  end
+
+  test "index shows the rack with status pills counting each status" do
+    create(:user_paint, user: @user, paint: @other_paint, status: :wishlist)
+    get user_paints_url
+    assert_select "h1", text: "My rack"
+    assert_select "#collection-counts a[aria-current=page]", text: /All\s+2/
+    assert_select "#collection-counts a", text: /Wanted\s+1/
+    assert_select "a.paint-card .tag-owned", text: /Owned/
+    assert_select "a.paint-card .tag-wanted", text: /Wanted/
+  end
+
+  test "index search with no matches offers the catalogue" do
+    get user_paints_url(search: "zzzznothing")
+    assert_select "h2", text: "Not on your rack"
+    assert_select "a[href=?]", paints_path(search: "zzzznothing")
+    assert_select "a", text: "Show whole rack"
+  end
+
+  test "empty wishlist tab has its own empty state" do
+    get user_paints_url(status: "wishlist")
+    assert_select "#collection-counts a[aria-current=page]", text: /Wanted/
+    assert_select "h2", text: "Nothing on the wishlist"
   end
 
   test "should require authentication for index" do
@@ -163,6 +188,41 @@ class UserPaintsControllerTest < ActionDispatch::IntegrationTest
   test "should get edit when owner" do
     get edit_user_paint_url(@user_paint)
     assert_response :success
+  end
+
+  test "edit is a single step with status, notes and purchase details" do
+    get edit_user_paint_url(@user_paint)
+    assert_select "[data-controller~='multi-step-form']", count: 0
+    assert_select "h2#edit-paint-title", text: @paint.name
+    assert_select "input[type=radio][name='user_paint[status]'][value=owned][checked]"
+    assert_select "input[type=radio][name='user_paint[status]'][value=wishlist]"
+    assert_select "textarea[name='user_paint[notes]']"
+    assert_select "input[name='user_paint[purchase_price]']"
+    assert_select "input[name='user_paint[purchase_date]']"
+    assert_select "button[form=edit_user_paint_form]", text: "Save"
+    assert_select "form[action=?] button", user_paint_path(@user_paint), text: "Remove from rack"
+  end
+
+  test "turbo stream update from a status tab drops the card and refreshes the pills" do
+    patch user_paint_url(@user_paint),
+      params: {user_paint: {status: "wishlist"}},
+      headers: {"Accept" => "text/vnd.turbo-stream.html", "Referer" => user_paints_url(status: "owned")}
+    assert_response :success
+    assert_includes response.body, %(<turbo-stream action="remove" target="#{dom_id(@user_paint)}">)
+    assert_includes response.body, %(target="collection-counts")
+  end
+
+  test "turbo stream index refreshes tabs and grid" do
+    get user_paints_url(search: "Test", format: :turbo_stream)
+    assert_response :success
+    assert_includes response.body, "collection-counts"
+    assert_includes response.body, @paint.name
+  end
+
+  test "new keeps the brand, range and paint picker" do
+    get new_user_paint_url
+    assert_response :success
+    assert_select "[data-controller~='multi-step-form'] select#brand_id"
   end
 
   test "should not get edit for other user's paint" do

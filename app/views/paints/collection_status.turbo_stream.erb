@@ -1,0 +1,4 @@
+<%# Refresh every place this paint's status is shown on the current page. %>
+<%= turbo_stream.replace "paint-card-#{@paint.id}", partial: "paints/modern_catalog_card", locals: {user_paint: @user_paint} %>
+<%= turbo_stream.replace "collection-options-#{@paint.id}", partial: "paints/collection_options", locals: {paint: @paint, user_paint: @user_paint} %>
+<%= turbo_stream.replace_all ".swap-status-#{@paint.id}", partial: "paints/swap_status", locals: {user_paint: @user_paint} %>

@@ -1,16 +1,22 @@
-<div class="mt-2">
-  <%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
-    <%= link_to "Forgot your password?", new_password_path(resource_name) %><br />
+<div class="flex flex-col gap-1.5 text-[13px] text-muted">
+  <%- if %w[passwords confirmations unlocks].include?(controller_name) %>
+    <p>Remembered it? <%= link_to "Sign in", new_session_path(resource_name), class: "text-soft underline hover:text-accent-text" %></p>
+  <% end %>
+  <%- if devise_mapping.registerable? && controller_name != 'registrations' && controller_name != 'sessions' %>
+    <p>New here? <%= link_to "Create a free account", new_registration_path(resource_name), class: "text-soft underline hover:text-accent-text" %></p>
+  <% end %>
+  <%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' && controller_name != 'sessions' %>
+    <p>Forgot your password? <%= link_to "Reset it", new_password_path(resource_name), class: "text-soft underline hover:text-accent-text" %></p>
   <% end %>
   <%- if devise_mapping.confirmable? && controller_name != 'confirmations' %>
-    <%= link_to "Didn't receive confirmation instructions?", new_confirmation_path(resource_name) %><br />
+    <p>Didn't get the confirmation email? <%= link_to "Send it again", new_confirmation_path(resource_name), class: "text-soft underline hover:text-accent-text" %></p>
   <% end %>
   <%- if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != 'unlocks' %>
-    <%= link_to "Didn't receive unlock instructions?", new_unlock_path(resource_name) %><br />
+    <p>Account locked? <%= link_to "Send unlock instructions", new_unlock_path(resource_name), class: "text-soft underline hover:text-accent-text" %></p>
   <% end %>
   <%- if devise_mapping.omniauthable? %>
     <%- resource_class.omniauth_providers.each do |provider| %>
-      <%= button_to "Sign in with #{OmniAuth::Utils.camelize(provider)}", omniauth_authorize_path(resource_name, provider), data: { turbo: false } %><br />
+      <%= button_to "Sign in with #{OmniAuth::Utils.camelize(provider)}", omniauth_authorize_path(resource_name, provider), class: "btn btn-outline w-full", data: { turbo: false } %>
     <% end %>
   <% end %>
 </div>

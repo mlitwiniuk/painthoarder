@@ -503,11 +503,11 @@ module ApplicationHelper
       'owned' => [
         {
           status: 'wishlist',
-          label: 'Move to Wishlist',
-          short_label: 'Wishlist',
+          label: 'Mark as Wanted',
+          short_label: 'Wanted',
           icon: 'heart',
           class: 'btn-warning',
-          tooltip: 'Move to wishlist'
+          tooltip: 'Mark as wanted'
         },
         {
           status: 'avoid',
@@ -524,7 +524,7 @@ module ApplicationHelper
           label: 'Mark as Owned',
           short_label: 'Own',
           icon: 'check',
-          class: 'btn-success',
+          class: 'btn-neutral',
           tooltip: 'Mark as owned'
         },
         {
@@ -542,16 +542,16 @@ module ApplicationHelper
           label: 'Mark as Owned',
           short_label: 'Own',
           icon: 'check',
-          class: 'btn-success',
+          class: 'btn-neutral',
           tooltip: 'Mark as owned'
         },
         {
           status: 'wishlist',
-          label: 'Add to Wishlist',
-          short_label: 'Wishlist',
+          label: 'Mark as Wanted',
+          short_label: 'Wanted',
           icon: 'heart',
           class: 'btn-warning',
-          tooltip: 'Add to wishlist'
+          tooltip: 'Mark as wanted'
         }
       ],
       'not_in_collection' => [
@@ -560,16 +560,16 @@ module ApplicationHelper
           label: 'Add as Owned',
           short_label: 'Own',
           icon: 'check',
-          class: 'btn-success',
+          class: 'btn-neutral',
           tooltip: 'Add as owned'
         },
         {
           status: 'wishlist',
-          label: 'Add to Wishlist',
-          short_label: 'Wishlist',
+          label: 'Mark as Wanted',
+          short_label: 'Wanted',
           icon: 'heart',
           class: 'btn-warning',
-          tooltip: 'Add to wishlist'
+          tooltip: 'Mark as wanted'
         },
         {
           status: 'avoid',
@@ -596,19 +596,19 @@ module ApplicationHelper
       'wishlist' => {
         class: 'badge-warning',
         icon: 'heart',
-        label: 'Wishlist',
+        label: 'Wanted',
         color: 'text-warning'
       },
       'avoid' => {
         class: 'badge-error',
         icon: 'ban',
-        label: 'Avoiding',
+        label: 'Avoid',
         color: 'text-error'
       },
       'not_in_collection' => {
         class: 'badge-ghost',
         icon: 'plus',
-        label: 'Not in Collection',
+        label: 'Not mine',
         color: 'text-base-content'
       }
     }

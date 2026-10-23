@@ -1,19 +1,10 @@
-<h2>Resend unlock instructions</h2>
-
-<%= simple_form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { method: :post, data: { turbo: "false" } }) do |f| %>
-  <%= f.error_notification %>
-  <%= f.full_error :unlock_token %>
-
-  <div class="form-inputs">
-    <%= f.input :email,
-                required: true,
-                autofocus: true,
-                input_html: { autocomplete: "email" } %>
-  </div>
-
-  <div class="form-actions">
-    <%= f.button :submit, "Resend unlock instructions" %>
-  </div>
+<% content_for :title, "Unlock account · PaintHoarder" %>
+<%= form_with model: resource, scope: resource_name, url: unlock_path(resource_name), method: :post, class: "flex flex-col gap-5", data: { turbo: "false" } do |f| %>
+  <%= render "devise/shared/heading", title: "Unlock your account",
+        intro: "Too many wrong passwords. We'll email you an unlock link." %>
+  <%= render "devise/shared/error_messages", resource: resource %>
+  <%= render "devise/shared/field", f: f, attribute: :email, label: "Email", type: :email_field,
+        input_html: { autofocus: true, autocomplete: "email", required: true } %>
+  <%= f.submit "Send unlock link", class: "btn btn-primary btn-lg h-13 w-full" %>
+  <%= render "devise/shared/links" %>
 <% end %>
-
-<%= render "devise/shared/links" %>

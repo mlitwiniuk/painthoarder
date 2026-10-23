@@ -3,11 +3,9 @@
 
 <%# Flash notification %>
 <%= turbo_stream.prepend "flash-messages" do %>
-  <div class="alert alert-success shadow-lg mb-6 max-w-5xl mx-auto">
-    <div>
-      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-      <span><%= flash.now[:notice] %></span>
-    </div>
+  <div role="status" class="panel flex items-start gap-3 px-4 py-3 border-base-content">
+    <%= ph_icon(:check, size: 18, stroke: 2.4, css: "shrink-0 mt-0.5") %>
+    <p class="flex-1 text-sm font-medium"><%= flash.now[:notice] %></p>
   </div>
 <% end %>
 
@@ -27,39 +25,20 @@
   <% end %>
 <% end %>
 
-<%# Handle collection updates - if status changed, remove from current collection view %>
+<%# Rack page: drop the card when it no longer belongs to the open status tab, otherwise refresh it. %>
+<% on_detail_page = request.referer&.include?(user_paint_path(@user_paint)) %>
+<% rack_status = (Rack::Utils.parse_query(URI.parse(request.referer.to_s).query.to_s)["status"].presence rescue nil) %>
+<% unless on_detail_page %>
+  <% if rack_status.present? && rack_status != @user_paint.status %>
+    <%= turbo_stream.remove dom_id(@user_paint) %>
+  <% else %>
+    <%= turbo_stream.replace dom_id(@user_paint) do %>
+      <%= render "user_paints/modern_paint_card", user_paint: @user_paint %>
+    <% end %>
+  <% end %>
+<% end %>
 <% if @previous_status.present? && @previous_status != @user_paint.status %>
-  <%= turbo_stream.remove dom_id(@user_paint) %>
-  
-  <%# Update the collection counts %>
-  <%= turbo_stream.replace "collection-counts" do %>
-    <div id="collection-counts">
-      <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).except(:status)),
-              class: "tab #{params[:status].blank? ? 'tab-active' : ''}" do %>
-        All (<%= current_user.user_paints.count %>)
-      <% end %>
-      
-      <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).merge(status: :owned)),
-              class: "tab #{params[:status] == 'owned' ? 'tab-active' : ''}" do %>
-        Owned (<%= current_user.user_paints.owned.count %>)
-      <% end %>
-      
-      <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).merge(status: :wishlist)),
-              class: "tab #{params[:status] == 'wishlist' ? 'tab-active' : ''}" do %>
-        Wishlist (<%= current_user.user_paints.wishlist.count %>)
-      <% end %>
-      
-      <%= link_to user_paints_path(params.permit(:search, :brand_id, :product_line_id, :color).merge(status: :avoid)),
-              class: "tab #{params[:status] == 'avoid' ? 'tab-active' : ''}" do %>
-        Avoid (<%= current_user.user_paints.avoid.count %>)
-      <% end %>
-    </div>
-  <% end %>
-<% else %>
-  <%# Update the paint in its current collection if status hasn't changed %>
-  <%= turbo_stream.replace dom_id(@user_paint) do %>
-    <%= render 'user_paints/collection_paint_card', user_paint: @user_paint %>
-  <% end %>
+  <%= render "user_paints/rack_counts_stream" %>
 <% end %>
 
 <%# Update any paint cards for this paint that might be on the page %>
