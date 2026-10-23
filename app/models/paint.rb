@@ -54,7 +54,7 @@ class Paint < ApplicationRecord
     numericality: {only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 255}
 
   validate :complete_rgb
-  validates :color_source, inclusion: {in: %w[legacy_dataset manual unknown]}
+  validates :color_source, inclusion: {in: %w[legacy_dataset manual unknown warhub]}
   scope :with_color, -> { where.not(red: nil).where.not(green: nil).where.not(blue: nil).where.not(lab_l: nil).where.not(lab_a: nil).where.not(lab_b: nil) }
   has_many :paint_catalog_records, dependent: :restrict_with_error
 
@@ -290,7 +290,7 @@ class Paint < ApplicationRecord
       self.color_source = "unknown"
       return
     end
-    self.color_source = "manual" if color_source == "unknown" || (persisted? && (red_changed? || green_changed? || blue_changed?))
+    self.color_source = "manual" if color_source == "unknown" || (persisted? && !color_source_changed? && (red_changed? || green_changed? || blue_changed?))
     self.hex_color = "##{red.to_s(16).rjust(2, "0")}#{green.to_s(16).rjust(2, "0")}#{blue.to_s(16).rjust(2, "0")}"
   end
 

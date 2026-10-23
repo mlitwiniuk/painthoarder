@@ -1,5 +1,10 @@
 <h1 class="text-3xl font-bold mb-3">Producer catalog updates</h1>
 <p class="mb-6">Catalogs refresh automatically every day. New paints, reliable matches and linked producer updates are published automatically. Only uncertain changes are held back; the rest of the catalog keeps updating.</p>
+<% @latest_runs.values.compact.select { |run| run.status == "failed" || %w[failed blocked].include?(run.automation_status) }.each do |run| %>
+  <p class="alert alert-warning mb-3"><%= run.source_name %>: <%= run.error_message || run.automation_error || "Automatic publishing paused after an unusual count change" %> <%= link_to "Details", admin_paint_catalog_run_path(run), class: "link" %></p>
+<% end %>
+<details class="mb-6">
+<summary class="font-semibold cursor-pointer">Sources and manual refresh (<%= @sources.size %>)</summary>
 <div class="grid md:grid-cols-2 gap-4 mb-8">
   <% @sources.each do |source, config| %>
     <% latest = PaintCatalogRun.where(source: source).order(id: :desc).first %>
@@ -16,6 +21,7 @@
     </section>
   <% end %>
 </div>
+</details>
 <h2 class="text-xl font-semibold mb-3">Exceptions (<%= @exception_count %>)</h2>
 <p class="mb-4">These paints keep their existing data until resolved. A resolved match is remembered for future updates. Dismissals stay dismissed until producer details change.</p>
 <% if @exceptions.empty? %>

@@ -8,14 +8,17 @@
   <div class="alert alert-error"><%= @run.error_message %></div>
   <p class="mt-3">No paint catalog changes were made by this fetch. Start a new fetch to retry.</p>
 <% else %>
-  <p class="mb-3"><%= @run.snapshot.size %> store products checked. <%= @run.entries.count %> paint comparisons. <%= @run.exclusions.size %> products excluded.</p>
+  <p class="mb-3"><%= @run.snapshot.size %> source records checked. <%= @run.entries.count %> paint comparisons. <%= @run.exclusions.size %> products excluded.</p>
+  <% if @run.source_metadata.present? %>
+    <p class="mb-3">WarHub release <%= @run.source_metadata["version"] %> · Published <%= @run.source_metadata["generatedAt"] %> · Checksum verified</p>
+  <% end %>
   <% if @run.auto_apply? %>
     <p class="mb-3">Automatic publishing: <%= @run.automation_status.humanize %>. <%= @run.entries.where(application_method: "automatic").count %> processed automatically; <%= @run.entries.where(status: "pending").where.not(action: "unchanged").count %> changes held for a decision.</p>
     <% if @run.automation_error %><div class="alert alert-error mb-3"><%= @run.automation_error %></div><% end %>
   <% else %>
     <p class="mb-3">Preview only. This fetch did not publish changes.</p>
   <% end %>
-  <p class="mb-4">Applying a comparison preserves existing paint IDs, codes, ranges, colors, and collections. It can update a paint name or add a new paint without a swatch.</p>
+  <p class="mb-4">Applying a comparison preserves existing paint IDs, codes, ranges, colors, and collections. New paints and unknown colors use source swatches when available.</p>
   <% unless @run.reviewable? %><div class="alert alert-warning mb-4">This batch is superseded or more than 14 days old. Fetch a fresh catalog before applying changes.</div><% end %>
   <% @run.warnings.each do |warning| %><div class="alert alert-warning mb-3"><%= warning %></div><% end %>
   <nav class="flex flex-wrap gap-3 my-5" aria-label="Comparison filters">

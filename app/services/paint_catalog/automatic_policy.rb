@@ -6,13 +6,16 @@ module PaintCatalog
       return "Multiple or uncertain existing matches" if entry.action == "ambiguous"
       if entry.action == "link"
         paint = entry.paint
-        code_matches = entry.payload.values_at("code", "sku").include?(paint.code)
-        return nil if code_matches && Identity.name(paint.name) == Identity.name(entry.payload.fetch("name"))
+        code_matches = Identity.codes(run.source, entry.payload).include?(Identity.code(run.source, paint.code))
+        return nil if code_matches && Identity.paint_name(run.source, paint.name) == Identity.paint_name(run.source, entry.payload.fetch("name"))
+        if Array(entry.payload["variant_codes"]).many? && !code_matches
+          return "Source has multiple coded variants with this name; existing variant is unknown"
+        end
         family = Identity.family(run.source, entry.payload.fetch("range"))
         unless family && family == Identity.family(run.source, paint.product_line.name)
           return "Existing code belongs to a different or unknown paint family"
         end
-        if Identity.producer_code?(run.source, paint.code) && !code_matches
+        if entry.payload["has_product_code"] != false && Identity.producer_code?(run.source, paint.code, paint_name: paint.name) && !code_matches
           return "Name matches but the existing producer code differs"
         end
       elsif %w[update unchanged].include?(entry.action)
