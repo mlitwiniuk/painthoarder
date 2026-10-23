@@ -1,91 +1,59 @@
 <%= turbo_frame_tag "similar-paints-frame-#{@strategy}" do %>
-  <div data-controller="brand-filter"
-       data-brand-filter-url-value="<%= similar_paint_path %>"
-       data-brand-filter-source-id-value="<%= @source_paint.id %>"
-       data-brand-filter-similar-type-value="<%= @strategy %>"
-       data-brand-filter-per-page-value="<%= @per_page %>"
-       data-brand-filter-selected-brands-value="<%= @brand_ids.present? ? @brand_ids.to_json : '[]' %>">
+  <% selected_ids = Array(@brand_ids).map(&:to_s) %>
+  <% chip_brands = (@brands.select { |b| selected_ids.include?(b.id.to_s) } + @similar_paints.map { |up| up.paint.product_line.brand }).uniq.first(8) %>
+  <% chip_path = ->(ids) { similar_paint_path(@source_paint, similar_type: @strategy, per_page: @per_page, brand_ids: ids.any? ? ids.join(",") : "all", format: :html) } %>
+  <% on_rack, others = @similar_paints.partition { |up| !up.virtual? && up.persisted? && up.status == "owned" } %>
 
-    <!-- Brand Filter Section -->
-    <div class="mb-6" data-brand-filter-target="container">
-      <div class="bg-base-200 rounded-2xl p-4">
-        <label class="form-control w-full">
-          <div class="label justify-between">
-            <span class="label-text font-semibold">Filter by Brand</span>
-            <% if @brand_ids&.any? %>
-              <span class="badge badge-primary badge-sm"><%= @brand_ids.size %> selected</span>
-            <% end %>
-          </div>
-          <select data-brand-filter-target="brandSelect" class="select select-bordered w-full bg-base-100" multiple>
-            <% @brands.each do |brand| %>
-              <option value="<%= brand.id %>" <%= @brand_ids&.include?(brand.id.to_s) ? 'selected' : '' %>><%= brand.name %></option>
-            <% end %>
-          </select>
-        </label>
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-wrap justify-between items-center gap-3">
+      <p class="text-sm text-soft max-w-xl">
+        <% if @strategy == "color" %>
+          Ranked by how close the colour looks (CIEDE2000 ΔE). Finish and coverage can still differ.
+        <% else %>
+          Paints in the same hue family, nearest first.
+        <% end %>
+        <%= pluralize(@total_count, "match") %> within range.
+      </p>
+      <div class="flex flex-wrap gap-1.5" role="group" aria-label="Filter by brand">
+        <%= link_to "All brands", chip_path.call([]), class: "chip", aria: {pressed: selected_ids.empty?.to_s} %>
+        <% chip_brands.each do |brand| %>
+          <% on = selected_ids.include?(brand.id.to_s) %>
+          <%= link_to brand.name, chip_path.call(on ? selected_ids - [brand.id.to_s] : selected_ids + [brand.id.to_s]),
+                class: "chip", aria: {pressed: on.to_s} %>
+        <% end %>
       </div>
     </div>
 
     <% if @similar_paints.any? %>
-      <p class="text-sm text-base-content/60 mb-4">
-        <% if @strategy == "color" %>
-          Closest matches by perceptual colour distance (CIEDE2000 ΔE) &mdash;
-        <% else %>
-          Paints in the same hue family &mdash;
-        <% end %>
-        <%= pluralize(@total_count, "match") %> within range.
-      </p>
-
-      <!-- Similar Paints Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-        <% @similar_paints.each do |user_paint| %>
-          <div id="similar-paint-<%= user_paint.paint_id %>" class="similar-paint-item">
-            <%= render "similar_paint_card",
-                  user_paint: user_paint,
-                  score_label: similarity_score_label(@strategy, @scores[user_paint.paint_id]) %>
-          </div>
-        <% end %>
-      </div>
-
-      <!-- Load More Section -->
-      <% if @has_more %>
-        <div id="load-more-<%= @strategy %>" class="text-center py-8">
-          <% load_more_params = { page: @page + 1, similar_type: @strategy, per_page: @per_page, format: :turbo_stream } %>
-          <% load_more_params[:brand_ids] = @brand_ids.join(',') if @brand_ids.present? %>
-          <%= link_to similar_paint_path(@source_paint, load_more_params),
-                    class: "btn btn-outline btn-wide gap-2 hover:btn-primary" do %>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-            Load More Similar Paints
+      <% if on_rack.any? %>
+        <span class="eyebrow">On your rack</span>
+        <ul class="flex flex-col">
+          <% on_rack.each do |user_paint| %>
+            <%= render "paints/swap_row", user_paint: user_paint, source: @source_paint, score: @scores[user_paint.paint_id], strategy: @strategy %>
           <% end %>
-        </div>
+        </ul>
       <% end %>
-    <% else %>
-      <!-- Empty State -->
-      <div class="flex flex-col items-center justify-center py-16">
-        <div class="w-24 h-24 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-          </svg>
-        </div>
+      <span class="eyebrow <%= 'hidden' if others.empty? %>"><%= on_rack.any? ? "Not on your rack" : "Closest matches" %></span>
+      <ul id="swap-list-<%= @strategy %>" class="flex flex-col">
+        <% others.each do |user_paint| %>
+          <%= render "paints/swap_row", user_paint: user_paint, source: @source_paint, score: @scores[user_paint.paint_id], strategy: @strategy %>
+        <% end %>
+      </ul>
 
-        <h3 class="text-xl font-bold mb-2">No Close Matches Found</h3>
-        <p class="text-base-content/60 text-center max-w-md">
-          <% if @brand_ids&.any? %>
+      <%= render "paints/similar_load_more" %>
+    <% else %>
+      <div class="panel-dashed px-6 py-10 flex flex-col items-start gap-2">
+        <h3 class="cond font-black text-3xl leading-none">No Close Matches Found</h3>
+        <p class="text-soft max-w-xl">
+          <% if selected_ids.any? %>
             No paints close enough to <%= @source_paint.name %> in the selected brands. Try widening your brand filter.
           <% else %>
             No paints in the catalogue are close enough to <%= @source_paint.name %>
             <%= @strategy == "color" ? "by colour distance" : "in this hue family" %>. Try the other tab.
           <% end %>
         </p>
-
-        <% if @brand_ids&.any? %>
-          <div class="mt-4">
-            <%= link_to similar_paint_path(@source_paint, similar_type: @strategy, per_page: @per_page, format: :html),
-                      class: "btn btn-outline btn-sm" do %>
-              Clear Filters
-            <% end %>
-          </div>
+        <% if selected_ids.any? %>
+          <%= link_to "Show all brands", chip_path.call([]), class: "btn btn-outline btn-sm mt-2" %>
         <% end %>
       </div>
     <% end %>

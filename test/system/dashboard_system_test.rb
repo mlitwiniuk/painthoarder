@@ -18,11 +18,11 @@ class DashboardSystemTest < ApplicationSystemTestCase
   test "viewing dashboard with paint collections" do
     visit user_root_path
 
-    assert_selector "h1", text: "Welcome back, #{@user.name}"
-    assert_selector "h2", text: "Recently Added Paints"
+    assert_selector "h1", text: /#{@user.name}/i
+    assert_selector "h2", text: /Recently added/i
     assert_text @paint1.name
     assert_text @paint2.name
-    click_on "View My Collection"
-    assert_selector "h1", text: "My Paint Collection"
+    click_on "Open rack →"
+    assert_current_path user_paints_path
   end
 end

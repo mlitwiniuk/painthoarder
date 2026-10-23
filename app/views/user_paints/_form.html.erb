@@ -1,3 +1,7 @@
+<%# Existing rack paints get the one-step editor; new ones pick brand → range → paint first. %>
+<% if @user_paint.persisted? %>
+  <%= render "user_paints/edit_form" %>
+<% else %>
 <%= turbo_frame_tag "modal" do %>
   <div
     class="modal modal-open"
@@ -15,16 +19,16 @@
     <div
       class="
         modal-box max-w-md sm:max-w-2xl h-full sm:h-auto sm:max-h-[90vh] p-0
-        overflow-hidden
+        overflow-hidden bg-base-100 border-2 border-line-strong rounded shadow-none
       "
     >
       <!-- Header -->
-      <div class="sticky top-0 bg-base-100 border-b border-base-200 p-4 sm:p-6">
+      <div class="sticky top-0 bg-base-100 border-b-2 border-line p-4 sm:p-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <button
               type="button"
-              class="btn btn-ghost btn-sm btn-circle sm:hidden"
+              class="btn btn-ghost btn-square sm:hidden"
               data-multi-step-form-target="backButton"
               data-action="click->multi-step-form#previousStep"
             >
@@ -38,17 +42,18 @@
               </svg>
             </button>
             <div>
-              <h2 class="font-bold text-lg sm:text-xl">
-                <%= @user_paint.persisted? ? "Edit Paint" : "Add Paint" %>
+              <h2 class="cond font-black text-[30px] leading-none">
+                Add paint
               </h2>
-              <p class="text-sm text-base-content/60" data-multi-step-form-target="stepTitle">
+              <p class="text-sm text-muted mt-1" data-multi-step-form-target="stepTitle">
                 Choose your brand
               </p>
             </div>
           </div>
           <button
             type="button"
-            class="btn btn-ghost btn-sm btn-circle"
+            class="btn btn-ghost btn-square"
+            aria-label="Close"
             data-action="click->modal#close"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,7 +70,7 @@
         <div class="mt-4">
           <div
             class="
-              flex items-center justify-between text-xs text-base-content/40 mb-2
+              flex items-center justify-between font-mono text-[11px] uppercase text-muted mb-2
             "
           >
             <span>Step
@@ -73,9 +78,9 @@
               of 4</span>
             <span><span data-multi-step-form-target="progressPercent">25</span>%</span>
           </div>
-          <div class="w-full bg-base-200 rounded-full h-1">
+          <div class="w-full bg-base-200 h-1.5">
             <div
-              class="bg-primary h-1 rounded-full transition-all duration-300"
+              class="bg-primary h-1.5 transition-all duration-300"
               data-multi-step-form-target="progressBar"
               style="width: 25%"
             ></div>
@@ -89,10 +94,10 @@
       }) do |form| %>
         <!-- Error Display -->
         <% if @user_paint.errors.any? %>
-          <div class="alert alert-error mx-4 sm:mx-6 mt-4">
+          <div role="alert" class="flex gap-3 items-start mx-4 sm:mx-6 mt-4 px-3.5 py-3 border-2 border-avoid rounded text-sm">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="stroke-current shrink-0 h-6 w-6"
+              class="stroke-current shrink-0 h-5 w-5 text-avoid"
               fill="none"
               viewBox="0 0 24 24"
             >
@@ -104,7 +109,7 @@
               />
             </svg>
             <div>
-              <h3 class="font-bold">Please fix the following errors:</h3>
+              <h3 class="font-semibold">Fix this and you’re in:</h3>
               <ul class="mt-1 list-disc list-inside">
                 <% @user_paint.errors.full_messages.each do |message| %>
                   <li><%= message %></li>
@@ -119,13 +124,13 @@
           <div class="step-content" data-multi-step-form-target="step" data-step="0">
             <div class="py-6">
               <div class="mb-6">
-                <label class="block text-sm font-medium text-base-content mb-3">
+                <label class="block text-sm font-semibold mb-2">
                   Select a brand
                 </label>
                 <div class="space-y-2">
                   <select
                     id="brand_id"
-                    class="select select-bordered w-full h-12 text-base"
+                    class="select w-full text-base"
                     data-cascading-select-target="brandSelect"
                     data-multi-step-form-target="brandSelect"
                     data-action="
@@ -155,12 +160,12 @@
           >
             <div class="py-6">
               <div class="mb-6">
-                <label class="block text-sm font-medium text-base-content mb-3">
+                <label class="block text-sm font-semibold mb-2">
                   Select a product line
                 </label>
                 <select
                   id="product_line_id"
-                  class="select select-bordered w-full h-12 text-base"
+                  class="select w-full text-base"
                   data-cascading-select-target="productLineSelect"
                   data-multi-step-form-target="productLineSelect"
                   data-action="
@@ -190,13 +195,13 @@
           >
             <div class="py-6">
               <div class="mb-6">
-                <label class="block text-sm font-medium text-base-content mb-3">
+                <label class="block text-sm font-semibold mb-2">
                   Select a paint
                 </label>
                 <select
                   id="user_paint_paint_id"
                   name="user_paint[paint_id]"
-                  class="select select-bordered w-full h-12 text-base"
+                  class="select w-full text-base"
                   data-cascading-select-target="paintSelect"
                   data-multi-step-form-target="paintSelect"
                   data-action="
@@ -221,19 +226,19 @@
               </div>
               <!-- Color Preview -->
               <div
-                class="bg-base-200 rounded-lg p-4 mb-4"
+                class="panel p-4 mb-4"
                 data-color-preview-target="previewContainer"
               >
                 <div class="flex items-center space-x-4">
                   <div
                     class="
-                      w-16 h-16 rounded-lg border-2 border-base-300 shadow-sm flex-shrink-0
+                      w-16 h-16 rounded border border-line-strong flex-shrink-0
                     "
                     data-color-preview-target="colorSwatch"
                   ></div>
                   <div class="flex-1">
-                    <div class="font-medium" data-color-preview-target="paintName">Paint Preview</div>
-                    <div class="text-sm text-base-content/60" data-color-preview-target="colorCode"></div>
+                    <div class="cond font-extrabold text-xl leading-tight" data-color-preview-target="paintName">Paint Preview</div>
+                    <div class="font-mono text-xs text-muted" data-color-preview-target="colorCode"></div>
                   </div>
                 </div>
               </div>
@@ -246,138 +251,40 @@
             data-step="3"
           >
             <div class="py-6 space-y-6">
-              <!-- Status -->
-              <div class="form-control">
-                <label class="block text-sm font-medium text-base-content mb-3">
-                  Status
-                </label>
-                <div class="grid grid-cols-3 gap-2">
-                  <label class="cursor-pointer">
-                    <input
-                      type="radio"
-                      name="user_paint[status]"
-                      value="owned"
-                      class="radio radio-primary hidden"
-                      <%= (@user_paint.status.to_s == 'owned' || @user_paint.status.blank? || @user_paint.new_record?) ? 'checked="checked"' : '' %>
-                      data-multi-step-form-target="statusRadio"
-                      data-action="change->multi-step-form#statusChanged"
-                    >
-                    <div
-                      class="
-                        btn btn-outline btn-sm h-auto py-3 px-2 flex flex-col items-center space-y-1
-                        radio-card
-                      "
-                    >
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M5 13l4 4L19 7"
-                        ></path>
-                      </svg>
-                      <span class="text-xs">Owned</span>
-                    </div>
-                  </label>
-                  <label class="cursor-pointer">
-                    <input
-                      type="radio"
-                      name="user_paint[status]"
-                      value="wishlist"
-                      class="radio radio-primary hidden"
-                      <%= @user_paint.status.to_s == 'wishlist' ? 'checked="checked"' : '' %>
-                      data-multi-step-form-target="statusRadio"
-                      data-action="change->multi-step-form#statusChanged"
-                    >
-                    <div
-                      class="
-                        btn btn-outline btn-sm h-auto py-3 px-2 flex flex-col items-center space-y-1
-                        radio-card
-                      "
-                    >
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                        ></path>
-                      </svg>
-                      <span class="text-xs">Wishlist</span>
-                    </div>
-                  </label>
-                  <label class="cursor-pointer">
-                    <input
-                      type="radio"
-                      name="user_paint[status]"
-                      value="avoid"
-                      class="radio radio-primary hidden"
-                      <%= @user_paint.status.to_s == 'avoid' ? 'checked="checked"' : '' %>
-                      data-multi-step-form-target="statusRadio"
-                      data-action="change->multi-step-form#statusChanged"
-                    >
-                    <div
-                      class="
-                        btn btn-outline btn-sm h-auto py-3 px-2 flex flex-col items-center space-y-1
-                        radio-card
-                      "
-                    >
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636"
-                        ></path>
-                      </svg>
-                      <span class="text-xs">Avoid</span>
-                    </div>
-                  </label>
-                </div>
-              </div>
+              <%= render "user_paints/status_radio_cards", user_paint: @user_paint, wizard: true %>
               <!-- Notes -->
               <div class="form-control">
-                <label class="block text-sm font-medium text-base-content mb-3">
+                <label class="block text-sm font-semibold mb-2">
                   Notes (optional)
                 </label>
                 <%= form.text_area :notes,
                                rows: 3,
-                               class: "textarea textarea-bordered w-full",
+                               class: "textarea w-full text-base",
                                placeholder: "Add any notes about this paint..." %>
               </div>
               <!-- Purchase Details (Collapsible) -->
-              <div class="collapse collapse-arrow bg-base-200" data-controller="collapse">
+              <div class="collapse collapse-arrow border-2 border-line rounded" data-controller="collapse">
                 <input
                   type="checkbox"
                   data-collapse-target="toggle"
                   data-action="change->collapse#toggle"
                 >
-                <div class="collapse-title text-sm font-medium">
-                  Purchase Details (optional)
+                <div class="collapse-title text-sm font-semibold">
+                  Purchase details <span class="font-normal text-muted">(optional, only you see these)</span>
                 </div>
                 <div class="collapse-content">
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                     <div class="form-control">
                       <label class="label">
-                        <span class="label-text text-sm">Purchase Date</span>
+                        <span class="label-text text-[13px] font-semibold text-base-content">When</span>
                       </label>
-                      <%= form.date_field :purchase_date, class: "input input-bordered" %>
+                      <%= form.date_field :purchase_date, class: "input w-full" %>
                     </div>
                     <div class="form-control">
                       <label class="label">
-                        <span class="label-text text-sm">Purchase Price</span>
+                        <span class="label-text text-[13px] font-semibold text-base-content">Price</span>
                       </label>
-                      <div class="join w-full">
-                        <span
-                          class="
-                            join-item flex items-center justify-center px-3 bg-base-200 text-sm
-                          "
-                        >$</span>
-                        <%= form.number_field :purchase_price,
-                                          step: 0.01,
-                                          min: 0,
-                                          class: "input input-bordered join-item w-full" %>
-                      </div>
+                      <%= form.number_field :purchase_price, step: 0.01, min: 0, inputmode: "decimal", class: "input w-full" %>
                     </div>
                   </div>
                 </div>
@@ -387,11 +294,11 @@
           </div>
         </div>
         <!-- Footer Actions -->
-        <div class="sticky bottom-0 bg-base-100 border-t border-base-200 p-4 sm:p-6">
+        <div class="sticky bottom-0 bg-base-100 border-t-2 border-line p-4 sm:p-6">
           <div class="flex items-center justify-between space-x-3">
             <button
               type="button"
-              class="btn btn-ghost hidden sm:flex"
+              class="btn btn-outline hidden sm:flex"
               data-multi-step-form-target="prevButton"
               data-action="click->multi-step-form#previousStep"
             >
@@ -400,7 +307,7 @@
 
             <button
               type="button"
-              class="btn btn-ghost sm:hidden"
+              class="btn btn-outline sm:hidden"
               data-action="click->modal#close"
             >
               Cancel
@@ -421,7 +328,7 @@
                 class="btn btn-primary hidden"
                 data-multi-step-form-target="submitButton"
               >
-                <%= @user_paint.persisted? ? "Update Paint" : "Add Paint" %>
+                Add to rack
               </button>
             </div>
           </div>
@@ -432,4 +339,5 @@
 
     <div class="modal-backdrop"></div>
   </div>
+<% end %>
 <% end %>

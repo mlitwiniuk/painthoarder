@@ -1,0 +1,45 @@
+<%# Search is always visible; brand, range and colour narrow the rack in place. %>
+<% filters_active = params[:search].present? || params[:color].present? || params.dig(:q, :paint_product_line_brand_id_eq).present? || params.dig(:q, :paint_product_line_id_eq).present? %>
+<%= search_form_for @q, url: user_paints_path, method: :get,
+      html: { role: "search", class: "flex flex-wrap items-stretch gap-2.5" },
+      data: { turbo_frame: "collection-results", turbo_action: "advance", controller: "auto-submit" } do |f| %>
+  <label class="flex-[1_1_320px] flex items-center gap-2.5 h-[52px] px-3.5 bg-base-100 border-2 border-line-strong rounded focus-within:border-base-content">
+    <%= ph_icon(:search, size: 18, css: "text-muted shrink-0") %>
+    <span class="sr-only">Search your rack</span>
+    <%= search_field_tag :search, params[:search], id: "rack_search",
+          placeholder: "Search your rack: name, brand, colour",
+          autocomplete: "off",
+          class: "w-full bg-transparent border-0 outline-none text-base",
+          data: { action: "input->auto-submit#debouncedSubmit" } %>
+  </label>
+
+  <div class="grid grid-cols-3 sm:flex gap-2.5 w-full sm:w-auto">
+    <%= f.select :paint_product_line_brand_id_eq,
+          @brands.map { |b| [b.name, b.id] },
+          { include_blank: "Brand" },
+          class: "select h-[52px] w-full sm:w-36 font-semibold text-sm",
+          aria: { label: "Brand" },
+          data: { action: "change->auto-submit#submit" } %>
+    <%= f.select :paint_product_line_id_eq,
+          @product_lines.map { |pl| ["#{pl.brand.name} · #{pl.name}", pl.id] },
+          { include_blank: "Range" },
+          class: "select h-[52px] w-full sm:w-40 font-semibold text-sm",
+          aria: { label: "Range" },
+          data: { action: "change->auto-submit#submit" } %>
+    <%= select_tag :color,
+          options_for_select(@color_categories, params[:color]),
+          include_blank: "Colour",
+          class: "select h-[52px] w-full sm:w-36 font-semibold text-sm",
+          aria: { label: "Colour" },
+          data: { action: "change->auto-submit#submit" } %>
+  </div>
+
+  <% if filters_active %>
+    <%= link_to "Clear", user_paints_path(status: params[:status]),
+          class: "self-center text-sm font-semibold underline underline-offset-4 hover:text-accent-text px-1",
+          data: { turbo_frame: "_top" } %>
+  <% end %>
+
+  <%= hidden_field_tag :status, params[:status] %>
+  <%= f.hidden_field :s, value: params.dig(:q, :s).to_s %>
+<% end %>

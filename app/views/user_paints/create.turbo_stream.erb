@@ -29,7 +29,7 @@
 <% end %>
 <%= turbo_stream.prepend "collection-results-grid-all", partial: "modern_paint_card", locals: { user_paint: @user_paint } %>
 <%= turbo_stream.prepend "collection-results-grid-#{@user_paint.status}", partial: "modern_paint_card", locals: { user_paint: @user_paint } %>
-<%= turbo_stream.replace "stats-grid", partial: "stats_grid" %>
+<%= render "user_paints/rack_counts_stream" %>
 
 <%# Update the collection options section on paint show page %>
 <%= turbo_stream.replace "collection-options-#{paint_id}" do %>
@@ -63,19 +63,13 @@
 <% end %>
 
 <%# Update the paint in paints index if present %>
-<%= turbo_stream.replace "paint-card-#{paint_id}" do %>
-  <div id="paint-card-<%= paint_id %>" class="paint-card">
-    <%= render "paints/modern_catalog_card", user_paint: @user_paint %>
-  </div>
-<% end %>
+<%= turbo_stream.replace "paint-card-#{paint_id}", partial: "paints/modern_catalog_card", locals: { user_paint: @user_paint } %>
 
 <%# Flash a success notice %>
-<%= turbo_stream.prepend "flash" do %>
-  <div class="alert alert-success shadow-lg mb-4" data-controller="auto-dismiss" data-auto-dismiss-timeout-value="5000">
-    <div>
-      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-      <span>Paint added to your <%= @user_paint.status %> collection!</span>
-    </div>
-    <button class="btn btn-sm btn-ghost">×</button>
+<%= turbo_stream.prepend "flash-messages" do %>
+  <div role="status" class="panel flex items-start gap-3 px-4 py-3 border-base-content">
+    <%= ph_icon(:check, size: 18, stroke: 2.4, css: "shrink-0 mt-0.5") %>
+    <p class="flex-1 text-sm font-medium">Added to your rack as <%= status_label(@user_paint.status) %>.</p>
+    <button type="button" aria-label="Dismiss" class="shrink-0 opacity-70 hover:opacity-100" onclick="this.parentElement.remove()"><%= ph_icon(:x, size: 16) %></button>
   </div>
 <% end %>

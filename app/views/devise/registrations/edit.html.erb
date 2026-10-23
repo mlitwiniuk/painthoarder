@@ -1,35 +1,36 @@
-<h2>Edit <%= resource_name.to_s.humanize %></h2>
+<% content_for :title, "Account settings · PaintHoarder" %>
+<% content_for :tagline, safe_join(["Your", tag.br, "account."]) %>
+<%= form_with model: resource, scope: resource_name, url: registration_path(resource_name), method: :put, class: "flex flex-col gap-5", data: { turbo: "false" } do |f| %>
+  <%= render "devise/shared/heading", title: "Account",
+        intro: safe_join(["Signed in as ", tag.b(resource.username, class: "text-base-content"), ". ", link_to("Back to your rack", user_paints_path, class: "text-accent-text font-semibold")]) %>
+  <%= render "devise/shared/error_messages", resource: resource %>
 
-<%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, data: { turbo: "false" } }) do |f| %>
-  <%= f.error_notification %>
+  <%= render "devise/shared/field", f: f, attribute: :email, label: "Email", type: :email_field,
+        input_html: { autocomplete: "email", required: true } %>
+  <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+    <p class="text-[13px] text-muted -mt-3">Waiting for you to confirm <b class="text-base-content"><%= resource.unconfirmed_email %></b>.</p>
+  <% end %>
 
-  <div class="form-inputs">
-    <%= f.input :email, required: true, autofocus: true %>
+  <fieldset class="border-2 border-line rounded p-4 flex flex-col gap-4">
+    <legend class="text-sm font-semibold px-1.5">New password <span class="font-normal text-muted">(leave blank to keep the current one)</span></legend>
+    <%= render "devise/shared/field", f: f, attribute: :password, label: "New password", type: :password_field,
+          hint: ("At least #{@minimum_password_length} characters" if @minimum_password_length),
+          input_html: { autocomplete: "new-password" } %>
+    <%= render "devise/shared/field", f: f, attribute: :password_confirmation, label: "Repeat new password", type: :password_field,
+          input_html: { autocomplete: "new-password" } %>
+  </fieldset>
 
-    <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-      <p>Currently waiting confirmation for: <%= resource.unconfirmed_email %></p>
-    <% end %>
+  <%= render "devise/shared/field", f: f, attribute: :current_password, label: "Current password", type: :password_field,
+        hint: "We need it to confirm any change.",
+        input_html: { autocomplete: "current-password", required: true } %>
 
-    <%= f.input :password,
-                hint: "leave it blank if you don't want to change it",
-                required: false,
-                input_html: { autocomplete: "new-password" } %>
-    <%= f.input :password_confirmation,
-                required: false,
-                input_html: { autocomplete: "new-password" } %>
-    <%= f.input :current_password,
-                hint: "we need your current password to confirm your changes",
-                required: true,
-                input_html: { autocomplete: "current-password" } %>
-  </div>
-
-  <div class="form-actions">
-    <%= f.button :submit, "Update" %>
-  </div>
+  <%= f.submit "Save changes", class: "btn btn-primary btn-lg h-13 w-full" %>
 <% end %>
 
-<h3>Cancel my account</h3>
-
-<div>Unhappy? <%= button_to "Cancel my account", registration_path(resource_name), data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" }, method: :delete %></div>
-
-<%= link_to "Back", :back %>
+<section class="border-t-2 border-line pt-5 flex flex-col gap-3">
+  <h2 class="cond font-black text-2xl">Close account</h2>
+  <p class="text-sm text-soft">Closes your PaintHoarder account. This can't be undone.</p>
+  <%= button_to "Delete my account", registration_path(resource_name), method: :delete,
+        class: "btn btn-outline btn-error self-start",
+        data: { confirm: "Are you sure?", turbo_confirm: "Are you sure?" } %>
+</section>

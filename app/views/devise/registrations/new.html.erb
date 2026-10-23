@@ -1,35 +1,43 @@
-<h2 class="mt-8 text-2xl font-bold leading-9 tracking-tight text-primary">Sign up new account</h2>
-<p class="mt-2 text-sm leading-6">
-  Already a member?
-  <a href="/users/sign_in" class="font-semibold text-primary hover:text-secondary">Sign in</a>
-</p>
-<%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name), html: { data: { turbo: "false" }}) do |f| %>
-  <%= f.error_notification %>
-  <div class="form-inputs mt-4">
-    <%= f.input :username,
-                required: true,
-                label: false,
-                placeholder: "Username",
-                autofocus: true %>
-    <%= f.input :email,
-                required: true,
-                label: false,
-                placeholder: "Email",
-                input_html: { autocomplete: "email" }%>
-    <%= f.input :password,
-                required: true,
-                label: false,
-                placeholder: "Password",
-                hint: ("#{@minimum_password_length} characters minimum" if @minimum_password_length),
-                input_html: { autocomplete: "new-password" } %>
-    <%= f.input :password_confirmation,
-                required: true,
-                label: false,
-                placeholder: "Password confirmation",
-                input_html: { autocomplete: "new-password" } %>
-  </div>
-  <div class="form-actions mt-3">
-    <%= f.button :submit, "Sign up", class: "w-full" %>
+<% content_for :title, "Join free · PaintHoarder" %>
+<% content_for :side do %>
+  <div class="flex flex-col gap-7">
+    <p class="cond font-black text-5xl leading-[.9]">Two minutes<br>to a full rack.</p>
+    <ol class="flex flex-col gap-5">
+      <% [["Create your account", "Free. No card."],
+          ["Import what you own", "Paste a list or snap a photo of your shelf. We match it to the catalogue."],
+          ["Check before you buy", "Open your rack on your phone at the store."]].each_with_index do |(title, body), i| %>
+        <li class="flex gap-4">
+          <span class="cond font-black text-[32px] leading-none text-accent-text w-9 shrink-0"><%= format("%02d", i + 1) %></span>
+          <span class="flex flex-col gap-1"><b class="text-base"><%= title %></b><span class="text-sm text-muted"><%= body %></span></span>
+        </li>
+      <% end %>
+    </ol>
   </div>
 <% end %>
-<%= render "devise/shared/links" %>
+
+<%= form_with model: resource, scope: resource_name, url: registration_path(resource_name), class: "flex flex-col gap-5", html: { novalidate: true }, data: { turbo: "false" } do |f| %>
+  <%= render "devise/shared/heading", title: "Join free",
+        intro: safe_join(["Already have an account? ", link_to("Sign in", new_session_path(resource_name), class: "text-accent-text font-semibold")]) %>
+
+  <%= render "devise/shared/error_messages", resource: resource %>
+
+  <%= render "devise/shared/field", f: f, attribute: :username, label: "Username",
+        input_html: { autofocus: true, autocomplete: "username", required: true } %>
+  <%= render "devise/shared/field", f: f, attribute: :email, label: "Email", type: :email_field,
+        input_html: { autocomplete: "email", required: true } %>
+  <%= render "devise/shared/field", f: f, attribute: :password, label: "Password", type: :password_field,
+        hint: ("At least #{@minimum_password_length} characters" if @minimum_password_length),
+        input_html: { autocomplete: "new-password", required: true } %>
+  <%= render "devise/shared/field", f: f, attribute: :password_confirmation, label: "Repeat password", type: :password_field,
+        input_html: { autocomplete: "new-password", required: true } %>
+
+  <%= f.submit "Create account", class: "btn btn-primary btn-lg h-13 w-full" %>
+
+  <p class="text-[13px] leading-normal text-muted">
+    By creating an account you agree to the
+    <%= link_to "Terms", page_path("terms-of-service"), class: "text-soft underline" %> and
+    <%= link_to "Privacy policy", page_path("privacy-policy"), class: "text-soft underline" %>.
+  </p>
+
+  <%= render "devise/shared/links" %>
+<% end %>

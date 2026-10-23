@@ -1,165 +1,28 @@
-<% content_for :title, "Paint Catalog | PaintHoarder" %>
+<% content_for :title, "Catalogue | PaintHoarder" %>
 
-<!-- Hero Section with Stats -->
-<div class="relative bg-gradient-to-br from-secondary/10 to-accent/10 rounded-3xl p-8 mb-8 overflow-hidden">
-  <div class="absolute inset-0 bg-gradient-to-r from-secondary/5 to-transparent"></div>
-  <div class="z-10">
-    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-      <div>
-        <h1 class="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent mb-2">
-          Paint Catalog
-        </h1>
-        <p class="text-base-content/60 text-lg">Discover and explore thousands of miniature paints</p>
-      </div>
-
-      <!-- Quick Stats -->
-      <%= turbo_frame_tag "catalog-stats" do %>
-        <div class="flex gap-6">
-          <div class="text-center">
-            <div class="text-3xl font-bold text-secondary"><%= Paint.count %></div>
-            <div class="text-sm text-base-content/60">Paints</div>
-          </div>
-          <div class="text-center">
-            <div class="text-3xl font-bold text-accent"><%= Brand.count %></div>
-            <div class="text-sm text-base-content/60">Brands</div>
-          </div>
-          <div class="text-center">
-            <div class="text-3xl font-bold text-primary"><%= ProductLine.count %></div>
-            <div class="text-sm text-base-content/60">Lines</div>
-          </div>
-        </div>
-      <% end %>
-    </div>
-  </div>
-</div>
-
-<!-- Navigation Bar -->
-<div class="sticky top-0 z-40 backdrop-blur-xl border-b border-base-200 -mx-4 px-4 mb-8" data-controller="toggle">
-  <div class="flex items-center justify-between py-4">
-    <!-- Sort Options -->
-    <div class="flex items-center gap-1 bg-base-200 rounded-full p-1">
-      <%= link_to paints_path(search: params[:search], q: request.params[:q]&.merge(s: "name asc") || {s: "name asc"}),
-              class: "px-4 py-2 rounded-full text-sm font-medium transition-all #{params.dig(:q, :s) == 'name asc' ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/60 hover:text-base-content'}" do %>
-        Name A-Z
-      <% end %>
-      <%= link_to paints_path(search: params[:search], q: request.params[:q]&.merge(s: "product_line_brand_name asc") || {s: "product_line_brand_name asc"}),
-              class: "px-4 py-2 rounded-full text-sm font-medium transition-all #{params.dig(:q, :s) == 'product_line_brand_name asc' ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/60 hover:text-base-content'}" do %>
-        Brand A-Z
-      <% end %>
-      <%= link_to paints_path(search: params[:search], q: request.params[:q]&.merge(s: "created_at desc") || {s: "created_at desc"}),
-              class: "px-4 py-2 rounded-full text-sm font-medium transition-all #{params.dig(:q, :s) == 'created_at desc' ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/60 hover:text-base-content'}" do %>
-        Newest
-      <% end %>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="flex items-center gap-3">
-      <button class="btn btn-ghost btn-sm" data-action="click->toggle#toggle">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-        </svg>
-        <span class="hidden sm:inline">Filter</span>
-      </button>
-
-      <% if user_signed_in? %>
-        <%= link_to user_paints_path, class: "btn btn-primary btn-sm" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
-          <span class="hidden sm:inline ml-2">My Collection</span>
-        <% end %>
-      <% end %>
-    </div>
+<div class="flex flex-col gap-6">
+  <div class="flex flex-wrap justify-between items-end gap-4">
+    <h1 class="page-title">Catalogue</h1>
+    <nav aria-label="Catalogue view" class="cond flex gap-1 font-extrabold text-[17px] tracking-[.03em]">
+      <%= link_to "Paints", paints_path, aria: {current: "page"}, class: "no-underline px-4 py-2.5 rounded bg-neutral text-neutral-content" %>
+      <%= link_to "Brands & ranges", brands_path, class: "no-underline px-4 py-2 rounded border-2 border-line-strong hover:border-base-content" %>
+    </nav>
   </div>
 
-  <!-- Collapsible Filter Section -->
-  <%= turbo_frame_tag "catalog-filters" do %>
-    <div data-toggle-target="content" class="<%= "hidden" if params[:search].blank? && params[:q].blank? %> pb-3">
-      <div class="bg-base-50 rounded-xl px-3 py-3 lg:px-6 lg:py-4 border border-base-200">
-        <%= render "shared/filter_form",
-            q: @q,
-            url: paints_path,
-            turbo_frame: "catalog-results",
-            brands: @brands,
-            product_lines: @product_lines,
-            color_categories: @color_categories,
-            clear_url: paints_path %>
-      </div>
-    </div>
+  <%= form_with url: paints_path, method: :get, id: "catalogue-filters",
+        data: {controller: "auto-submit", turbo_frame: "catalog-results", turbo_action: "advance"} do %>
+    <label class="flex items-center gap-3 px-4 h-[60px] bg-base-100 border-2 border-line-strong rounded focus-within:border-base-content">
+      <%= ph_icon(:search, size: 22, css: "text-muted shrink-0") %>
+      <span class="sr-only">Search all paints</span>
+      <%= search_field_tag :search, params[:search],
+            placeholder: "Search #{number_with_delimiter(@total_paints)} paints from #{@total_brands} brands",
+            autocomplete: "off",
+            class: "w-full bg-transparent border-0 outline-none text-lg",
+            data: {action: "input->auto-submit#debouncedSubmit"} %>
+    </label>
+  <% end %>
+
+  <%= turbo_frame_tag "catalog-results", data: {turbo_action: "advance"} do %>
+    <%= render "paints/catalog_results" %>
   <% end %>
 </div>
-
-<!-- Results Section -->
-<%= turbo_frame_tag "catalog-results" do %>
-  <% if @paints.any? %>
-    <!-- Results Info -->
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-      <div class="text-base-content/60">
-        <%= raw @pagy.info_tag %>
-      </div>
-    </div>
-
-    <!-- Paint Catalog Grid -->
-    <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-2 lg:gap-4 xl:gap-6 mb-8">
-      <% @paints.each do |paint| %>
-        <%
-          # Create a virtual UserPaint object for each paint
-          # If the user already has this paint in their collection, use that
-          user_paint = if user_signed_in? && @user_paint_ids&.include?(paint.id)
-                        current_user.user_paints.find_by(paint_id: paint.id)
-                      elsif user_signed_in?
-                        UserPaint.new(paint: paint, user: current_user, virtual: true)
-                      else
-                        UserPaint.new(paint: paint, virtual: true)
-                      end
-        %>
-        <%= render "paints/modern_catalog_card", user_paint: user_paint %>
-      <% end %>
-    </div>
-
-    <!-- Pagination -->
-    <div class="flex justify-center">
-      <div class="join">
-        <%== @pagy.series_nav %>
-      </div>
-    </div>
-  <% else %>
-    <!-- Empty State -->
-    <div class="flex flex-col items-center justify-center py-20">
-      <div class="w-32 h-32 bg-gradient-to-br from-secondary/20 to-accent/20 rounded-full flex items-center justify-center mb-8">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      </div>
-
-      <h2 class="text-3xl font-bold mb-4">No paints found</h2>
-
-      <p class="text-base-content/60 text-center max-w-md mb-8">
-        <% if params[:q].present? %>
-          No paints match your current search or filters. Try adjusting your criteria to find what you're looking for.
-        <% else %>
-          The paint catalog appears to be empty. Check back soon as we're always adding new paints!
-        <% end %>
-      </p>
-
-      <div class="flex gap-4">
-        <% if params[:q].present? %>
-          <%= link_to "Clear Filters", paints_path, class: "btn btn-outline" %>
-        <% end %>
-        <% if user_signed_in? %>
-          <%= link_to user_paints_path, class: "btn btn-primary" do %>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
-            My Collection
-          <% end %>
-        <% else %>
-          <%= link_to "Sign Up to Start Collecting", new_user_registration_path,
-              class: "btn btn-primary" %>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
-<% end %>
-
-<%= turbo_frame_tag "modal" %>

@@ -1,235 +1,149 @@
 <% content_for :title, "Dashboard" %>
+<% greeting = case Time.current.hour
+               when 5..11 then "Morning"
+               when 12..17 then "Afternoon"
+               else "Evening"
+               end %>
 
-<!-- Dashboard Header -->
-<div class="mb-8">
-  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-    <div>
-      <h1 class="text-3xl font-bold text-base-content">Welcome back, <%= current_user.name || current_user.email.split('@').first.capitalize %>! 🎨</h1>
-      <p class="text-base-content/60 mt-1">Here's what's happening with your paint collection</p>
+<div class="flex flex-col gap-8">
+  <div class="flex flex-wrap justify-between items-end gap-5">
+    <div class="flex flex-col gap-2.5">
+      <h1 class="page-title"><%= greeting %>, <%= current_user.name %></h1>
+      <p class="eyebrow text-[13px]">
+        <%= @owned_paints_count %> owned · <%= @wishlist_count %> wanted · <%= pluralize(@projects_count, "project") %>
+      </p>
     </div>
-    <%= link_to user_paints_path, class: "btn btn-primary btn-lg shadow-lg hover:shadow-xl transition-all lg:w-auto w-full" do %>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-      </svg>
-      View My Collection
+    <div class="flex flex-wrap gap-2.5">
+      <%= link_to "Import paints", bulk_import_user_paints_path, class: "btn btn-outline" %>
+      <%= link_to new_user_paint_path, class: "btn btn-primary", data: {turbo_frame: "modal"} do %>
+        <%= ph_icon(:plus, size: 18, stroke: 2.6) %>Add paint
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid gap-5 grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))]">
+    <section class="panel-inverse p-7 flex flex-col gap-4" aria-labelledby="rack-check-title">
+      <h2 id="rack-check-title" class="cond font-black text-4xl leading-[.95]">At the shop?<br>Do I own it?</h2>
+      <%= form_with url: user_root_path, method: :get,
+            data: {turbo_frame: "rack-check", controller: "auto-submit"} do %>
+        <label class="flex items-center gap-2.5 h-14 px-4 rounded bg-page text-base-content">
+          <%= ph_icon(:search, size: 20) %>
+          <span class="sr-only">Check a paint against your rack</span>
+          <%= search_field_tag :check, @check_query, placeholder: "Paint name, e.g. Abaddon Black",
+                autocomplete: "off",
+                class: "w-full bg-transparent border-0 outline-none text-lg font-medium",
+                data: {action: "input->auto-submit#debouncedSubmit"} %>
+        </label>
+      <% end %>
+      <%= render "dashboard/rack_check" %>
+    </section>
+
+    <section class="panel p-6 flex flex-col gap-3.5" aria-labelledby="shopping-list-title">
+      <div class="flex justify-between items-baseline gap-3">
+        <h2 id="shopping-list-title" class="cond font-black text-[28px]">Shopping list</h2>
+        <% if @wishlist_count.positive? %>
+          <%= link_to "All #{@wishlist_count} wanted →", user_paints_path(status: :wishlist), class: "text-link text-sm" %>
+        <% end %>
+      </div>
+      <% if @wishlist_items.any? %>
+        <ul class="flex flex-col">
+          <% @wishlist_items.each do |user_paint| %>
+            <li id="<%= dom_id(user_paint) %>" class="flex items-center gap-3 py-2 border-b border-line">
+              <span class="w-8 h-8 rounded-[3px] shrink-0" style="<%= paint_swatch_style(user_paint.paint) %>"></span>
+              <%= link_to user_paint_path(user_paint), class: "flex-1 min-w-0 flex flex-col no-underline hover:text-accent-text" do %>
+                <b class="text-[15px] font-semibold"><%= user_paint.paint.name %></b>
+                <span class="text-xs text-muted"><%= user_paint.paint.product_line.brand.name %> · <%= user_paint.paint.product_line.name %></span>
+              <% end %>
+              <%= button_to "Got it", user_paint_path(user_paint), method: :patch,
+                    params: {user_paint: {status: "owned"}},
+                    class: "h-9 px-3 rounded border-2 border-line-strong text-[13px] font-semibold hover:border-base-content cursor-pointer",
+                    form: {class: "shrink-0"},
+                    aria: {label: "Got it: mark #{user_paint.paint.name} as owned"} %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="panel-dashed p-5 flex flex-col gap-1.5 items-start">
+          <span class="cond font-extrabold text-[22px]">Nothing on the wishlist</span>
+          <span class="text-sm text-soft">Mark paints as Wanted from the catalogue and they'll show up here as a shopping list.</span>
+          <%= link_to "Browse catalogue →", paints_path, class: "cond mt-1.5 font-extrabold text-base text-accent-text no-underline" %>
+        </div>
+      <% end %>
+    </section>
+  </div>
+
+  <section class="flex flex-col gap-3.5" aria-labelledby="recent-title">
+    <div class="flex justify-between items-baseline gap-3">
+      <h2 id="recent-title" class="cond font-black text-[28px]">Recently added</h2>
+      <% if @recent_additions.any? %>
+        <%= link_to "Open rack →", user_paints_path, class: "text-link text-sm" %>
+      <% end %>
+    </div>
+    <% if @recent_additions.any? %>
+      <div class="grid grid-cols-3 md:grid-cols-6 gap-2.5">
+        <% @recent_additions.each do |user_paint| %>
+          <%= link_to user_paint_path(user_paint), class: "flex flex-col gap-2 min-w-0 no-underline group" do %>
+            <span class="h-24 rounded border border-line" style="<%= paint_swatch_style(user_paint.paint) %>"></span>
+            <span class="flex flex-col">
+              <b class="text-sm font-semibold leading-tight group-hover:text-accent-text"><%= user_paint.paint.name %></b>
+              <span class="text-xs text-muted"><%= user_paint.paint.product_line.brand.name %> · <%= time_ago_in_words(user_paint.created_at) %> ago</span>
+            </span>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="panel-dashed p-8 md:p-12 flex flex-col items-start gap-3">
+        <span class="cond font-black text-4xl leading-[.95]">Your rack is empty</span>
+        <span class="text-base text-soft max-w-[520px]">Import a typed list or a photo of your shelf, or find paints in the catalogue and mark them Owned.</span>
+        <div class="flex flex-wrap gap-2.5 mt-2">
+          <%= link_to "Import paints", bulk_import_user_paints_path, class: "btn btn-primary" %>
+          <%= link_to "Browse catalogue", paints_path, class: "btn btn-outline" %>
+        </div>
+      </div>
     <% end %>
-  </div>
-</div>
+  </section>
 
-<!-- Stats Grid -->
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-8">
-  <div class="stats shadow-lg bg-base-100 border border-base-300">
-    <div class="stat place-items-center px-2 py-3 sm:px-4 sm:py-4">
-      <div class="stat-title text-xs sm:text-sm text-base-content/60">Total Paints</div>
-      <div class="stat-value text-lg sm:text-2xl lg:text-3xl text-primary"><%= current_user.user_paints.count %></div>
-      <div class="stat-desc text-xs text-base-content/50 hidden sm:block">In your collection</div>
-    </div>
-  </div>
-
-  <div class="stats shadow-lg bg-base-100 border border-base-300">
-    <div class="stat place-items-center px-2 py-3 sm:px-4 sm:py-4">
-      <div class="stat-title text-xs sm:text-sm text-base-content/60">Wishlist</div>
-      <div class="stat-value text-lg sm:text-2xl lg:text-3xl text-secondary"><%= current_user.user_paints.wishlist.count %></div>
-      <div class="stat-desc text-xs text-base-content/50 hidden sm:block">Paints to buy</div>
-    </div>
-  </div>
-
-  <div class="stats shadow-lg bg-base-100 border border-base-300">
-    <div class="stat place-items-center px-2 py-3 sm:px-4 sm:py-4">
-      <div class="stat-title text-xs sm:text-sm text-base-content/60">Brands</div>
-      <div class="stat-value text-lg sm:text-2xl lg:text-3xl text-accent"><%= current_user.user_paints.joins(paint: :brand).distinct.count('product_line.brand_id') %></div>
-      <div class="stat-desc text-xs text-base-content/50 hidden sm:block">Different brands</div>
-    </div>
-  </div>
-
-  <div class="stats shadow-lg bg-base-100 border border-base-300">
-    <div class="stat place-items-center px-2 py-3 sm:px-4 sm:py-4">
-      <div class="stat-title text-xs sm:text-sm text-base-content/60">This Month</div>
-      <div class="stat-value text-lg sm:text-2xl lg:text-3xl text-info"><%= current_user.user_paints.where(created_at: 1.month.ago..Time.current).count %></div>
-      <div class="stat-desc text-xs text-base-content/50 hidden sm:block">New additions</div>
-    </div>
-  </div>
-</div>
-
-<!-- Main Content Grid -->
-<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-  <!-- Recent Paints Section -->
-  <div class="xl:col-span-2">
-    <div class="card bg-base-100 shadow-lg border border-base-300">
-      <div class="card-body">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="card-title text-xl text-base-content">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Recently Added Paints
-          </h2>
-          <%= link_to "View All", user_paints_path, class: "btn btn-ghost btn-sm text-base-content/60 hover:text-base-content" %>
-        </div>
-
-        <% if current_user.user_paints.any? %>
-          <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <% current_user.user_paints.includes(:paint => :brand).order(created_at: :desc).limit(12).each do |user_paint| %>
-              <div class="group relative">
-                <div class="aspect-square rounded-xl border-2 border-base-300 overflow-hidden shadow-sm hover:shadow-lg transition-all group-hover:scale-105">
-                  <div class="w-full h-full flex items-center justify-center" style="<%= paint_swatch_style(user_paint.paint) %>">
-                    <% if user_paint.paint.hex_color %>
-                      <div class="w-full h-full" style="<%= paint_swatch_style(user_paint.paint) %>"></div>
-                    <% else %>
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-base-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                      </svg>
-                    <% end %>
-                  </div>
-                </div>
-                <div class="mt-2 text-center">
-                  <p class="text-xs font-medium text-base-content/80 truncate"><%= user_paint.paint.name %></p>
-                  <p class="text-xs text-base-content/50 truncate"><%= user_paint.paint.brand.name %></p>
-                </div>
-
-                <!-- Status badge -->
-                <% if user_paint.wishlist? %>
-                  <div class="absolute -top-1 -right-1 w-4 h-4 bg-secondary rounded-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-secondary-content" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </div>
-                <% end %>
-              </div>
-            <% end %>
+  <% if @latest_project || @latest_video %>
+    <div class="grid gap-5 grid-cols-[repeat(auto-fit,minmax(min(100%,320px),1fr))]">
+      <% if @latest_project %>
+        <section class="panel p-6 flex gap-4.5 items-center">
+          <% if @latest_project_photo %>
+            <%= image_tag optimized_variant(@latest_project_photo, :thumb), alt: "",
+                  class: "w-30 h-30 shrink-0 rounded object-cover border-2 border-line" %>
+          <% else %>
+            <div class="w-30 h-30 shrink-0 rounded bg-base-200 border-2 border-dashed border-line-strong flex items-center justify-center text-[11px] text-muted text-center">No photo yet</div>
+          <% end %>
+          <div class="flex flex-col gap-1.5 min-w-0">
+            <span class="eyebrow text-[11px]">Your project · updated <%= time_ago_in_words(@latest_project.updated_at) %> ago</span>
+            <%= link_to @latest_project.title, project_path(@latest_project), class: "cond font-black text-[26px] leading-none no-underline hover:text-accent-text" %>
+            <span class="text-sm text-soft">
+              <%= pluralize(@latest_project_stats[:updates], "update") %> · <%= pluralize(@latest_project_stats[:photos], "photo") %> · <%= pluralize(@latest_project_stats[:paints], "paint") %> used
+            </span>
+            <%= link_to "Post an update →", new_project_project_update_path(@latest_project), class: "text-link text-sm" %>
           </div>
-        <% else %>
-          <div class="text-center py-12">
-            <div class="w-20 h-20 mx-auto bg-base-200 rounded-full flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
+        </section>
+      <% end %>
+
+      <% if @latest_video %>
+        <section class="panel p-6 flex flex-col gap-2.5">
+          <span class="eyebrow text-[11px]">Video paint list</span>
+          <%= link_to (@latest_video.title.presence || "Untitled video"), video_path(@latest_video),
+                class: "cond font-black text-[26px] leading-none no-underline hover:text-accent-text" %>
+          <% if @latest_video_total.positive? %>
+            <div class="flex items-center gap-3">
+              <span class="flex-1 h-2 rounded-full bg-base-200 overflow-hidden flex" aria-hidden="true">
+                <span class="bg-primary" style="width: <%= (@latest_video_owned * 100.0 / @latest_video_total).round %>%"></span>
+              </span>
+              <span class="text-sm font-semibold"><%= @latest_video_owned %> of <%= @latest_video_total %> on your rack</span>
             </div>
-            <h3 class="text-lg font-semibold text-base-content/80 mb-2">Start Your Collection</h3>
-            <p class="text-base-content/60 mb-4">Add your first paints to begin organizing your collection</p>
-            <%= link_to "Browse Paints", paints_path, class: "btn btn-primary" %>
-          </div>
-        <% end %>
-      </div>
+            <% missing = @latest_video_total - @latest_video_owned %>
+            <%= link_to (missing.positive? ? "See the #{missing} you're missing →" : "Open the paint list →"),
+                  video_path(@latest_video), class: "text-link text-sm" %>
+          <% else %>
+            <%= link_to "Open the paint list →", video_path(@latest_video), class: "text-link text-sm" %>
+          <% end %>
+        </section>
+      <% end %>
     </div>
-  </div>
-
-  <!-- Sidebar -->
-  <div class="space-y-6">
-    <!-- Quick Actions -->
-    <div class="card bg-base-100 shadow-lg border border-base-300">
-      <div class="card-body">
-        <h3 class="card-title text-lg text-base-content mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          Quick Actions
-        </h3>
-        <div class="space-y-3">
-          <%= link_to paints_path, class: "btn btn-ghost btn-sm justify-start w-full" do %>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            Explore Paints
-          <% end %>
-
-          <%= link_to bulk_import_user_paints_path, class: "btn btn-ghost btn-sm justify-start w-full" do %>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-            Bulk Import
-          <% end %>
-
-          <%= link_to user_paints_path(filter: :wishlist), class: "btn btn-ghost btn-sm justify-start w-full" do %>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-            My Wishlist
-          <% end %>
-        </div>
-      </div>
-    </div>
-
-    <!-- Brand Breakdown -->
-    <div class="card bg-base-100 shadow-lg border border-base-300">
-      <div class="card-body">
-        <h3 class="card-title text-lg text-base-content mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-          Top Brands
-        </h3>
-
-        <% brand_counts = current_user.user_paints.joins(paint: :brand).group('brands.name').count.sort_by(&:last).reverse.first(5) %>
-        <% if brand_counts.any? %>
-          <div class="space-y-3">
-            <% brand_counts.each do |brand_name, count| %>
-              <div class="flex items-center justify-between">
-                <span class="text-sm font-medium text-base-content/80"><%= brand_name %></span>
-                <div class="flex items-center gap-2">
-                  <span class="text-sm text-base-content/60"><%= count %></span>
-                  <div class="w-12 bg-base-300 rounded-full h-2">
-                    <div class="bg-primary h-2 rounded-full transition-all" style="width: <%= [count.to_f / brand_counts.first.last * 100, 100].min %>%"></div>
-                  </div>
-                </div>
-              </div>
-            <% end %>
-          </div>
-        <% else %>
-          <p class="text-sm text-base-content/50">No brands in your collection yet</p>
-        <% end %>
-      </div>
-    </div>
-
-    <!-- Recent Activity (Placeholder for future social features) -->
-    <div class="card bg-base-100 shadow-lg border border-base-300">
-      <div class="card-body">
-        <h3 class="card-title text-lg text-base-content mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Recent Activity
-        </h3>
-        <div class="space-y-3">
-          <% current_user.user_paints.order(created_at: :desc).limit(3).each do |user_paint| %>
-            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-base-200 transition-colors">
-              <div class="w-6 h-6 rounded-full border border-base-300" style="<%= paint_swatch_style(user_paint.paint) %>"></div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm text-base-content/80 truncate">Added <%= user_paint.paint.name %></p>
-                <p class="text-xs text-base-content/50"><%= time_ago_in_words(user_paint.created_at) %> ago</p>
-              </div>
-            </div>
-          <% end %>
-
-          <% if current_user.user_paints.none? %>
-            <p class="text-sm text-base-content/50 text-center py-4">No activity yet</p>
-          <% end %>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Coming Soon Banner -->
-<div class="mt-8">
-  <div class="flex alert alert-info shadow-lg">
-    <div class="flex items-center justify-between w-full">
-      <div class="flex items-center gap-3">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        <div>
-          <h3 class="font-bold">More social features coming soon!</h3>
-          <div class="text-xs">Share your painted miniatures, discover community projects, and connect with fellow painters.</div>
-        </div>
-      </div>
-      <div class="flex-shrink-0">
-          <%= link_to "https://discord.gg/wePFhTrZ2r", target: "_blank", rel: "noopener noreferrer", class: "btn btn-primary btn-sm gap-2" do %>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-            </svg>
-            Join Discord
-          <% end %>
-        </div>
-    </div>
-
-  </div>
+  <% end %>
 </div>

@@ -1,0 +1,20 @@
+<%# Owned / Wanted / Avoid as large radio cards. Checked styling lives in
+    application.tailwind.css (input[value=…]:checked + .radio-card).
+    Locals: user_paint, wizard (adds multi-step-form hooks), size (:lg default, :md). %>
+<% wizard = local_assigns.fetch(:wizard, false) %>
+<% current = user_paint.status.presence || "owned" %>
+<fieldset class="flex flex-col gap-2.5">
+  <legend class="text-sm font-semibold mb-2.5">Status</legend>
+  <div class="grid grid-cols-3 gap-2.5">
+    <% [["owned", "Owned", :check], ["wishlist", "Wanted", :heart], ["avoid", "Avoid", :ban]].each do |value, label, icon| %>
+      <label class="cursor-pointer">
+        <input type="radio" name="user_paint[status]" value="<%= value %>" class="peer sr-only"
+               <%= "checked" if current == value %>
+               <% if wizard %>data-multi-step-form-target="statusRadio" data-action="change->multi-step-form#statusChanged"<% end %>>
+        <span class="radio-card cond h-16 flex items-center justify-center gap-2 rounded border-2 border-line-strong bg-page text-soft font-extrabold text-[19px] tracking-[.04em] hover:border-base-content peer-focus-visible:outline-3 peer-focus-visible:outline-base-content peer-focus-visible:outline-offset-3">
+          <%= ph_icon(icon, size: 18, stroke: 2.6) %><%= label %>
+        </span>
+      </label>
+    <% end %>
+  </div>
+</fieldset>

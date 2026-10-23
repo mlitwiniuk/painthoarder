@@ -1,0 +1,7 @@
+<%# Turbo stream: refresh rack status pills after a create/update from a modal.
+    Counts are rack totals; the selected pill follows the page the request came from. %>
+<% referer_status = Rack::Utils.parse_query(URI.parse(request.referer.to_s).query.to_s)["status"] rescue nil %>
+<% totals = current_user.user_paints.group(:status).count %>
+<%= turbo_stream.replace "collection-counts" do %>
+  <%= render "user_paints/status_tabs", counts: totals.merge("all" => totals.values.sum), current: referer_status %>
+<% end %>

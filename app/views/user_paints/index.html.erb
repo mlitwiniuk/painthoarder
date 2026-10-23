@@ -1,127 +1,29 @@
-<% content_for :title, "My Collection" %>
+<% content_for :title, "My rack" %>
 
-<!-- Modern Collection Header -->
-<div class="mb-8">
-  <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-    <div>
-      <h1 class="text-4xl font-bold text-base-content mb-2">
-        My Paint Collection
-        <span class="text-2xl text-base-content/40 font-normal">🎨</span>
-      </h1>
-      <p class="text-base-content/60 text-lg">Discover, organize, and showcase your miniature paints</p>
+<div class="flex flex-col gap-6">
+  <div class="flex flex-wrap items-end justify-between gap-5">
+    <div class="flex flex-col gap-1.5">
+      <h1 class="page-title">My rack</h1>
+      <p class="eyebrow md:hidden">
+        <%= @owned_count %> owned · <%= @wishlist_count %> wanted
+      </p>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="flex justify-end md:justify-center items-center gap-3">
-      <%= link_to bulk_import_user_paints_path, class: "btn btn-ghost btn-sm" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-        </svg>
-        Bulk Import
+    <div class="flex flex-wrap gap-2.5">
+      <%= link_to color_wheel_user_paints_path, class: "btn btn-outline hidden sm:inline-flex" do %>
+        <%= ph_icon(:wheel, size: 18, stroke: 2.4) %>Colour wheel
       <% end %>
-      <%= link_to new_user_paint_path, class: "btn btn-primary shadow-lg hover:shadow-xl transition-all", data: { turbo_frame: "modal" } do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        Add Paint
-      <% end %>
-    </div>
-  </div>
-</div>
-
-<!-- Stats Grid -->
-<%= render partial: "stats_grid" %>
-
-<!-- Modern Filter Navigation -->
-<div class="sticky top-0 z-40 bg-base-100/90 backdrop-blur-xl border-b border-base-300 -mx-4 px-4 mb-8" data-controller="toggle">
-  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 py-4">
-    <!-- Status Filter Tabs -->
-    <div class="grid grid-cols-2 sm:flex sm:items-center gap-1 sm:bg-base-200 sm:rounded-full sm:p-1">
-      <%= link_to user_paints_path(color: params[:color], status: nil),
-              class: "flex items-center justify-center px-2 sm:px-4 py-2 rounded-lg sm:rounded-full text-xs sm:text-sm font-medium transition-all #{params[:status] == 'all' || params[:status].blank? ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/70 hover:text-base-content hover:bg-base-300 bg-base-200 sm:bg-transparent'}" do %>
-        <span class="sm:hidden">All</span>
-        <span class="hidden sm:inline">All</span>
-        <span class="ml-1 opacity-60 text-[11px] sm:text-xs">(<%= @all_count %>)</span>
-      <% end %>
-      <%= link_to user_paints_path(color: params[:color], status: :owned),
-              class: "flex items-center justify-center px-2 sm:px-4 py-2 rounded-lg sm:rounded-full text-xs sm:text-sm font-medium transition-all #{params[:status] == 'owned' ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/70 hover:text-base-content hover:bg-base-300 bg-base-200 sm:bg-transparent'}" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        <span class="sm:hidden ml-1">Own</span>
-        <span class="hidden sm:inline">Owned</span>
-        <span class="ml-1 opacity-60 text-[11px] sm:text-xs">(<%= @owned_count %>)</span>
-      <% end %>
-      <%= link_to user_paints_path(color: params[:color], status: :wishlist),
-              class: "flex items-center justify-center px-2 sm:px-4 py-2 rounded-lg sm:rounded-full text-xs sm:text-sm font-medium transition-all #{params[:status] == 'wishlist' ? 'bg-secondary text-secondary-content shadow-sm' : 'text-base-content/70 hover:text-base-content hover:bg-base-300 bg-base-200 sm:bg-transparent'}" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-        </svg>
-        <span class="sm:hidden ml-1">Want</span>
-        <span class="hidden sm:inline">Wishlist</span>
-        <span class="ml-1 opacity-60 text-[11px] sm:text-xs">(<%= @wishlist_count %>)</span>
-      <% end %>
-      <%= link_to user_paints_path(color: params[:color], status: :avoid),
-              class: "flex items-center justify-center px-2 sm:px-4 py-2 rounded-lg sm:rounded-full text-xs sm:text-sm font-medium transition-all #{params[:status] == 'avoid' ? 'bg-error text-error-content shadow-sm' : 'text-base-content/70 hover:text-base-content hover:bg-base-300 bg-base-200 sm:bg-transparent'}" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-        </svg>
-        <span class="sm:hidden ml-1">No</span>
-        <span class="hidden sm:inline">Avoid</span>
-        <span class="ml-1 opacity-60 text-[11px] sm:text-xs">(<%= @avoid_count %>)</span>
-      <% end %>
-    </div>
-
-    <!-- Filter & More Actions -->
-    <div class="flex items-center gap-3">
-      <button class="btn btn-ghost btn-sm hover:bg-base-200" data-action="click->toggle#toggle">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-        </svg>
-        Filters
-      </button>
-
-      <%= link_to color_wheel_user_paints_path, class: "btn btn-ghost btn-sm hover:bg-base-200" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-        </svg>
-        Color Wheel
+      <%= link_to "Import", bulk_import_user_paints_path, class: "btn btn-outline hidden sm:inline-flex" %>
+      <%= link_to new_user_paint_path, class: "btn btn-primary", data: { turbo_frame: "modal" } do %>
+        <%= ph_icon(:plus, size: 18, stroke: 2.6) %>Add paint
       <% end %>
     </div>
   </div>
 
-  <!-- Collapsible Filter Section -->
-  <%= turbo_frame_tag "collection-filters" do %>
-    <div data-toggle-target="content" class="<%= "hidden" if params[:search].blank? && params[:q].blank? %> pb-4">
-      <div class="bg-base-200 rounded-2xl py-4 px-6 border border-base-300">
-        <%= render "shared/filter_form",
-            q: @q,
-            url: user_paints_path,
-            turbo_frame: "collection-results",
-            brands: @brands,
-            product_lines: @product_lines,
-            color_categories: @color_categories,
-            clear_url: user_paints_path(status: params[:status]),
-            brand_field: :paint_product_line_brand_id_eq,
-            product_line_field: :paint_product_line_id_eq %>
-      </div>
-    </div>
+  <%= render "user_paints/rack_filters" %>
+
+  <%= turbo_frame_tag "collection-results", class: "flex flex-col gap-6" do %>
+    <%= render "user_paints/status_tabs", counts: @status_counts %>
+    <%= render "user_paints/rack_grid", user_paints: @user_paints %>
   <% end %>
 </div>
-
-<!-- Modern Paint Collection Grid -->
-<%= turbo_frame_tag "collection-results" do %>
-  <% if @user_paints.any? %>
-    <div id="collection-results-grid-<%= @status || 'all' %>" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-2 lg:gap-4 xl:gap-6 mb-8">
-
-      <% @user_paints.each do |user_paint| %>
-        <%= render 'user_paints/modern_paint_card', user_paint: user_paint %>
-      <% end %>
-    </div>
-  <% else %>
-    <%= render "no_paints" %>
-  <% end %>
-<% end %>
-</div>
-
-<%= turbo_frame_tag "modal" %>

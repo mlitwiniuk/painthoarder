@@ -1,6 +1,10 @@
 generated_at: "2026-10-23T11:43:56+00:00"
 generated_from: "docs/README.md"
 fast_paths:
+- label: "Redesign planning"
+  links:
+  - title: "Screenshots and workflow inventory"
+    path: "docs/ref_redesign-screenshots.md"
 - label: "Producer updates"
   links:
   - title: "Paint catalog refresh"
@@ -18,6 +22,11 @@ fast_paths:
   - title: "Architecture"
     path: "docs/ref_architecture.md"
 docs:
+- path: "docs/ref_redesign-screenshots.md"
+  title: "Redesign screenshots"
+  type: "ref"
+  section: "References"
+  summary: "Browser captures, screen inventory, design observations, and proposed redesign work packages."
 - path: "docs/ref_architecture.md"
   title: "Architecture"
   type: "ref"

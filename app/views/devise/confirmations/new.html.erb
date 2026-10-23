@@ -1,20 +1,11 @@
-<h2>Resend confirmation instructions</h2>
-
-<%= simple_form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post, data: { turbo: "false" } }) do |f| %>
-  <%= f.error_notification %>
-  <%= f.full_error :confirmation_token %>
-
-  <div class="form-inputs">
-    <%= f.input :email,
-                required: true,
-                autofocus: true,
-                value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email),
-                input_html: { autocomplete: "email" } %>
-  </div>
-
-  <div class="form-actions">
-    <%= f.button :submit, "Resend confirmation instructions" %>
-  </div>
+<% content_for :title, "Resend confirmation · PaintHoarder" %>
+<%= form_with model: resource, scope: resource_name, url: confirmation_path(resource_name), method: :post, class: "flex flex-col gap-5", data: { turbo: "false" } do |f| %>
+  <%= render "devise/shared/heading", title: "Resend confirmation",
+        intro: "We'll send the confirmation link again." %>
+  <%= render "devise/shared/error_messages", resource: resource %>
+  <%= render "devise/shared/field", f: f, attribute: :email, label: "Email", type: :email_field,
+        input_html: { autofocus: true, autocomplete: "email", required: true,
+                      value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email) } %>
+  <%= f.submit "Send it again", class: "btn btn-primary btn-lg h-13 w-full" %>
+  <%= render "devise/shared/links" %>
 <% end %>
-
-<%= render "devise/shared/links" %>

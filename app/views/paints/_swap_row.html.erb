@@ -1,0 +1,22 @@
+<%# One brand-swap candidate. Locals: user_paint, source (Paint), score, strategy %>
+<% paint = user_paint.paint %>
+<% quality = match_quality(score) if strategy == "color" %>
+<li class="flex flex-wrap items-center gap-x-4 gap-y-2 p-3 rounded hover:bg-base-200">
+  <span class="swatch-pair" aria-hidden="true">
+    <span style="<%= paint_swatch_style(source) %>"></span><span style="<%= paint_swatch_style(paint) %>"></span>
+  </span>
+  <span class="flex-[1_1_200px] min-w-0 flex flex-col">
+    <%= link_to paint.name, directory_paint_path_for(paint), class: "font-bold text-base no-underline hover:text-accent-text", data: {turbo_frame: "_top"} %>
+    <span class="text-[13px] text-muted"><%= paint.product_line.brand.name %> · <%= paint.product_line.name %></span>
+  </span>
+  <span class="flex items-center gap-2.5 w-52">
+    <% if quality %>
+      <%= match_meter(quality[:level]) %>
+      <b class="text-sm" title="<%= quality[:meaning] %>"><%= quality[:label] %></b>
+      <span class="font-mono text-[11px] text-muted">ΔE <%= score.round(1) %></span>
+    <% elsif score %>
+      <span class="font-mono text-xs text-muted"><%= similarity_score_label(strategy, score) %></span>
+    <% end %>
+  </span>
+  <%= render "paints/swap_status", user_paint: user_paint %>
+</li>

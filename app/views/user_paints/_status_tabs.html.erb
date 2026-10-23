@@ -1,0 +1,13 @@
+<%# Status pills. Locals: counts (hash keyed by status + "all"), current (status string, defaults to params). %>
+<% current = local_assigns.fetch(:current) { params[:status] }.presence || "all" %>
+<% filter_params = params.permit(:search, :color, q: [:paint_product_line_brand_id_eq, :paint_product_line_id_eq, :s]).to_h %>
+<nav id="collection-counts" aria-label="Filter by status" class="flex gap-2 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
+  <% [["all", "All"], ["owned", "Owned"], ["wishlist", "Wanted"], ["avoid", "Avoid"]].each do |status, label| %>
+    <%= link_to user_paints_path(filter_params.merge(status: (status == "all" ? nil : status)).compact_blank),
+          class: "chip chip-lg flex-none",
+          aria: { current: (current == status ? "page" : nil) },
+          data: { turbo_frame: "_top" } do %>
+      <%= label %> <span class="count"><%= counts[status].to_i %></span>
+    <% end %>
+  <% end %>
+</nav>

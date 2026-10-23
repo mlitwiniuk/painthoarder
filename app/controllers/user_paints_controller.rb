@@ -18,6 +18,9 @@ class UserPaintsController < ApplicationController
     # Get filtered results
     @user_paints = @query
 
+    # Status tab counts respect search/brand/range/colour, but not the status itself
+    @status_counts = filtered_status_counts(@q.result)
+
     # Data for filter dropdowns - only include brands and product lines from user's owned paints
     @brands = Brand.joins(product_lines: {paints: {user_paints: :user}})
       .where(user_paints: {user_id: current_user.id})
@@ -330,6 +333,13 @@ class UserPaintsController < ApplicationController
   def apply_filters(query)
     # Use the shared filter logic from the Filterable concern
     super
+  end
+
+  def filtered_status_counts(scope)
+    scope = filter_by_search(scope) if params[:search].present?
+    scope = filter_by_color(scope, params[:color].downcase) if params[:color].present?
+    counts = scope.unscope(:order, :includes).group(:status).count
+    counts.merge("all" => counts.values.sum)
   end
 
   def get_counters_for_stats_grid

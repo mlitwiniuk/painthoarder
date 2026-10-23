@@ -1,0 +1,7 @@
+<%# Locals: title, intro (optional HTML) %>
+<div class="flex flex-col gap-2">
+  <h1 class="cond font-black text-[56px] leading-[.9]"><%= title %></h1>
+  <% if local_assigns[:intro].present? %>
+    <p class="text-[15px] text-muted"><%= local_assigns[:intro] %></p>
+  <% end %>
+</div>

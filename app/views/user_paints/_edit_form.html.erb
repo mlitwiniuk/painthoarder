@@ -1,0 +1,68 @@
+<%# One-step edit of a paint already on the rack. %>
+<% paint = @user_paint.paint %>
+<%= turbo_frame_tag "modal" do %>
+  <div class="modal modal-open items-start pt-4 sm:pt-12"
+       data-controller="modal"
+       data-action="click->modal#closeBackground keyup@window->modal#closeWithKeyboard">
+    <div class="modal-box p-0 w-full max-w-[600px] max-h-[calc(100dvh-2rem)] sm:max-h-[90vh] flex flex-col bg-base-100 border-2 border-line-strong rounded shadow-none"
+         role="dialog" aria-modal="true" aria-labelledby="edit-paint-title">
+
+      <div class="flex items-center gap-4 px-6 py-5 border-b-2 border-line">
+        <span class="w-14 h-14 rounded flex-none border border-line-strong" style="<%= paint_swatch_style(paint) %>"></span>
+        <div class="flex-1 min-w-0 flex flex-col gap-0.5">
+          <h2 id="edit-paint-title" class="cond m-0 text-[30px] font-black leading-none"><%= paint.name %></h2>
+          <span class="text-sm text-muted">
+            <%= paint.product_line.brand.name %> · <%= paint.product_line.name %><% if paint.code.present? %> · <span class="font-mono text-xs"><%= paint.code %></span><% end %>
+          </span>
+        </div>
+        <button type="button" aria-label="Close" class="w-11 h-11 flex items-center justify-center rounded hover:bg-base-200" data-action="modal#close">
+          <%= ph_icon(:x, size: 20, stroke: 2.4) %>
+        </button>
+      </div>
+
+      <%= form_with model: @user_paint, id: "edit_user_paint_form", class: "overflow-y-auto px-6 py-6 flex flex-col gap-[22px]" do |form| %>
+        <% if @user_paint.errors.any? %>
+          <div role="alert" class="flex gap-2.5 items-start px-3.5 py-3 border-2 border-avoid rounded text-sm">
+            <%= ph_icon(:alert, size: 18, stroke: 2.4, css: "text-avoid shrink-0 mt-px") %>
+            <ul class="list-none">
+              <% @user_paint.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <%= render "user_paints/status_radio_cards", user_paint: @user_paint %>
+
+        <label class="flex flex-col gap-1.5">
+          <span class="text-sm font-semibold">Notes <span class="font-normal text-muted">(optional)</span></span>
+          <%= form.text_area :notes, rows: 2, class: "textarea w-full text-base", placeholder: "Nearly empty, thinned with medium…" %>
+        </label>
+
+        <fieldset class="border-2 border-line rounded p-4 flex flex-col gap-3.5">
+          <legend class="text-sm font-semibold px-1.5">Purchase details <span class="font-normal text-muted">(optional, only you see these)</span></legend>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label class="flex flex-col gap-1.5">
+              <span class="text-[13px] font-semibold">Price</span>
+              <%= form.number_field :purchase_price, step: 0.01, min: 0, inputmode: "decimal", class: "input w-full text-base" %>
+            </label>
+            <label class="flex flex-col gap-1.5">
+              <span class="text-[13px] font-semibold">When</span>
+              <%= form.date_field :purchase_date, class: "input w-full text-base" %>
+            </label>
+          </div>
+        </fieldset>
+      <% end %>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-t-2 border-line">
+        <%= button_to "Remove from rack", user_paint_path(@user_paint), method: :delete,
+              form: { data: { turbo_confirm: "Remove #{paint.name} from your rack?", turbo_frame: "_top" } },
+              class: "h-11 px-1 text-[15px] font-semibold text-avoid underline underline-offset-4 cursor-pointer" %>
+        <div class="flex gap-2.5">
+          <button type="button" class="btn btn-outline" data-action="modal#close">Cancel</button>
+          <button type="submit" form="edit_user_paint_form" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

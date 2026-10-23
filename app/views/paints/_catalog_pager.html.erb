@@ -1,0 +1,12 @@
+<div id="catalog-pager" class="flex flex-col items-center gap-4">
+  <% if @pagy.next %>
+    <%= link_to "Load #{[@pagy.count - @pagy.to, 24].min} more", catalogue_path_with(page: @pagy.next),
+          class: "btn btn-outline", data: {turbo_stream: true} %>
+  <% end %>
+  <div class="flex flex-wrap items-center justify-center gap-3 text-sm text-muted">
+    <%== @pagy.info_tag %>
+    <% if @pagy.last > 1 %>
+      <%== @pagy.series_nav %>
+    <% end %>
+  </div>
+</div>

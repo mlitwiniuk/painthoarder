@@ -1,0 +1,102 @@
+<%# Filters, results bar and grid. Lives inside the "catalog-results" frame; its
+    controls submit the search form above via form="catalogue-filters". %>
+<% q = request.query_parameters["q"].is_a?(Hash) ? request.query_parameters["q"] : {} %>
+<% color = params[:color].presence %>
+<% brand = @selected_brand || @selected_line&.brand %>
+
+<%= hidden_field_tag "q[product_line_brand_id_eq]", q["product_line_brand_id_eq"], form: "catalogue-filters", id: nil if q["product_line_brand_id_eq"].present? %>
+<%= hidden_field_tag "q[product_line_id_eq]", q["product_line_id_eq"], form: "catalogue-filters", id: nil if q["product_line_id_eq"].present? %>
+<%= hidden_field_tag :color, color, form: "catalogue-filters", id: nil if color %>
+
+<div class="flex flex-col gap-6">
+  <div class="flex flex-wrap items-center gap-2">
+    <% if brand %>
+      <span class="chip chip-active pr-1.5">
+        Brand: <%= brand.name %>
+        <%= link_to "×", catalogue_path_with(brand: nil), aria: {label: "Remove brand filter"},
+              class: "w-7 h-7 rounded-full flex items-center justify-center text-base no-underline hover:bg-base-content/10" %>
+      </span>
+      <% if @selected_line %>
+        <span class="chip chip-active pr-1.5">
+          Range: <%= @selected_line.name %>
+          <%= link_to "×", catalogue_path_with(line: nil), aria: {label: "Remove range filter"},
+                class: "w-7 h-7 rounded-full flex items-center justify-center text-base no-underline hover:bg-base-content/10" %>
+        </span>
+      <% elsif @brand_lines.any? %>
+        <details class="dropdown">
+          <summary class="chip chip-dashed list-none">+ Range</summary>
+          <ul class="dropdown-content menu z-30 mt-2 w-64 max-h-80 overflow-y-auto flex-nowrap p-2 panel">
+            <% @brand_lines.each do |line| %>
+              <li><%= link_to line.name, catalogue_path_with(line: line.id) %></li>
+            <% end %>
+          </ul>
+        </details>
+      <% end %>
+    <% else %>
+      <details class="dropdown">
+        <summary class="chip chip-dashed list-none">+ Brand</summary>
+        <ul class="dropdown-content menu z-30 mt-2 w-64 max-h-80 overflow-y-auto flex-nowrap p-2 panel">
+          <% @brands.each do |b| %>
+            <li><%= link_to b.name, catalogue_path_with(brand: b.id) %></li>
+          <% end %>
+        </ul>
+      </details>
+    <% end %>
+
+    <span class="w-0.5 h-6 bg-line mx-1.5" aria-hidden="true"></span>
+
+    <% @color_categories.each do |category| %>
+      <% active = color&.downcase == category.downcase %>
+      <%= link_to catalogue_path_with(color: active ? nil : category.downcase),
+            class: "chip", aria: {pressed: active.to_s} do %>
+        <span class="chip-swatch" style="<%= color_family_swatch_style(category) %>"></span><%= color_family_label(category) %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="flex flex-wrap justify-between items-center gap-3 border-t-2 border-line pt-4">
+    <% summary = catalogue_filter_summary(brand: brand, line: @selected_line, color: color) %>
+    <span class="text-[15px] text-soft">
+      <b class="text-base-content"><%= pluralize(number_with_delimiter(@pagy.count), "paint") %></b><% if summary.any? %> · <%= summary.join(" · ") %><% end %><% if params[:search].present? %> · “<%= params[:search] %>”<% end %>
+    </span>
+    <div class="flex flex-wrap items-center gap-4">
+      <% if user_signed_in? %>
+        <label class="flex items-center gap-2 text-sm min-h-11 cursor-pointer">
+          <%= check_box_tag :hide_owned, "1", @hide_owned, form: "catalogue-filters", id: nil,
+                class: "checkbox checkbox-primary checkbox-sm", onchange: "this.form.requestSubmit()" %>
+          Hide paints I own
+        </label>
+      <% end %>
+      <label class="flex items-center gap-2 text-sm">
+        Sort
+        <%= select_tag "q[s]", options_for_select(CatalogueHelper::SORT_OPTIONS, q["s"].presence || "name asc"),
+              form: "catalogue-filters", id: nil,
+              class: "select select-sm w-auto font-semibold", onchange: "this.form.requestSubmit()" %>
+      </label>
+    </div>
+  </div>
+
+  <% if @paints.any? %>
+    <div id="catalog-grid" class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3 sm:gap-4">
+      <% @catalog_user_paints.each do |user_paint| %>
+        <%= render "paints/modern_catalog_card", user_paint: user_paint %>
+      <% end %>
+    </div>
+
+    <%= render "paints/catalog_pager" %>
+  <% else %>
+    <div class="panel-dashed px-8 py-12 flex flex-col items-start gap-3">
+      <h2 class="section-title">No paints found</h2>
+      <p class="text-soft max-w-xl">
+        <% if params[:search].present? || summary.any? %>
+          Nothing in the catalogue matches these filters. Remove a filter or try another spelling.
+        <% else %>
+          The catalogue is empty for now. Check back soon.
+        <% end %>
+      </p>
+      <% if params[:search].present? || summary.any? || @hide_owned %>
+        <%= link_to "Clear filters", paints_path, class: "btn btn-outline mt-2", data: {turbo_frame: "_top"} %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

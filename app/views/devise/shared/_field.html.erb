@@ -1,0 +1,23 @@
+<%# Labelled Devise field with inline error.
+    Locals: f, attribute, label, type (default :text_field), hint, aside, input_html %>
+<% type = local_assigns.fetch(:type, :text_field) %>
+<% input_html = local_assigns.fetch(:input_html, {}) %>
+<% messages = f.object.respond_to?(:errors) ? f.object.errors.full_messages_for(attribute) : [] %>
+<% field_id = "#{f.object_name}_#{attribute}" %>
+<% described_by = messages.any? ? "#{field_id}_error" : (local_assigns[:hint].present? ? "#{field_id}_hint" : nil) %>
+<div class="flex flex-col gap-1.5">
+  <div class="flex justify-between items-baseline gap-3 text-sm font-semibold">
+    <%= f.label attribute, label %>
+    <%= local_assigns[:aside] %>
+  </div>
+  <%= f.public_send(type, attribute, **input_html,
+        class: "input w-full text-base #{'border-avoid' if messages.any?}",
+        aria: {invalid: (messages.any? || nil), describedby: described_by}) %>
+  <% if messages.any? %>
+    <span id="<%= field_id %>_error" class="flex items-center gap-1.5 text-[13px] text-avoid">
+      <%= ph_icon(:alert, size: 14, stroke: 2.6, css: "shrink-0") %><%= messages.to_sentence %>
+    </span>
+  <% elsif local_assigns[:hint].present? %>
+    <span id="<%= field_id %>_hint" class="text-[13px] text-muted"><%= local_assigns[:hint] %></span>
+  <% end %>
+</div>

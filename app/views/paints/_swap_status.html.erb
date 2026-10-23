@@ -1,0 +1,12 @@
+<% paint = user_paint.paint %>
+<div class="swap-status-<%= paint.id %> w-24 flex justify-end shrink-0">
+  <% if user_signed_in? && !user_paint.virtual? %>
+    <%= status_tag(user_paint.status, css: "w-24 justify-center") %>
+  <% elsif user_signed_in? %>
+    <%= button_to collection_status_paint_path(paint), method: :patch, params: {status: "owned"},
+          class: "tag tag-add w-24 h-9 justify-center cursor-pointer hover:border-base-content",
+          aria: {label: "Add #{paint.name} to rack as owned"} do %>
+      <%= ph_icon(:plus, size: 12, stroke: 3) %>Add
+    <% end %>
+  <% end %>
+</div>
