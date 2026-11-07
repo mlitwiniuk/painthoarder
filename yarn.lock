@@ -1736,10 +1736,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rails/actioncable@npm:>=7.0, @rails/actioncable@npm:^8.1.400":
+"@rails/actioncable@npm:>=7.0":
   version: 8.1.400
   resolution: "@rails/actioncable@npm:8.1.400"
   checksum: 10c0/69dd0c3ef4e72bfe281e0f22b18aea9766057ce6725a47832fd714db889948e439c5918279fcffcf644ed86c16c6abb55bf32fd6d8aad160d4d7ef8773bd9980
+  languageName: node
+  linkType: hard
+
+"@rails/actioncable@npm:^8.1.401":
+  version: 8.1.401
+  resolution: "@rails/actioncable@npm:8.1.401"
+  checksum: 10c0/d15bd660c2013e1214e8785237ce81f2bfed8f6e0342525e05073300825761b8483b421aece7b04cb415d779fab0b9169719b7541481369a82eaf13a34c86d84
   languageName: node
   linkType: hard
 
@@ -2344,7 +2351,7 @@ __metadata:
   dependencies:
     "@hotwired/stimulus": "npm:^3.2.2"
     "@hotwired/turbo-rails": "npm:^8.0.23"
-    "@rails/actioncable": "npm:^8.1.400"
+    "@rails/actioncable": "npm:^8.1.401"
     "@rails/actiontext": "npm:^8.1.400"
     "@rails/activestorage": "npm:^8.1.400"
     "@rails/request.js": "npm:^0.0.13"
