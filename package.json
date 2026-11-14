@@ -17,7 +17,7 @@
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "4.3.3",
     "tailwindcss-displaymodes": "^1.0.8",
-    "tom-select": "^2.6.2",
+    "tom-select": "^2.7.0",
     "trix": "^2.1.19",
     "workbox-precaching": "^7.4.1",
     "workbox-routing": "^7.4.1",
