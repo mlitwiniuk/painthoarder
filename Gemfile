@@ -49,7 +49,7 @@ gem "friendly_id", "~> 5.5.0"
 gem "pagy", "~> 43.7"
 gem "ransack", "~> 4.4", ">= 4.4.3"
 gem "premailer-rails"
-gem "mailgun-ruby", "~>1.2"
+gem "mailgun-ruby", "~>1.4"
 
 group :development, :test do
   gem "brakeman", require: false
