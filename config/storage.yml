@@ -6,11 +6,11 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
-# Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
+# AWS keys come from ENV (Kamal secrets from 1Password), falling back to credentials.
 amazon:
   service: S3
-  access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
-  secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
+  access_key_id: <%= ENV["AWS_ACCESS_KEY_ID"].presence || Rails.application.credentials.dig(:aws, :access_key_id) %>
+  secret_access_key: <%= ENV["AWS_SECRET_ACCESS_KEY"].presence || Rails.application.credentials.dig(:aws, :secret_access_key) %>
   region: eu-central-1
   bucket: painthoarder-<%= Rails.env %>
 # Remember not to checkin your GCS keyfile to a repository
