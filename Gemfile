@@ -100,4 +100,4 @@ gem "ruby_llm", "~> 2.0"
 gem "youtube-transcript-rb"
 gem "sitemap_generator", "~> 6.3"
 
-gem "appsignal", "~> 4.5"
+gem "appsignal", "~> 5.0"
