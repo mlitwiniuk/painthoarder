@@ -101,3 +101,7 @@ gem "youtube-transcript-rb"
 gem "sitemap_generator", "~> 6.3"
 
 gem "appsignal", "~> 4.5"
+
+gem "beskar", "~> 0.2.1"
+
+gem "rack-attack", "~> 6.8"

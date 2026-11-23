@@ -7,3 +7,7 @@ production:
     class: RefreshPaintCatalogsJob
     queue: default
     schedule: every day at 5am
+  beskar_cleanup_security_state:
+    command: "Beskar::SecurityState.cleanup_expired!"
+    queue: default
+    schedule: every day at 4am

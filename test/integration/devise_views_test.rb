@@ -2,14 +2,14 @@ require "test_helper"
 class DeviseViewsTest < ActionDispatch::IntegrationTest
   test "sign up shows a top alert and inline field errors" do
     create(:confirmed_user, username: "takenname")
-    post user_registration_path, params: {user: {username: "takenname", email: "bad", password: "x", password_confirmation: "y"}}
+    post user_registration_path, params: with_turnstile({user: {username: "takenname", email: "bad", password: "x", password_confirmation: "y"}})
     assert_response :unprocessable_entity
     assert_select "[role=alert]#error_explanation"
     assert_select "input#user_username[aria-invalid=true][aria-describedby=user_username_error]"
     assert_select "#user_username_error", /Username/
   end
   test "failed sign in shows the alert and keeps login and remember me" do
-    post user_session_path, params: {user: {login: "nobody", password: "nope"}}
+    post user_session_path, params: with_turnstile({user: {login: "nobody", password: "nope"}})
     assert_select "[role=alert]", /Invalid/i
     assert_select "input[name='user[login]']"
     assert_select "input[name='user[remember_me]']"

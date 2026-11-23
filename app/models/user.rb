@@ -46,6 +46,7 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
     :recoverable, :rememberable, :validatable, :lockable, :confirmable,
     authentication_keys: [:login]
+  include Beskar::Models::SecurityTrackable
 
   ## ASSOCIATIONS
   has_many :user_paints
@@ -68,6 +69,13 @@ class User < ApplicationRecord
 
   def admin?
     is_admin?
+  end
+
+  BESKAR_ADMIN_PERMISSIONS = %w[read manage_bans export read_audit].freeze
+
+  # Beskar dashboard grants; admins get full access.
+  def beskar_permissions
+    admin? ? BESKAR_ADMIN_PERMISSIONS : []
   end
 
   def can_create_video?

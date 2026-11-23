@@ -5,6 +5,7 @@
   <%= render "devise/shared/error_messages", resource: resource %>
   <%= render "devise/shared/field", f: f, attribute: :email, label: "Email", type: :email_field,
         input_html: { autofocus: true, autocomplete: "email", required: true } %>
+  <%= render "devise/shared/turnstile", action: "unlock" %>
   <%= f.submit "Send unlock link", class: "btn btn-primary btn-lg h-13 w-full" %>
   <%= render "devise/shared/links" %>
 <% end %>

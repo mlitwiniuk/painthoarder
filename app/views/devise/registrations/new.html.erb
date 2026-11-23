@@ -31,6 +31,8 @@
   <%= render "devise/shared/field", f: f, attribute: :password_confirmation, label: "Repeat password", type: :password_field,
         input_html: { autocomplete: "new-password", required: true } %>
 
+  <%= render "devise/shared/turnstile", action: "signup" %>
+
   <%= f.submit "Create account", class: "btn btn-primary btn-lg h-13 w-full" %>
 
   <p class="text-[13px] leading-normal text-muted">

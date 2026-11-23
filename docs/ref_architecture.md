@@ -1,6 +1,6 @@
 # PaintHoarder Architecture
 
-Rails 8.1.4 / Ruby 4.0.7 / SQLite / Hotwire / DaisyUI
+Rails 8.1.4.1 / Ruby 4.0.10 / SQLite / Hotwire / DaisyUI
 
 ## Domain
 
@@ -90,6 +90,18 @@ Page (CMS, standalone)
 - Login via username or email
 - Admin check: `current_user.admin?` (boolean column)
 - No Pundit/CanCanCan — manual `authorize_admin!` and `ensure_owner`
+
+### Abuse protection
+
+- **Cloudflare Turnstile** on sign in, sign up, password reset, confirmation and unlock forms.
+  `app/services/turnstile.rb` (server verification, fails closed), `TurnstileProtection` concern,
+  `Users::*Controller` Devise subclasses, `turnstile_controller.js` (explicit render, Turbo-safe).
+  Keys: credentials `turnstile.site_key` / `turnstile.secret_key` (or `TURNSTILE_*` ENV); production
+  refuses to boot without them. Dev/test fall back to Cloudflare's always-pass test keys.
+- **Rack::Attack** (`config/initializers/rack_attack.rb`): per-IP general limit, sign-in, sign-up,
+  email-sending and LLM-backed endpoint throttles. Disabled in tests except `rack_attack_test.rb`.
+- **Beskar** (`config/initializers/beskar.rb`): WAF + IP bans, per-account login admission, admin
+  dashboard at `/beskar`. Active (blocking) mode.
 
 ## External Integrations
 
