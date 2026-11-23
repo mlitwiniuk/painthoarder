@@ -162,7 +162,7 @@ GEM
       thor (~> 1.3)
       zeitwerk (~> 2.6)
     concurrent-ruby (1.3.8)
-    connection_pool (3.0.2)
+    connection_pool (3.0.3)
     console (1.38.0)
       fiber-annotation
       fiber-local (~> 1.1)
@@ -255,6 +255,7 @@ GEM
       json (~> 2.0)
       mime-types (~> 3.4)
       rack (~> 3.1)
+    ffi (1.17.4)
     ffi (1.17.4-aarch64-linux-gnu)
     ffi (1.17.4-aarch64-linux-musl)
     ffi (1.17.4-arm-linux-gnu)
@@ -461,9 +462,9 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.4.2)
-    ransack (4.4.4)
-      activerecord (>= 7.2)
-      activesupport (>= 7.2)
+    ransack (6.1.1)
+      activerecord (>= 8.1)
+      activesupport (>= 8.1)
       i18n
     rbs (4.2.0)
       logger
@@ -582,6 +583,8 @@ GEM
       fugit (~> 1.11)
       railties (>= 7.1)
       thor (>= 1.3.1)
+    sqlite3 (2.10.2)
+      mini_portile2 (~> 2.8.0)
     sqlite3 (2.10.2-aarch64-linux-gnu)
     sqlite3 (2.10.2-aarch64-linux-musl)
     sqlite3 (2.10.2-arm-linux-gnu)
@@ -709,7 +712,7 @@ DEPENDENCIES
   puma (~> 8.0, >= 8.0.2)
   rack-attack (~> 6.8)
   rails (~> 8.1.4)
-  ransack (~> 4.4, >= 4.4.3)
+  ransack (~> 6.1)
   responders
   rubocop
   rubocop-capybara
