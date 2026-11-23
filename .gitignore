@@ -44,6 +44,8 @@
 /config/credentials/development.key
 
 /config/credentials/production.key
+# Encrypted production credentials are kept out of the public repo.
+/config/credentials/production.yml.enc
 config/deploy.yml.bak
 
 # ClaudeOnRails
