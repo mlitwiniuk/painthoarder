@@ -59,7 +59,7 @@ jobs:
           SKIP_JS_BUILD: "1"
           SKIP_CSS_BUILD: "1"
         run: bin/rails db:test:prepare test test:system
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: screenshots
