@@ -2,7 +2,7 @@
 
 ## Setup
 
-Install the versions in `.tool-versions` using `mise install`, then use `mise exec --` or activate mise in your shell. Ruby 4.0.7, Node 24.21.0, and libvips are required; browser tests also need Chrome.
+Install the versions in `.tool-versions` using `mise install`, then use `mise exec --` or activate mise in your shell. Ruby 4.0.10, Node 24.21.0, and libvips are required; browser tests also need Chrome.
 
 ```sh
 corepack enable

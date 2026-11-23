@@ -4,7 +4,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   test "confirmed users can sign in by username and email" do
     user = create(:confirmed_user)
     [user.username, user.email].each do |login|
-      post user_session_path, params: {user: {login: login, password: "password123"}}
+      post user_session_path, params: with_turnstile({user: {login: login, password: "password123"}})
       assert_redirected_to root_path
       get user_paints_path
       assert_response :success
@@ -14,7 +14,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
 
   test "unconfirmed and locked users cannot sign in" do
     [create(:user), create(:user, :confirmed, :locked)].each do |user|
-      post user_session_path, params: {user: {login: user.email, password: "password123"}}
+      post user_session_path, params: with_turnstile({user: {login: user.email, password: "password123"}})
       get user_paints_path
       assert_redirected_to new_user_session_path
     end

@@ -6,6 +6,7 @@
   <%= render "devise/shared/field", f: f, attribute: :email, label: "Email", type: :email_field,
         input_html: { autofocus: true, autocomplete: "email", required: true,
                       value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email) } %>
+  <%= render "devise/shared/turnstile", action: "confirmation" %>
   <%= f.submit "Send it again", class: "btn btn-primary btn-lg h-13 w-full" %>
   <%= render "devise/shared/links" %>
 <% end %>

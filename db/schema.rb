@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_05_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_21_080937) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -47,6 +47,71 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_05_140000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "beskar_administrative_actions", force: :cascade do |t|
+    t.string "actor", limit: 200, null: false
+    t.string "action", null: false
+    t.bigint "target_id"
+    t.string "operation_id", limit: 36, null: false
+    t.string "request_id", limit: 200, null: false
+    t.text "reason", null: false
+    t.json "before_state", default: {}, null: false
+    t.json "after_state", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.string "target_type", default: "BannedIp", null: false
+    t.index ["created_at"], name: "index_beskar_administrative_actions_on_created_at"
+    t.index ["operation_id", "target_id"], name: "index_beskar_actions_on_operation_target", unique: true
+    t.index ["target_id", "id"], name: "index_beskar_administrative_actions_on_target_id_and_id"
+  end
+
+  create_table "beskar_banned_ips", force: :cascade do |t|
+    t.string "ip_address", null: false
+    t.string "reason", null: false
+    t.text "details"
+    t.datetime "banned_at", null: false
+    t.datetime "expires_at"
+    t.boolean "permanent", default: false, null: false
+    t.integer "violation_count", default: 1, null: false
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["banned_at"], name: "index_beskar_banned_ips_on_banned_at"
+    t.index ["expires_at"], name: "index_beskar_banned_ips_on_expires_at"
+    t.index ["ip_address", "expires_at"], name: "index_beskar_banned_ips_on_ip_address_and_expires_at"
+    t.index ["ip_address"], name: "index_beskar_banned_ips_on_ip_address", unique: true
+  end
+
+  create_table "beskar_security_events", force: :cascade do |t|
+    t.string "user_type"
+    t.integer "user_id"
+    t.string "event_type", null: false
+    t.string "ip_address"
+    t.string "attempted_email"
+    t.text "user_agent"
+    t.json "metadata", default: {}
+    t.integer "risk_score"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["attempted_email"], name: "index_beskar_security_events_on_attempted_email"
+    t.index ["created_at"], name: "index_beskar_security_events_on_created_at"
+    t.index ["event_type"], name: "index_beskar_security_events_on_event_type"
+    t.index ["ip_address", "event_type", "created_at"], name: "index_security_events_on_ip_event_time"
+    t.index ["ip_address"], name: "index_beskar_security_events_on_ip_address"
+    t.index ["risk_score"], name: "index_beskar_security_events_on_risk_score"
+    t.index ["user_type", "user_id", "event_type", "created_at"], name: "index_beskar_events_on_user_event_time"
+    t.index ["user_type", "user_id"], name: "index_beskar_security_events_on_user"
+  end
+
+  create_table "beskar_security_states", force: :cascade do |t|
+    t.string "key", null: false
+    t.json "data", default: {}, null: false
+    t.datetime "expires_at"
+    t.integer "lock_version", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_beskar_security_states_on_expires_at"
+    t.index ["key"], name: "index_beskar_security_states_on_key", unique: true
   end
 
   create_table "brands", force: :cascade do |t|

@@ -17,6 +17,8 @@
     </label>
   <% end %>
 
+  <%= render "devise/shared/turnstile", action: "login" %>
+
   <%= f.submit "Sign in", class: "btn btn-primary btn-lg h-13 w-full" %>
 
   <%= render "devise/shared/links" %>

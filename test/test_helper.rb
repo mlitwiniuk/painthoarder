@@ -27,7 +27,26 @@ end
 
 class ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
+
+  TURNSTILE_TOKEN = "test-turnstile-token"
+
+  # Cloudflare accepts any token by default; pass success: false to simulate a failed check.
+  setup { stub_turnstile }
+
+  def stub_turnstile(success: true)
+    body = success ? {success: true} : {:success => false, "error-codes" => ["invalid-input-response"]}
+    stub_request(:post, Turnstile::VERIFY_URL.to_s)
+      .to_return(status: 200, body: body.to_json, headers: {"Content-Type" => "application/json"})
+  end
+
+  # Form params including the Turnstile widget's hidden field.
+  def with_turnstile(params)
+    params.merge(Turnstile::RESPONSE_PARAM => TURNSTILE_TOKEN)
+  end
 end
+
+# Throttling is enabled per test in test/integration/rack_attack_test.rb.
+Rack::Attack.enabled = false
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
