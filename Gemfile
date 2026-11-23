@@ -76,7 +76,7 @@ group :test do
   gem "mocha"
   gem "shoulda-context"
   gem "shoulda-matchers"
-  gem "webmock", "~> 3.0"
+  gem "webmock", "~> 3.36"
 end
 
 group :development do
